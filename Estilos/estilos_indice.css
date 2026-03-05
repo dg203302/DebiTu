@@ -1,0 +1,51 @@
+/* Fuente (solo para el botón) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Botón de inicio de sesión con Google */
+.btn-google {
+	appearance: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	width: 100%;
+	max-width: 420px;
+	text-decoration: none;
+	padding: 10px 14px;
+	border-radius: 10px;
+	background: #ffffff;
+	color: #111827;
+	border: 1px solid #e5e7eb;
+	font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell,
+		Noto Sans, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
+	font-weight: 600;
+	transition: background-color 0.2s ease, transform 0.02s ease, box-shadow 0.2s ease;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.btn-google:hover { background: #f9fafb; }
+.btn-google:active { transform: translateY(1px); }
+.btn-google:focus-visible {
+	outline: 2px solid #3b82f6;
+	outline-offset: 2px;
+}
+
+.btn-google__icon {
+	width: 20px;
+	height: 20px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 20px;
+}
+
+.btn-google__icon img {
+	display: block;
+	width: 20px;
+	height: 20px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.btn-google { transition: none; }
+}
+

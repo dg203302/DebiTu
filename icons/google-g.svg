@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20" role="img" aria-label="Google">
+  <defs>
+    <clipPath id="gclip">
+      <circle cx="10" cy="10" r="9" />
+    </clipPath>
+  </defs>
+  <g clip-path="url(#gclip)">
+    <rect x="1" y="1" width="9" height="9" fill="#4285F4" />
+    <rect x="10" y="1" width="9" height="9" fill="#EA4335" />
+    <rect x="10" y="10" width="9" height="9" fill="#FBBC05" />
+    <rect x="1" y="10" width="9" height="9" fill="#34A853" />
+  </g>
+
+  <!-- “G” simple (sin depender de tipografías) -->
+  <circle
+    cx="10"
+    cy="10"
+    r="4.8"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="2.2"
+    stroke-linecap="round"
+    stroke-dasharray="26 6"
+    stroke-dashoffset="-3"
+  />
+  <path d="M10.2 10H14.2" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" />
+</svg>
