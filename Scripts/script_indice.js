@@ -8,7 +8,7 @@ document.getElementById('btn_google').addEventListener('click', async (e) => {
         const { data, error } = await client.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: '/'
+                redirectTo: '/index.html'
             }
         });
         if (error) {
