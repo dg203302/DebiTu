@@ -8,33 +8,62 @@
     <title>Bienvenido</title>
 </head>
 <body>
-    pantalla de carga
+    <main id="loading-screen" role="status" aria-live="polite" aria-busy="true">
+        <img class="loading-logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMzYiIGhlaWdodD0iMTM2IiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWxvYWRlci1pY29uIGx1Y2lkZS1sb2FkZXIiPjxwYXRoIGQ9Ik0xMiAydjQiLz48cGF0aCBkPSJtMTYuMiA3LjggMi45LTIuOSIvPjxwYXRoIGQ9Ik0xOCAxMmg0Ii8+PHBhdGggZD0ibTE2LjIgMTYuMiAyLjkgMi45Ii8+PHBhdGggZD0iTTEyIDE4djQiLz48cGF0aCBkPSJtNC45IDE5LjEgMi45LTIuOSIvPjxwYXRoIGQ9Ik0yIDEyaDQiLz48cGF0aCBkPSJtNC45IDQuOSAyLjkgMi45Ii8+PC9zdmc+" alt="Cargando">
+        <h1 class="loading-title">Cargando…</h1>
+        <p id="loading-status" class="loading-subtitle">Verificando sesión</p>
+    </main>
     <script type="module">
         import { loadSupaBseWithAuth } from '../Scripts/supabase.js';
-        const clientesup = await loadSupaBseWithAuth();
-        window.onload = async function(){
-            const id_usuario = localStorage.getItem('UserID');
-            if (id_usuario) {
-                window.location.href = '/Plantillas/Inicio.html';
-            } else {
+
+        const statusEl = document.getElementById('loading-status');
+        const setStatus = (msg) => { if (statusEl) statusEl.textContent = msg; };
+
+        (async () => {
+            try {
+                setStatus('Cargando Supabase…');
+                const clientesup = await loadSupaBseWithAuth();
+
+                setStatus('Verificando sesión…');
+                const id_usuario = localStorage.getItem('UserID');
+                if (id_usuario) {
+                    window.location.href = '/Plantillas/Inicio.html';
+                    return;
+                }
 
                 const {data: { session }, error} = await clientesup.auth.getSession();
-
                 if (error) {
-                    alert('Error al obtener la sesión:', error);
+                    setStatus('Error al obtener la sesión');
+                    alert('Error al obtener la sesión: ' + (error.message || error));
+                    return;
                 }
-                else if (session){
-                    alert('Mensaje temporal = Sesión obtenida:', session);
+
+                if (session) {
                     localStorage.setItem('UserID', session.user.id);
-                    localStorage.setItem('UserName', session.user.user_metadata.full_name);
+
+                    const meta = session.user?.user_metadata || {};
+                    const identity0 = Array.isArray(session.user?.identities)
+                        ? session.user.identities[0]?.identity_data
+                        : null;
+
+                    const userName = (meta.full_name || meta.name || meta.user_name || meta.username || session.user?.email || '').toString().trim();
+                    if (userName) localStorage.setItem('UserName', userName);
+                    else localStorage.removeItem('UserName');
+
+                    const userPhoto = (meta.avatar_url || meta.picture || identity0?.avatar_url || identity0?.picture || '').toString().trim();
+                    if (userPhoto) localStorage.setItem('UserPhoto', userPhoto);
+                    else localStorage.removeItem('UserPhoto');
                     window.location.href = '/Plantillas/Inicio.html';
+                    return;
                 }
-                else {
-                    alert('Mensaje temporal =No hay sesión activa');
-                    window.location.href = '/Plantillas/inicio_sesion.html';
-                }
+
+                window.location.href = '/Plantillas/inicio_sesion.html';
+            } catch (e) {
+                console.error(e);
+                setStatus('Ocurrió un error');
+                alert('Ocurrió un error al iniciar: ' + (e?.message || e));
             }
-        }
+        })();
     </script>
 </body>
 </html>

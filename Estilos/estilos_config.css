@@ -1,0 +1,279 @@
+
+/* Configuración
+   Coherente con la estética oscura del proyecto (Inicio/Clientes/Login)
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+	--bg: #0f172a;           /* slate-900 */
+	--bg-elev: #111827;      /* gray-900 */
+	--input: #0b1220;        /* más oscuro */
+	--text: #e5e7eb;         /* gray-200 */
+	--muted: #9ca3af;        /* gray-400 */
+	--heading: #f9fafb;      /* gray-50 */
+	--border: #1f2937;       /* gray-800 */
+	--primary: #3b82f6;      /* blue-500 */
+	--primary-600: #2563eb;  /* blue-600 */
+	--ring: rgba(59, 130, 246, 0.45);
+	--success: #10b981;      /* emerald-500 */
+	--danger: #ef4444;       /* red-500 */
+	--danger-600: #dc2626;   /* red-600 */
+	--footer-h: 64px;
+}
+
+/* Tema claro (para el toggle) */
+:root[data-theme="light"] {
+	--bg: #f8fafc;           /* slate-50 */
+	--bg-elev: #ffffff;      /* white */
+	--input: #f1f5f9;        /* slate-100 */
+	--text: #111827;         /* gray-900 */
+	--muted: #6b7280;        /* gray-500 */
+	--heading: #0f172a;      /* slate-900 */
+	--border: #e5e7eb;       /* gray-200 */
+	--ring: rgba(59, 130, 246, 0.30);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+
+body {
+	margin: 0;
+	font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell,
+		Noto Sans, Helvetica, Arial;
+	background: var(--bg);
+	color: var(--text);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #0b1220; }
+:root[data-theme="light"] ::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+:root[data-theme="light"] ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+:root[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+header, main {
+	width: 100%;
+	max-width: 1100px;
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: 16px;
+	padding-right: 16px;
+}
+
+header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding-top: 24px;
+	padding-bottom: 12px;
+}
+
+header h1 {
+	margin: 0;
+	font-size: 1.75rem;
+	line-height: 2.25rem;
+	font-weight: 800;
+	color: var(--heading);
+}
+
+main {
+	display: grid;
+	gap: 16px;
+	padding-bottom: calc(24px + var(--footer-h) + env(safe-area-inset-bottom, 0px));
+}
+
+main > section {
+	background: var(--bg-elev);
+	border: 1px solid var(--border);
+	border-radius: 16px;
+	padding: 16px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 6px 24px rgba(0, 0, 0, 0.20);
+}
+
+main > section > h1 {
+	margin: 0 0 12px 0;
+	font-size: 1.125rem;
+	line-height: 1.5rem;
+	font-weight: 800;
+	color: var(--heading);
+}
+
+main h3 {
+	margin: 0;
+	font-size: 0.95rem;
+	font-weight: 700;
+	color: var(--heading);
+}
+
+/* Datos personales */
+main > section:first-of-type > div {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+#pfp {
+	width: 56px;
+	height: 56px;
+	border-radius: 14px;
+	border: 1px solid var(--border);
+	background: var(--input);
+	object-fit: cover;
+}
+
+#Datos_cuenta {
+	margin: 0;
+	color: var(--muted);
+	font-weight: 600;
+	overflow-wrap: anywhere;
+}
+
+/* Preferencias */
+main > section:nth-of-type(2) > div {
+	display: grid;
+	gap: 12px;
+}
+
+main > section:nth-of-type(2) > div > div {
+	background: var(--input);
+	border: 1px solid var(--border);
+	border-radius: 14px;
+	padding: 12px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+main > section:nth-of-type(2) > div > div:nth-of-type(2) {
+	justify-content: flex-start;
+}
+main > section:nth-of-type(2) > div > div:nth-of-type(2) h3 {
+	flex: 1 1 180px;
+}
+main > section:nth-of-type(2) > div > div:nth-of-type(2) button {
+	flex: 0 0 auto;
+}
+
+button {
+	appearance: none;
+	background: var(--primary);
+	color: #ffffff;
+	font-weight: 700;
+	border: 0;
+	border-radius: 12px;
+	padding: 10px 14px;
+	cursor: pointer;
+	transition: background-color 0.2s ease, transform 0.02s ease, box-shadow 0.2s ease;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.2), 0 2px 6px rgba(0,0,0,0.25);
+}
+
+button:hover { background: var(--primary-600); }
+button:active { transform: translateY(1px); }
+button:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 3px var(--ring);
+}
+
+#eliminar-cuenta-btn {
+	background: var(--danger);
+}
+#eliminar-cuenta-btn:hover {
+	background: var(--danger-600);
+}
+
+/* Créditos */
+main > section:last-of-type {
+	text-align: center;
+	color: var(--muted);
+}
+
+main > section:last-of-type p {
+	margin: 0;
+	font-weight: 600;
+}
+
+/* Footer */
+footer {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	min-height: var(--footer-h);
+	background: var(--bg);
+	border-top: 1px solid var(--border);
+	padding: 8px 12px;
+	padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 14px;
+}
+
+footer a,
+footer button {
+	background: transparent;
+	color: var(--text);
+	border: 1px solid var(--border);
+	box-shadow: none;
+	padding: 10px;
+	border-radius: 14px;
+}
+
+footer a:hover,
+footer button:hover {
+	background: rgba(255,255,255,0.04);
+}
+
+:root[data-theme="light"] footer a:hover,
+:root[data-theme="light"] footer button:hover {
+	background: rgba(15, 23, 42, 0.04);
+}
+
+img {
+	width: 25px;
+	height: 25px;
+}
+
+/* En tema claro, los SVG embebidos (blancos) necesitan invertirse */
+:root[data-theme="light"] footer img {
+	filter: invert(1);
+}
+
+/* SweetAlert2 (coherente y compatible con ambos temas) */
+.swal2-popup {
+	background: var(--bg-elev) !important;
+	color: var(--text) !important;
+	border: 1px solid var(--border);
+	border-radius: 16px;
+}
+
+.swal2-title { color: var(--heading) !important; }
+.swal2-html-container { color: var(--text) !important; }
+
+.swal2-confirm {
+	background: var(--primary) !important;
+	border-radius: 10px !important;
+}
+.swal2-confirm:hover { background: var(--primary-600) !important; }
+
+.swal2-cancel {
+	background: transparent !important;
+	color: var(--text) !important;
+	border: 1px solid var(--border) !important;
+	border-radius: 10px !important;
+}
+
+.swal2-actions .swal2-styled:focus { box-shadow: 0 0 0 3px var(--ring) !important; }
+
+@media (prefers-reduced-motion: reduce) {
+	* { transition: none !important; }
+}
+

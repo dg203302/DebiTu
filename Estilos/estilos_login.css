@@ -1,0 +1,203 @@
+
+/*
+	Login (Google OAuth)
+	Estética oscura coherente con el resto del sistema (Inicio)
+	- Tipografía Inter
+	- Tarjeta central con borde/sombra
+	- Botón Google con icono y foco visible
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+	--bg: #0f172a;           /* slate-900 */
+	--bg-elev: #111827;      /* gray-900 */
+	--input: #0b1220;        /* más oscuro */
+	--text: #e5e7eb;         /* gray-200 */
+	--muted: #9ca3af;        /* gray-400 */
+	--heading: #f9fafb;      /* gray-50 */
+	--border: #1f2937;       /* gray-800 */
+	--primary: #3b82f6;      /* blue-500 */
+	--primary-600: #2563eb;  /* blue-600 */
+	--ring: rgba(59, 130, 246, 0.45);
+	--success: #10b981;      /* emerald-500 */
+	--danger: #ef4444;       /* red-500 */
+	--footer-h: 56px;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+
+body {
+	margin: 0;
+	font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell,
+		Noto Sans, Helvetica, Arial;
+	background: var(--bg);
+	color: var(--text);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	display: grid;
+	place-items: center;
+	padding: 24px;
+	padding-bottom: calc(24px + var(--footer-h) + env(safe-area-inset-bottom, 0px));
+}
+
+/* Scrollbar (oscuro) */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #0b1220; }
+::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+
+main {
+	width: 100%;
+	max-width: 420px;
+	background: var(--bg-elev);
+	border: 1px solid var(--border);
+	border-radius: 16px;
+	padding: 24px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 6px 24px rgba(0, 0, 0, 0.24);
+	display: grid;
+	gap: 14px;
+	justify-items: stretch;
+	text-align: center;
+}
+
+h1 {
+	margin: 6px 0 4px;
+	font-size: 1.75rem;
+	line-height: 2.25rem;
+	font-weight: 800;
+	color: var(--heading);
+}
+
+/* Botón Google */
+.btn-google {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	text-decoration: none;
+	width: 100%;
+	padding: 12px 14px;
+	border-radius: 14px;
+	border: 1px solid var(--border);
+	background: var(--input);
+	color: var(--text);
+	font-weight: 700;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.12), 0 6px 24px rgba(0,0,0,0.18);
+	transition: background-color 0.2s ease, transform 0.02s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-google:hover {
+	background: rgba(255,255,255,0.04);
+}
+
+.btn-google:active {
+	transform: translateY(1px);
+}
+
+.btn-google:focus-visible {
+	outline: none;
+	border-color: var(--primary);
+	box-shadow: 0 0 0 3px var(--ring);
+}
+
+.btn-google__icon {
+	width: 40px;
+	height: 40px;
+	border-radius: 12px;
+	background: #fff;
+	display: grid;
+	place-items: center;
+	flex: 0 0 auto;
+}
+
+.btn-google__text {
+	line-height: 1.2;
+}
+
+/* Link secundario (inicio_sesion_og.html) */
+main > a:not(.btn-google) {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-decoration: none;
+	width: 100%;
+	padding: 12px 14px;
+	border-radius: 14px;
+	border: 1px solid var(--border);
+	background: transparent;
+	color: var(--muted);
+	font-weight: 700;
+	transition: background-color 0.2s ease, transform 0.02s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+main > a:not(.btn-google):hover {
+	background: rgba(255,255,255,0.03);
+	color: var(--text);
+}
+
+main > a:not(.btn-google):active {
+	transform: translateY(1px);
+}
+
+main > a:not(.btn-google):focus-visible {
+	outline: none;
+	border-color: var(--primary);
+	box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* SweetAlert2: tema oscuro coherente (toasts/alerts) */
+.swal2-popup {
+	background: var(--bg-elev) !important;
+	color: var(--text) !important;
+	border: 1px solid var(--border);
+	border-radius: 16px;
+}
+.swal2-title { color: var(--heading) !important; }
+.swal2-html-container { color: var(--text) !important; }
+.swal2-confirm {
+	background: var(--primary) !important;
+	border-radius: 10px !important;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
+}
+.swal2-confirm:hover { background: var(--primary-600) !important; }
+.swal2-cancel {
+	background: transparent !important;
+	color: var(--text) !important;
+	border: 1px solid var(--border) !important;
+	border-radius: 10px !important;
+}
+.swal2-input {
+	background: var(--input) !important;
+	color: var(--text) !important;
+	border: 1px solid var(--border) !important;
+	border-radius: 10px !important;
+}
+.swal2-actions .swal2-styled:focus { box-shadow: 0 0 0 3px var(--ring) !important; }
+
+@media (prefers-reduced-motion: reduce) {
+	* { transition: none !important; }
+}
+
+footer {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	min-height: var(--footer-h);
+	background: var(--bg);
+	color: var(--muted);
+	font-size: 0.875rem;
+	padding: 8px 12px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+
+footer p {
+	margin: 0;
+}
+

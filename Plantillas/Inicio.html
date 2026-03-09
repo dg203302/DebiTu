@@ -10,9 +10,9 @@
     <header>
         <div>
             <h1>Inicio</h1>
-            <h4>Buen dia, <p id="nombre_usu"></p></h4>
+            <h4 id="bienvenida"></h4>
         </div>
-        <button onclick="cerrarSesion()"><img src="https://img.icons8.com/?size=100&id=zG8bcABNFjRw&format=png&color=000000" alt="Cerrar Sesión"></button>
+        <img src="" alt="img_user" id="pfp">
     </header>
     <main>
         <section id="kpi_adeudado_mes">
@@ -20,19 +20,74 @@
                 <h2>Deuda Total Activa</h2>
                 <h1 id="total_adeudado_mes">Cargando...</h1>
             </div>
-            <button onclick="recargarMontos()"><img src="https://img.icons8.com/ios/50/reboot.png" alt="Recargar"></button>
+            <button onclick="recargarMontos()"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1yb3RhdGUtY2N3LWljb24gbHVjaWRlLXJvdGF0ZS1jY3ciPjxwYXRoIGQ9Ik0zIDEyYTkgOSAwIDEgMCA5LTkgOS43NSA5Ljc1IDAgMCAwLTYuNzQgMi43NEwzIDgiLz48cGF0aCBkPSJNMyAzdjVoNSIvPjwvc3ZnPg==" alt="Recargar"></button>
         </section>
         
         <section id="btnes_nav">
             <a href="/Plantillas/administracion_clientes.html">Administrar Clientes</a>
-            <a href="#" onclick="realizarOperacion(event)">Realizar Operación</a>
+            <a href="#" id="btn_realiz_op" onclick="realizarOperacion(event)">Realizar Operación</a>
         </section>
+        <section id="Operacion-ingreso" hidden>
+            <h2>Registrar Operación</h2>
+            <div class="op-reg">
+                <label for="op_clientSearch" style="font-weight:600">Buscar Cliente (nombre o teléfono)</label>
+                <input id="op_clientSearch" placeholder="Escribe nombre o teléfono" autocomplete="off" inputmode="search">
+                <div id="op_clientMatches" class="client-matches" aria-live="polite"></div>
 
+                <label for="op_category" style="font-weight:600">Detalles</label>
+                <input id="op_category" placeholder="Detalles (p.ej. Servicio, Producto)">
+
+                <label for="op_amount" style="font-weight:600">Monto</label>
+                <input id="op_amount" class="reg-amount" value="0" inputmode="decimal">
+
+                <div id="op_calc" class="calc-grid" aria-label="Calculadora">
+                    <button type="button" class="calc-btn" data-key="7">7</button>
+                    <button type="button" class="calc-btn" data-key="8">8</button>
+                    <button type="button" class="calc-btn" data-key="9">9</button>
+                    <button type="button" class="calc-op" data-op="/">÷</button>
+
+                    <button type="button" class="calc-btn" data-key="4">4</button>
+                    <button type="button" class="calc-btn" data-key="5">5</button>
+                    <button type="button" class="calc-btn" data-key="6">6</button>
+                    <button type="button" class="calc-op" data-op="*">×</button>
+
+                    <button type="button" class="calc-btn" data-key="1">1</button>
+                    <button type="button" class="calc-btn" data-key="2">2</button>
+                    <button type="button" class="calc-btn" data-key="3">3</button>
+                    <button type="button" class="calc-op" data-op="-">-</button>
+
+                    <button type="button" class="calc-btn" data-key="0">0</button>
+                    <button type="button" class="calc-btn" data-key=".">.</button>
+                    <button type="button" id="op_calc_eq">=</button>
+                    <button type="button" class="calc-op" data-op="+">+</button>
+                </div>
+
+                <div class="reg-actions">
+                    <button type="button" id="op_calc_back" title="Borrar un dígito">⌫</button>
+                    <button type="button" id="op_calc_clear">C</button>
+                </div>
+
+                <div class="type-row" role="radiogroup" aria-label="Tipo de operación">
+                    <label class="type-option" for="op_chkPago">
+                        <input type="radio" name="op_tipo" id="op_chkPago" value="pago">
+                        Pago
+                    </label>
+                    <label class="type-option" for="op_chkDeuda">
+                        <input type="radio" name="op_tipo" id="op_chkDeuda" value="deuda" checked>
+                        Deuda
+                    </label>
+                </div>
+
+                <div class="op-submit">
+                    <button type="button" id="op_registrar" class="btn">Registrar Operación</button>
+                </div>
+            </div>
+        </section>
         <section id="operaciones_rec">
             <div style="display: flex;flex-direction: row; align-items: center; justify-content: space-between;">
                 <h2>Operaciones Recientes</h2>
                 <div id="botones">
-                    <button onclick="recargarTabla()" id="boton_expandir"><img src="https://img.icons8.com/ios/50/reboot.png" alt="Recargar"></button>
+                    <button onclick="recargarTabla()" id="boton_expandir"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1yb3RhdGUtY2N3LWljb24gbHVjaWRlLXJvdGF0ZS1jY3ciPjxwYXRoIGQ9Ik0zIDEyYTkgOSAwIDEgMCA5LTkgOS43NSA5Ljc1IDAgMCAwLTYuNzQgMi43NEwzIDgiLz48cGF0aCBkPSJNMyAzdjVoNSIvPjwvc3ZnPg==" alt="Recargar"></button>
                 </div>
             </div>
             <div class="tabs" role="tablist" aria-label="Filtro de operaciones">
@@ -46,7 +101,11 @@
 
     </main>
     <footer>
-        <p>&copy;<p id="anio"></p> Sistema de Clientes. Todos los derechos reservados.</p>
+        
+        <a href="/Plantillas/Configuracion.html"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1jb2ctaWNvbiBsdWNpZGUtY29nIj48cGF0aCBkPSJNMTEgMTAuMjcgNyAzLjM0Ii8+PHBhdGggZD0ibTExIDEzLjczLTQgNi45MyIvPjxwYXRoIGQ9Ik0xMiAyMnYtMiIvPjxwYXRoIGQ9Ik0xMiAydjIiLz48cGF0aCBkPSJNMTQgMTJoOCIvPjxwYXRoIGQ9Im0xNyAyMC42Ni0xLTEuNzMiLz48cGF0aCBkPSJtMTcgMy4zNC0xIDEuNzMiLz48cGF0aCBkPSJNMiAxMmgyIi8+PHBhdGggZD0ibTIwLjY2IDE3LTEuNzMtMSIvPjxwYXRoIGQ9Im0yMC42NiA3LTEuNzMgMSIvPjxwYXRoIGQ9Im0zLjM0IDE3IDEuNzMtMSIvPjxwYXRoIGQ9Im0zLjM0IDcgMS43MyAxIi8+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMiIvPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjgiLz48L3N2Zz4=" alt="config"></a>
+        
+        <button onclick="cerrarSesion()"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1sb2ctb3V0LWljb24gbHVjaWRlLWxvZy1vdXQiPjxwYXRoIGQ9Im0xNiAxNyA1LTUtNS01Ii8+PHBhdGggZD0iTTIxIDEySDkiLz48cGF0aCBkPSJNOSAyMUg1YTIgMiAwIDAgMS0yLTJWNWEyIDIgMCAwIDEgMi0yaDQiLz48L3N2Zz4=" alt="Cerrar Sesión"></button>
+
     </footer>
     <script src="/Scripts/script_inicio.js" type="module"></script>
 </body>

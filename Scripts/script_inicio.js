@@ -1,8 +1,9 @@
-import {showError, showSuccess, showErrorToast, showSuccessToast, showinfo, showInfoHTML} from './sweetalert2.js'
+import {showError, showSuccess, showErrorToast, showSuccessToast, showinfo, showInfoHTML, loadSweetAlert2} from './sweetalert2.js'
 import {loadSupabase, loadSupaBseWithAuth} from './supabase.js'
 const client= await loadSupabase();
 let currentOpView = 'deudas'; // 'deudas' | 'pagos'
 let isExpanded = false; // controls whether list shows all items or limited
+let operacionIngresoInit = false;
 
 // --- Multi-tenant helper (ID_Negocio) ---
 // Regla:
@@ -33,9 +34,10 @@ window.onload = async function() {
     /*if (!localStorage.getItem('UserID')) {
         window.location.href = '/index.html';
     }*/
-   document.getElementById("nombre_usu").textContent = localStorage.getItem('UserName') || 'Usuario';
-    document.getElementById("anio").textContent = new Date().getFullYear();
+    document.getElementById("bienvenida").textContent = textoB();
+    document.getElementById("pfp").src = localStorage.getItem("UserPhoto");
     await cargarMontoAdeudadoMensual();
+    prepararOperacionIngreso();
     prepararTabsOperaciones();
     await mostrarOperaciones('deudas');
 };
@@ -57,10 +59,320 @@ window.expandirTabla = function(){
 }
 
 // Función invocada desde el enlace "Realizar Operación" en el HTML.
-// Muestra un modal para elegir entre registrar Deuda o Pago.
-window.realizarOperacion = async function(e){
+// Ahora solo oculta/muestra la sección embebida #Operacion-ingreso.
+window.realizarOperacion = function(e){
     if (e && typeof e.preventDefault === 'function') e.preventDefault();
-   await openRegistroOperacion();
+    const section = document.getElementById('Operacion-ingreso');
+    if (!section) return;
+    section.hidden = !section.hidden;
+    const btn = document.getElementById('btn_realiz_op');
+    if (btn) btn.textContent = section.hidden ? 'Realizar Operación' : 'Cerrar Operación';
+    if (!section.hidden){
+        // Preparar listeners si aún no se inicializó
+        prepararOperacionIngreso();
+        const input = document.getElementById('op_clientSearch');
+        if (input) setTimeout(() => input.focus(), 0);
+    }
+}
+
+function prepararOperacionIngreso(){
+    if (operacionIngresoInit) return;
+    const section = document.getElementById('Operacion-ingreso');
+    if (!section) return;
+
+    const input = document.getElementById('op_clientSearch');
+    const matches = document.getElementById('op_clientMatches');
+    const catInput = document.getElementById('op_category');
+    const amount = document.getElementById('op_amount');
+    const chkPago = document.getElementById('op_chkPago');
+    const chkDeuda = document.getElementById('op_chkDeuda');
+    const btnRegistrar = document.getElementById('op_registrar');
+
+    const calc = document.getElementById('op_calc');
+    const eq = document.getElementById('op_calc_eq');
+    const clear = document.getElementById('op_calc_clear');
+    const back = document.getElementById('op_calc_back');
+
+    if (!input || !matches || !catInput || !amount || !chkPago || !chkDeuda || !btnRegistrar || !calc || !eq || !clear || !back) {
+        console.warn('No se pudo inicializar Operacion-ingreso: faltan elementos del formulario.');
+        return;
+    }
+
+    operacionIngresoInit = true;
+
+    // --- Búsqueda de clientes ---
+    let debounceTimer = null;
+
+    async function loadMatches(term){
+        matches.innerHTML = '';
+        matches.selectedClient = null;
+        if (!term) return;
+        try{
+            const orQuery = `Nombre.ilike.%${term}%,Telefono.ilike.%${term}%`;
+            let q = client
+                .from('Clientes')
+                .select('Nombre, Telefono')
+                .or(orQuery)
+                .limit(50);
+            q = applyIdNegocioFilter(q);
+            const { data, error } = await q;
+            if (error) {
+                console.error(error);
+                matches.innerHTML = '<div class="muted">Error de búsqueda</div>';
+                return;
+            }
+            if (!data || data.length === 0) {
+                matches.innerHTML = '<div class="muted">No hay coincidencias</div>';
+                return;
+            }
+
+            data.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'match-item';
+                div.innerHTML = `<strong>${escapeHtml(c.Nombre ?? '')}</strong><br><small class="muted">${escapeHtml(c.Telefono ?? '')}</small>`;
+                div.addEventListener('click', () => {
+                    input.value = (c.Nombre ?? '').trim() || (c.Telefono ?? '');
+                    matches.selectedClient = c;
+                    matches.innerHTML = '';
+                    input.focus();
+                });
+                matches.appendChild(div);
+            });
+        }catch(err){
+            console.error('Busqueda clientes error', err);
+            matches.innerHTML = '<div class="muted">Error de búsqueda</div>';
+        }
+    }
+
+    input.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => loadMatches(input.value.trim()), 250);
+    });
+
+    // --- LÓGICA DE CALCULADORA ---
+    const btns = calc.querySelectorAll('.calc-btn');
+    const ops = calc.querySelectorAll('.calc-op');
+
+    let currentDisplay = '0';
+    let firstOperand = null;
+    let operator = null;
+    let waitingForSecondOperand = false;
+
+    function getOperatorSymbol(op) {
+        if (op === '+') return '+';
+        if (op === '-') return '-';
+        if (op === '*') return '×';
+        if (op === '/') return '÷';
+        return '';
+    }
+
+    function updateDisplay(value) {
+        currentDisplay = String(value);
+        amount.value = currentDisplay;
+        amount.placeholder = '';
+    }
+
+    function calculate(first, second, op) {
+        first = parseFloat(first);
+        second = parseFloat(second);
+        if (op === '+') return first + second;
+        if (op === '-') return first - second;
+        if (op === '*') return first * second;
+        if (op === '/') return second === 0 ? first : first / second;
+        return second;
+    }
+
+    function handleDigit(digit) {
+        if (waitingForSecondOperand) {
+            currentDisplay = digit;
+            waitingForSecondOperand = false;
+        } else {
+            if (currentDisplay === '0') currentDisplay = digit;
+            else currentDisplay += digit;
+        }
+        updateDisplay(currentDisplay);
+    }
+
+    function handleDecimal() {
+        if (waitingForSecondOperand) {
+            currentDisplay = '0.';
+            waitingForSecondOperand = false;
+            updateDisplay(currentDisplay);
+            return;
+        }
+        if (!currentDisplay.includes('.')) currentDisplay += '.';
+        updateDisplay(currentDisplay);
+    }
+
+    function handleOperator(nextOperator) {
+        if (nextOperator !== '+' && nextOperator !== '-' && nextOperator !== '*' && nextOperator !== '/') return;
+
+        const inputValue = parseFloat(currentDisplay);
+        if (operator && waitingForSecondOperand) {
+            operator = nextOperator;
+            amount.value = String(currentDisplay) + ' ' + getOperatorSymbol(operator);
+            return;
+        }
+
+        if (firstOperand === null) {
+            firstOperand = inputValue;
+        } else if (operator) {
+            const result = calculate(firstOperand, inputValue, operator);
+            firstOperand = result;
+            updateDisplay(firstOperand.toFixed(2));
+        }
+
+        amount.value = String(currentDisplay) + ' ' + getOperatorSymbol(nextOperator);
+        waitingForSecondOperand = true;
+        operator = nextOperator;
+    }
+
+    function handleEquals() {
+        if (operator === null || waitingForSecondOperand) return;
+        const inputValue = parseFloat(currentDisplay);
+        const result = calculate(firstOperand, inputValue, operator);
+        updateDisplay(result.toFixed(2));
+        firstOperand = result;
+        operator = null;
+        waitingForSecondOperand = true;
+    }
+
+    function clearCalculator() {
+        currentDisplay = '0';
+        firstOperand = null;
+        operator = null;
+        waitingForSecondOperand = false;
+        updateDisplay(currentDisplay);
+        amount.placeholder = '';
+    }
+
+    function backspace() {
+        if (waitingForSecondOperand) {
+            if (operator) {
+                operator = null;
+                waitingForSecondOperand = false;
+                amount.value = String(currentDisplay);
+                return;
+            }
+            waitingForSecondOperand = false;
+        }
+
+        if (!currentDisplay || currentDisplay === '0') return;
+        if (currentDisplay.length <= 1 || (currentDisplay.length === 2 && currentDisplay.startsWith('-'))) {
+            updateDisplay('0');
+        } else {
+            updateDisplay(currentDisplay.slice(0, -1));
+        }
+    }
+
+    btns.forEach(b => b.addEventListener('click', () => {
+        const k = b.dataset.key;
+        if (k === '.') handleDecimal();
+        else handleDigit(k);
+    }));
+
+    ops.forEach(o => o.addEventListener('click', () => handleOperator(o.dataset.op)));
+    eq.addEventListener('click', handleEquals);
+    clear.addEventListener('click', clearCalculator);
+    back.addEventListener('click', backspace);
+
+    if (amount.value !== '0') currentDisplay = amount.value;
+
+    // --- Registrar operación ---
+    btnRegistrar.addEventListener('click', async () => {
+        btnRegistrar.disabled = true;
+        try{
+            const tipo = chkPago.checked ? 'pago' : 'deuda';
+            const name = input.value.trim();
+            const categoria = catInput.value.trim();
+            const monto = parseFloat(amount.value);
+
+            if (isNaN(monto) || monto <= 0) {
+                await showErrorToast('Ingrese un monto válido mayor a 0');
+                return;
+            }
+
+            let phoneValue = null;
+            if (matches.selectedClient) phoneValue = matches.selectedClient.Telefono ?? null;
+            if (!phoneValue) {
+                const possible = name || '';
+                const digits = (possible.match(/\d+/g) || []).join('');
+                if (digits.length >= 6) phoneValue = digits;
+            }
+
+            const payload = {
+                Monto: monto,
+                Categoria: categoria,
+                Telefono_cliente: phoneValue,
+            };
+
+            const idNegocio = getIdNegocioForWrite();
+            if (idNegocio === undefined){
+                await showErrorToast('No se encontró el ID de usuario (UserID). Iniciá sesión nuevamente.');
+                return;
+            }
+            payload.ID_Negocio = idNegocio;
+
+            const table = tipo === 'deuda' ? 'Deudas' : 'Pagos';
+            const { error } = await client.from(table).insert(payload);
+            if (error){
+                await showErrorToast('Error al registrar: ' + (error.message || error));
+                return;
+            }
+
+            // Actualizar Deuda_Activa según tipo
+            if (phoneValue) {
+                let qClient = client
+                    .from('Clientes')
+                    .select('Deuda_Activa')
+                    .eq('Telefono', phoneValue);
+                qClient = applyIdNegocioFilter(qClient);
+                const { data: clientData, error: selectError } = await qClient.single();
+                if (selectError) {
+                    console.error('Error al obtener deuda actual del cliente', selectError);
+                    await showSuccessToast('Operación registrada');
+                    await showErrorToast('No se pudo obtener la deuda actual del cliente: ' + (selectError.message || selectError));
+                } else {
+                    const current = Number(clientData?.Deuda_Activa ?? 0) || 0;
+                    const delta = Number(payload.Monto) || 0;
+                    const newDeuda = tipo === 'deuda'
+                        ? parseFloat((current + delta).toFixed(2))
+                        : parseFloat(Math.max(0, current - delta).toFixed(2));
+                    let upd = client
+                        .from('Clientes')
+                        .update({ Deuda_Activa: newDeuda })
+                        .eq('Telefono', phoneValue);
+                    upd = applyIdNegocioFilter(upd);
+                    const { error: updError } = await upd;
+                    if (updError){
+                        console.error('Error al actualizar deuda del cliente', updError);
+                        await showSuccessToast('Operación registrada');
+                        await showErrorToast('No se pudo actualizar la deuda del cliente: ' + (updError.message || updError));
+                    } else {
+                        await showSuccessToast('Operación registrada correctamente');
+                    }
+                }
+            } else {
+                await showSuccessToast('Operación registrada correctamente');
+            }
+
+            try { await recargarMontos(); } catch(e){}
+            try { await recargarTabla(); } catch(e){}
+
+            // Reset básico del formulario
+            input.value = '';
+            catInput.value = '';
+            matches.innerHTML = '';
+            matches.selectedClient = null;
+            chkDeuda.checked = true;
+            clearCalculator();
+        }catch(err){
+            console.error(err);
+            await showErrorToast('Error al registrar la operación');
+        }finally{
+            btnRegistrar.disabled = false;
+        }
+    });
 }
 async function cargarPagosRecientes(){
     const { data, error } = await applyIdNegocioFilter(
@@ -780,7 +1092,10 @@ async function recargarMontos(){
 window.recargarMontos=recargarMontos;
 window.recargarTabla = recargarTabla;
 
-document.getElementById("deuda_total").addEventListener("click", async function() {
+const __deudaTotalEl = document.getElementById("deuda_total");
+if (__deudaTotalEl){
+__deudaTotalEl.addEventListener("click", async function() {
+    const Swal = await loadSweetAlert2();
     await Swal.fire({
         title: 'Desglose de Deuda Total Activa',
         html: 'Cargando...',
@@ -832,3 +1147,17 @@ document.getElementById("deuda_total").addEventListener("click", async function(
         }
     })
 });
+}
+
+function textoB(){
+    const tiempo_actual = new Date();
+    const texo_cont = document.getElementById("bienvenida");
+    const nombre = localStorage.getItem("UserName");
+    if (tiempo_actual.getHours() >= 5 && tiempo_actual.getHours() < 12) {
+        return `¡Buenos días, ${nombre}!`;
+    } else if (tiempo_actual.getHours() >= 12 && tiempo_actual.getHours() < 18) {
+        return `¡Buenas tardes, ${nombre}!`;
+    } else {
+        return `¡Buenas noches, ${nombre}!`;
+    }
+}

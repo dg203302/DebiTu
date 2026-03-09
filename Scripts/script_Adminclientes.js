@@ -921,3 +921,7 @@ async function eliminarDeudasCliente(telefono){
         return false;
     }
 }
+window.cerrarSesion=function() {
+    localStorage.clear();
+    window.location.href = "/index.html";
+}
