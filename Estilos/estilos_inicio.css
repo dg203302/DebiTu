@@ -26,6 +26,18 @@
 	--footer-h: 64px;
 }
 
+/* Tema claro (se activa con :root[data-theme="light"]) */
+:root[data-theme="light"] {
+	--bg: #f8fafc;           /* slate-50 */
+	--bg-elev: #ffffff;      /* white */
+	--input: #f1f5f9;        /* slate-100 */
+	--text: #111827;         /* gray-900 */
+	--muted: #6b7280;        /* gray-500 */
+	--heading: #0f172a;      /* slate-900 */
+	--border: #e5e7eb;       /* gray-200 */
+	--ring: rgba(59, 130, 246, 0.30);
+}
+
 /* Reset y base */
 * { box-sizing: border-box; }
 html, body { height: 100%; }
@@ -41,9 +53,12 @@ body {
 
 /* Scrollbar (oscuro) */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: #0b1220; }
+::-webkit-scrollbar-track { background: var(--input); }
 ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+
+:root[data-theme="light"] ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+:root[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
 /* Layout principal */
 header, main {
@@ -71,6 +86,29 @@ header h1 {
 	color: var(--heading);
 }
 
+header .header-text {
+	display: grid;
+	gap: 4px;
+}
+
+header #bienvenida {
+	margin: 0;
+	font-size: 1rem;
+	line-height: 1.25rem;
+	font-weight: 700;
+	color: var(--muted);
+}
+
+header #pfp {
+	width: 72px;
+	height: 72px;
+	border-radius: 18px;
+	border: 1px solid var(--border);
+	background: var(--input);
+	object-fit: cover;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.12), 0 6px 24px rgba(0,0,0,0.18);
+}
+
 /* Botón de cerrar sesión */
 header button {
 	appearance: none;
@@ -83,7 +121,7 @@ header button {
 	cursor: pointer;
 	transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
-header button:hover { background: #0b1220; }
+header button:hover { background: var(--input); }
 header button:focus-visible {
 	outline: none;
 	border-color: var(--primary);
@@ -185,7 +223,7 @@ main {
 #Operacion-ingreso .client-matches {
 	max-height: 35vh;
 	overflow: auto;
-	background: #0b1220;
+	background: var(--input);
 	border: 1px solid var(--border);
 	border-radius: 12px;
 }
@@ -223,7 +261,7 @@ main {
 
 #Operacion-ingreso .calc-grid button {
 	min-height: 44px;
-	background: #0b1220;
+	background: var(--input);
 	border: 1px solid var(--border);
 	color: var(--text);
 	border-radius: 8px;
@@ -335,7 +373,7 @@ main {
 }
 #operaciones_rec .tabs {
 	display: inline-flex;
-	background: #0b1220;
+	background: var(--input);
 	border: 1px solid var(--border);
 	border-radius: 12px;
 	padding: 4px;
@@ -364,7 +402,7 @@ main {
 }
 /* Tarjeta para cada ítem (si se generan div/li dentro) */
 #lista_operaciones > * {
-	background: #0b1220;
+	background: var(--input);
 	border: 1px solid var(--border);
 	border-radius: 12px;
 	padding: 12px;
@@ -504,7 +542,7 @@ button:disabled, .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 .swal2-html-container #calc .calc-op,
 .swal2-html-container #calc #calc-eq,
 .swal2-html-container #calc #calc-clear {
-	background: #0b1220;
+	background: var(--input);
 	border: 1px solid var(--border);
 	color: var(--text);
 	border-radius: 8px;

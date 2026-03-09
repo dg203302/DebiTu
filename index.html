@@ -4,6 +4,14 @@
     <link rel="manifest" href="/manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        (function () {
+            try {
+                var t = (localStorage.getItem('CMS_THEME') || '').toString().trim().toLowerCase();
+                document.documentElement.dataset.theme = (t === 'light' || t === 'claro') ? 'light' : 'dark';
+            } catch (e) {}
+        })();
+    </script>
     <link rel="stylesheet" href="/Estilos/estilos_pantalla_carga.css">
     <title>Bienvenido</title>
 </head>

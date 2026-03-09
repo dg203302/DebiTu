@@ -1075,7 +1075,8 @@ function actualizarColor(indicador){
     const valor = parseFloat(valorStr);
     if (Number.isNaN(valor)) return;
     if (valor === 0) {
-        indicador.style.color = 'white';
+        const isLight = document.documentElement?.dataset?.theme === 'light'
+        indicador.style.color = isLight ? 'var(--text)' : 'white';
     } else if (valor > 0 && valor <=100000){
         indicador.style.color = 'green';
     }

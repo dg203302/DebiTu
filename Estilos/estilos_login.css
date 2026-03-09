@@ -25,6 +25,18 @@
 	--footer-h: 56px;
 }
 
+/* Tema claro (se activa con :root[data-theme="light"]) */
+:root[data-theme="light"] {
+	--bg: #f8fafc;
+	--bg-elev: #ffffff;
+	--input: #f1f5f9;
+	--text: #111827;
+	--muted: #6b7280;
+	--heading: #0f172a;
+	--border: #e5e7eb;
+	--ring: rgba(59, 130, 246, 0.30);
+}
+
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 
@@ -44,9 +56,12 @@ body {
 
 /* Scrollbar (oscuro) */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: #0b1220; }
+::-webkit-scrollbar-track { background: var(--input); }
 ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+
+:root[data-theme="light"] ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+:root[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
 main {
 	width: 100%;

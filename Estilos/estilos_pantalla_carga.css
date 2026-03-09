@@ -11,6 +11,15 @@
 	--ring: rgba(59, 130, 246, 0.45);
 }
 
+:root[data-theme="light"] {
+	--bg: #f8fafc;
+	--bg-elev: #ffffff;
+	--text: #111827;
+	--muted: #6b7280;
+	--border: #e5e7eb;
+	--ring: rgba(59, 130, 246, 0.30);
+}
+
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 

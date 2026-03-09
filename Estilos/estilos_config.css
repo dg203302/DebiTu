@@ -20,6 +20,7 @@
 	--danger: #ef4444;       /* red-500 */
 	--danger-600: #dc2626;   /* red-600 */
 	--footer-h: 64px;
+	--switch-thumb: var(--heading);
 }
 
 /* Tema claro (para el toggle) */
@@ -32,6 +33,7 @@
 	--heading: #0f172a;      /* slate-900 */
 	--border: #e5e7eb;       /* gray-200 */
 	--ring: rgba(59, 130, 246, 0.30);
+	--switch-thumb: var(--bg-elev);
 }
 
 * { box-sizing: border-box; }
@@ -49,8 +51,7 @@ body {
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: #0b1220; }
-:root[data-theme="light"] ::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-track { background: var(--input); }
 ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
 :root[data-theme="light"] ::-webkit-scrollbar-thumb { background: #cbd5e1; }
 ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
@@ -187,6 +188,71 @@ button:focus-visible {
 }
 #eliminar-cuenta-btn:hover {
 	background: var(--danger-600);
+}
+
+/* Toggle iOS (Claro/Oscuro) */
+.theme-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	white-space: nowrap;
+}
+
+.theme-toggle__label {
+	font-size: 0.85rem;
+	font-weight: 800;
+	color: var(--muted);
+}
+
+:root[data-theme="light"] .theme-toggle__label--light { color: var(--heading); }
+:root[data-theme="light"] .theme-toggle__label--dark { color: var(--muted); }
+:root:not([data-theme="light"]) .theme-toggle__label--dark { color: var(--heading); }
+:root:not([data-theme="light"]) .theme-toggle__label--light { color: var(--muted); }
+
+button.ios-switch {
+	appearance: none;
+	-webkit-appearance: none;
+	width: 52px;
+	height: 32px;
+	padding: 0;
+	border-radius: 999px;
+	border: 1px solid var(--border);
+	background: var(--input);
+	box-shadow: none;
+	position: relative;
+	cursor: pointer;
+}
+
+button.ios-switch::after {
+	content: '';
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 28px;
+	height: 28px;
+	border-radius: 999px;
+	background: var(--switch-thumb);
+	box-shadow: 0 1px 2px rgba(0,0,0,0.22), 0 6px 18px rgba(0,0,0,0.18);
+	transform: translateX(0);
+	transition: transform 0.18s ease;
+}
+
+:root:not([data-theme="light"]) button.ios-switch {
+	background: var(--primary);
+	border-color: transparent;
+}
+
+:root:not([data-theme="light"]) button.ios-switch::after {
+	transform: translateX(20px);
+}
+
+button.ios-switch:hover { background: var(--input); }
+:root:not([data-theme="light"]) button.ios-switch:hover { background: var(--primary-600); }
+button.ios-switch:active { transform: none; }
+
+button.ios-switch:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 3px var(--ring);
 }
 
 /* Créditos */

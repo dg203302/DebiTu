@@ -16,9 +16,7 @@ function applyTheme(theme){
 
     const btn = document.getElementById('modo-oscuro-btn')
     if (btn){
-        // Mostrar el estado actual
-        btn.textContent = normalized === 'dark' ? 'Modo Oscuro' : 'Modo Claro'
-        btn.setAttribute('aria-pressed', String(normalized === 'dark'))
+        btn.setAttribute('aria-checked', String(normalized === 'dark'))
     }
 }
 

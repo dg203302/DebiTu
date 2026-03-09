@@ -19,6 +19,18 @@
 	--footer-h: 64px;
 }
 
+/* Tema claro (se activa con :root[data-theme="light"]) */
+:root[data-theme="light"]{
+  --bg: #f8fafc;
+  --bg-elev: #ffffff;
+  --input: #f1f5f9;
+  --text: #111827;
+  --muted: #6b7280;
+  --heading: #0f172a;
+  --border: #e5e7eb;
+  --ring: rgba(59,130,246,0.30);
+}
+
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
@@ -49,7 +61,7 @@ section{background:var(--bg-elev);border:1px solid var(--border);border-radius:1
 /* Results list */
 .clients-list{display:grid;gap:8px;margin-top:12px}
 #contenedorListaClientes{display:grid;gap:8px;margin-top:12px}
-.client-item{background:#0b1220;border:1px solid var(--border);padding:10px;border-radius:10px;display:flex;justify-content:space-between;align-items:center}
+.client-item{background:var(--input);border:1px solid var(--border);padding:10px;border-radius:10px;display:flex;justify-content:space-between;align-items:center}
 .client-item{gap:10px;min-width:0}
 .client-item .meta{color:var(--muted);font-size:0.9rem;overflow-wrap:anywhere}
 .client-item > div{min-width:0}
@@ -191,7 +203,7 @@ button:focus-visible, .btn:focus-visible {
 /* Tabs del panel de operaciones del cliente (coherentes con Inicio) */
 #operacionesCliente .tabs {
   display: inline-flex;
-  background: #0b1220;
+  background: var(--input);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 4px;
@@ -246,7 +258,7 @@ button:focus-visible, .btn:focus-visible {
   min-width:0;
 }
 .valor-card {
-  background: #0b1220;
+  background: var(--input);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 12px 14px;
@@ -280,5 +292,5 @@ button:focus-visible, .btn:focus-visible {
 
 /* Lista de operaciones: evitar overflow */
 #lista_operaciones_cliente{ min-width:0 }
-.op-item{ background:#0b1220; border:1px solid var(--border); border-radius:12px; padding:12px }
+.op-item{ background:var(--input); border:1px solid var(--border); border-radius:12px; padding:12px }
 .op-item .muted{ color:var(--muted) }
