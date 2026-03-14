@@ -16,14 +16,32 @@
 </head>
 <body>
     <header>
-        <div class="header-text">
-            <h1>Inicio</h1>
-            <h4 id="bienvenida"></h4>
+        <div class="header-inner">
+            <div class="header-text">
+                <h1>Inicio</h1>
+                <p id="bienvenida"></p>
+            </div>
+            <div class="header-actions">
+                <a class="icon-btn" href="/Plantillas/administracion_clientes.html" aria-label="Administrar clientes" title="Clientes">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                </a>
+                <a href="/Plantillas/Configuracion.html" class="pfp-link" aria-label="Configuración" title="Configuración">
+                    <img src="" alt="Foto de perfil" id="pfp">
+                </a>
+                <button type="button" class="icon-btn" onclick="cerrarSesion()" aria-label="Cerrar sesión" title="Cerrar sesión">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                </button>
+            </div>
         </div>
-        <a href="/Plantillas/Configuracion.html" class="pfp-link">
-            <img src="" alt="Foto de perfil" id="pfp">
-        </a>
-
     </header>
     <main>
         <section id="kpi_adeudado_mes">
@@ -31,12 +49,38 @@
                 <h2>Deuda Total Activa</h2>
                 <h1 id="total_adeudado_mes">Cargando...</h1>
             </div>
-            <button onclick="recargarMontos()"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1yb3RhdGUtY2N3LWljb24gbHVjaWRlLXJvdGF0ZS1jY3ciPjxwYXRoIGQ9Ik0zIDEyYTkgOSAwIDEgMCA5LTkgOS43NSA5Ljc1IDAgMCAwLTYuNzQgMi43NEwzIDgiLz48cGF0aCBkPSJNMyAzdjVoNSIvPjwvc3ZnPg==" alt="Recargar"></button>
+            <button type="button" class="icon-btn" onclick="recargarMontos()" aria-label="Recargar montos" title="Recargar">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                    <path d="M3 3v5h5" />
+                </svg>
+            </button>
         </section>
         
         <section id="btnes_nav">
-            <a href="/Plantillas/administracion_clientes.html">Administrar Clientes</a>
-            <a href="#" id="btn_realiz_op" onclick="realizarOperacion(event)">Realizar Operación</a>
+            <a class="nav-card" href="/Plantillas/administracion_clientes.html">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                <div class="nav-card__text">
+                    <span class="nav-card__title">Administrar Clientes</span>
+                    <span class="nav-card__subtitle">Altas, bajas y operaciones</span>
+                </div>
+            </a>
+            <button type="button" class="nav-card nav-card--primary" id="btn_realiz_op" onclick="realizarOperacion(event)" aria-expanded="false" aria-controls="Operacion-ingreso">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M8 12h8" />
+                    <path d="M12 8v8" />
+                </svg>
+                <div class="nav-card__text">
+                    <span class="nav-card__title">Realizar Operación</span>
+                    <span class="nav-card__subtitle">Registrar pago o deuda</span>
+                </div>
+            </button>
         </section>
         <section id="Operacion-ingreso" hidden>
             <h2>Registrar Operación</h2>
@@ -95,10 +139,22 @@
             </div>
         </section>
         <section id="operaciones_rec">
-            <div style="display: flex;flex-direction: row; align-items: center; justify-content: space-between;">
+            <div class="section-title-row">
                 <h2>Operaciones Recientes</h2>
-                <div id="botones">
-                    <button onclick="recargarTabla()" id="boton_expandir"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1yb3RhdGUtY2N3LWljb24gbHVjaWRlLXJvdGF0ZS1jY3ciPjxwYXRoIGQ9Ik0zIDEyYTkgOSAwIDEgMCA5LTkgOS43NSA5Ljc1IDAgMCAwLTYuNzQgMi43NEwzIDgiLz48cGF0aCBkPSJNMyAzdjVoNSIvPjwvc3ZnPg==" alt="Recargar"></button>
+                <div class="section-actions" id="botones">
+                    <button type="button" class="icon-btn" onclick="recargarTabla()" aria-label="Refrescar operaciones" title="Refrescar">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                            <path d="M3 3v5h5" />
+                        </svg>
+                    </button>
+                    <button type="button" class="icon-btn" id="btn_expandir_ops" onclick="expandirTabla()" aria-expanded="false" aria-label="Expandir operaciones" title="Expandir">
+                        <svg class="icon icon-rotate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="7 13 12 18 17 13" />
+                            <polyline points="7 6 12 11 17 6" />
+                        </svg>
+                        <span class="btn-label">Expandir</span>
+                    </button>
                 </div>
             </div>
             <div class="tabs" role="tablist" aria-label="Filtro de operaciones">

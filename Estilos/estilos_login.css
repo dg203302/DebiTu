@@ -9,32 +9,38 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-	--bg: #0f172a;           /* slate-900 */
-	--bg-elev: #111827;      /* gray-900 */
-	--input: #0b1220;        /* más oscuro */
-	--text: #e5e7eb;         /* gray-200 */
-	--muted: #9ca3af;        /* gray-400 */
-	--heading: #f9fafb;      /* gray-50 */
-	--border: #1f2937;       /* gray-800 */
-	--primary: #3b82f6;      /* blue-500 */
-	--primary-600: #2563eb;  /* blue-600 */
-	--ring: rgba(59, 130, 246, 0.45);
-	--success: #10b981;      /* emerald-500 */
-	--danger: #ef4444;       /* red-500 */
+	--bg: #0b0b0c;
+	--bg-elev: #121214;
+	--input: #18181b;
+	--text: #e5e5e5;
+	--muted: #a1a1aa;
+	--heading: #ffffff;
+	--border: #2a2a2f;
+	--primary: #ffffff;
+	--primary-600: #e4e4e7;
+	--on-primary: #0b0b0c;
+	--ring: rgba(255, 255, 255, 0.35);
+	--success: #ffffff;
+	--danger: #ffffff;
 	--footer-h: 56px;
 	--header-h: 64px;
+	color-scheme: dark;
 }
 
 /* Tema claro (se activa con :root[data-theme="light"]) */
 :root[data-theme="light"] {
-	--bg: #f8fafc;
-	--bg-elev: #ffffff;
-	--input: #f1f5f9;
-	--text: #111827;
-	--muted: #6b7280;
-	--heading: #0f172a;
-	--border: #e5e7eb;
-	--ring: rgba(59, 130, 246, 0.30);
+	--bg: #ffffff;
+	--bg-elev: #fafafa;
+	--input: #f4f4f5;
+	--text: #0b0b0c;
+	--muted: #52525b;
+	--heading: #0b0b0c;
+	--border: #e4e4e7;
+	--primary: #0b0b0c;
+	--primary-600: #1f1f23;
+	--on-primary: #ffffff;
+	--ring: rgba(0, 0, 0, 0.18);
+	color-scheme: light;
 }
 
 * { box-sizing: border-box; }
@@ -75,7 +81,7 @@ body {
 	left: 0;
 	right: 0;
 	height: var(--header-h);
-	background: rgba(15, 23, 42, 0.85);
+	background: rgba(11, 11, 12, 0.85);
 	backdrop-filter: blur(12px);
 	-webkit-backdrop-filter: blur(12px);
 	border-bottom: 1px solid var(--border);
@@ -85,7 +91,7 @@ body {
 }
 
 :root[data-theme="light"] .site-header {
-	background: rgba(248, 250, 252, 0.85);
+	background: rgba(255, 255, 255, 0.85);
 }
 
 .site-header__inner {
@@ -121,9 +127,9 @@ body {
 
 .site-header__logo {
 	font-size: 1.6rem;
-	color: var(--primary);
+	color: var(--heading);
 	line-height: 1;
-	filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.5));
+	filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.12));
 }
 
 .site-header__title {
@@ -277,6 +283,10 @@ body {
 	background: rgba(255,255,255,0.05);
 	border-color: rgba(255,255,255,0.12);
 }
+:root[data-theme="light"] .btn-google:hover {
+	background: rgba(0,0,0,0.04);
+	border-color: rgba(0,0,0,0.12);
+}
 
 .btn-google:active {
 	transform: translateY(1px);
@@ -324,6 +334,9 @@ body {
 	background: rgba(255,255,255,0.03);
 	color: var(--text);
 }
+:root[data-theme="light"] .login-panel > a:not(.btn-google):hover {
+	background: rgba(0,0,0,0.03);
+}
 
 .login-panel > a:not(.btn-google):active {
 	transform: translateY(1px);
@@ -369,6 +382,7 @@ footer p {
 .swal2-html-container { color: var(--text) !important; }
 .swal2-confirm {
 	background: var(--primary) !important;
+	color: var(--on-primary) !important;
 	border-radius: 10px !important;
 	box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
 }

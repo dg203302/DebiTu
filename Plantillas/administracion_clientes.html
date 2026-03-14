@@ -19,7 +19,7 @@
         <h1>Clientes</h1>
     </header>
     <main>
-        <section id="accionesClientes" style="display: flex; flex-direction: column; align-items: stretch; gap: 10px;">
+        <section id="accionesClientes">
             <div  id="botones">
                 <button onclick="verTodosClientes()">Ver Todos los Clientes</button>
                 <button onclick="agregarCliente()">Agregar Cliente</button>
@@ -28,9 +28,14 @@
         </section>
 
         <section id="listaClientes" style="display: none;">
-            <div id="cabeceraLista" style="display: flex;flex-direction: row; align-items: center; justify-content: space-between;">
+            <div id="cabeceraLista">
                 <h1>Lista de Clientes</h1>
-                <button onclick="cerrarListaClientes()" aria-label="Cerrar lista">❌</button>
+                <button type="button" class="icon-btn" onclick="cerrarListaClientes()" aria-label="Cerrar lista" title="Cerrar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
             </div>
             <div id="contenedorListaClientes">
 
@@ -38,9 +43,14 @@
         </section>
 
         <section id="detallesCliente" style="display: none;">
-            <div id="headerDetalles" style="display: flex;flex-direction: row; align-items: center; justify-content: space-between;">
+            <div id="headerDetalles">
                 <h2>Datos del Cliente</h2>
-                <button onclick="cerrarDetallesCliente()" aria-label="Cerrar detalles">❌</button>
+                <button type="button" class="icon-btn" onclick="cerrarDetallesCliente()" aria-label="Cerrar detalles" title="Cerrar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
             </div>
             <section id="datosCliente">
                 <p class="subtitle muted">Resumen e información del cliente</p>
@@ -64,7 +74,7 @@
                 </div>
             </section>
             <section id="operacionesCliente">
-                <div class="section-header" style="display: flex;flex-direction: row; align-items: center; justify-content: space-between;">
+                <div class="section-header">
                     <h2>Operaciones del Cliente</h2>
                     <div class="actions">
                         <button id="btn_refrescar_cliente" class="btn" type="button">Refrescar</button>
@@ -82,11 +92,39 @@
 
     </main>
     <footer>
-        <button onclick="Regresar()" aria-label="Regresar"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1ob3VzZS1pY29uIGx1Y2lkZS1ob3VzZSI+PHBhdGggZD0iTTE1IDIxdi04YTEgMSAwIDAgMC0xLTFoLTRhMSAxIDAgMCAwLTEgMXY4Ii8+PHBhdGggZD0iTTMgMTBhMiAyIDAgMCAxIC43MDktMS41MjhsNy02YTIgMiAwIDAgMSAyLjU4MiAwbDcgNkEyIDIgMCAwIDEgMjEgMTB2OWEyIDIgMCAwIDEtMiAySDVhMiAyIDAgMCAxLTItMnoiLz48L3N2Zz4=" alt="Regresar"></button>
+        <button type="button" onclick="Regresar()" aria-label="Regresar" title="Inicio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+                <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            </svg>
+        </button>
 
-        <a href="/Plantillas/Configuracion.html"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1jb2ctaWNvbiBsdWNpZGUtY29nIj48cGF0aCBkPSJNMTEgMTAuMjcgNyAzLjM0Ii8+PHBhdGggZD0ibTExIDEzLjczLTQgNi45MyIvPjxwYXRoIGQ9Ik0xMiAyMnYtMiIvPjxwYXRoIGQ9Ik0xMiAydjIiLz48cGF0aCBkPSJNMTQgMTJoOCIvPjxwYXRoIGQ9Im0xNyAyMC42Ni0xLTEuNzMiLz48cGF0aCBkPSJtMTcgMy4zNC0xIDEuNzMiLz48cGF0aCBkPSJNMiAxMmgyIi8+PHBhdGggZD0ibTIwLjY2IDE3LTEuNzMtMSIvPjxwYXRoIGQ9Im0yMC42NiA3LTEuNzMgMSIvPjxwYXRoIGQ9Im0zLjM0IDE3IDEuNzMtMSIvPjxwYXRoIGQ9Im0zLjM0IDcgMS43MyAxIi8+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMiIvPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjgiLz48L3N2Zz4=" alt="config"></a>
+        <a href="/Plantillas/Configuracion.html" aria-label="Configuración" title="Configuración">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M11 10.27 7 3.34" />
+                <path d="m11 13.73-4 6.93" />
+                <path d="M12 22v-2" />
+                <path d="M12 2v2" />
+                <path d="M14 12h8" />
+                <path d="m17 20.66-1-1.73" />
+                <path d="m17 3.34-1 1.73" />
+                <path d="M2 12h2" />
+                <path d="m20.66 17-1.73-1" />
+                <path d="m20.66 7-1.73 1" />
+                <path d="m3.34 17 1.73-1" />
+                <path d="m3.34 7 1.73 1" />
+                <circle cx="12" cy="12" r="2" />
+                <circle cx="12" cy="12" r="8" />
+            </svg>
+        </a>
         
-        <button onclick="cerrarSesion()"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1sb2ctb3V0LWljb24gbHVjaWRlLWxvZy1vdXQiPjxwYXRoIGQ9Im0xNiAxNyA1LTUtNS01Ii8+PHBhdGggZD0iTTIxIDEySDkiLz48cGF0aCBkPSJNOSAyMUg1YTIgMiAwIDAgMS0yLTJWNWEyIDIgMCAwIDEgMi0yaDQiLz48L3N2Zz4=" alt="Cerrar Sesión"></button>
+        <button type="button" onclick="cerrarSesion()" aria-label="Cerrar sesión" title="Cerrar sesión">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+        </button>
 
     </footer>
     <script src="/Scripts/script_Adminclientes.js" type="module"></script>

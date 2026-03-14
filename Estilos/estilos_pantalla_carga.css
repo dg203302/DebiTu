@@ -3,21 +3,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 
 :root {
-	--bg: #0f172a;
-	--bg-elev: #111827;
-	--text: #e5e7eb;
-	--muted: #9ca3af;
-	--border: #1f2937;
-	--ring: rgba(59, 130, 246, 0.45);
+	--bg: #0b0b0c;
+	--bg-elev: #121214;
+	--text: #e5e5e5;
+	--muted: #a1a1aa;
+	--border: #2a2a2f;
+	--ring: rgba(255, 255, 255, 0.35);
+	color-scheme: dark;
 }
 
 :root[data-theme="light"] {
-	--bg: #f8fafc;
-	--bg-elev: #ffffff;
-	--text: #111827;
-	--muted: #6b7280;
-	--border: #e5e7eb;
-	--ring: rgba(59, 130, 246, 0.30);
+	--bg: #ffffff;
+	--bg-elev: #fafafa;
+	--text: #0b0b0c;
+	--muted: #52525b;
+	--border: #e4e4e7;
+	--ring: rgba(0, 0, 0, 0.18);
+	color-scheme: light;
 }
 
 * { box-sizing: border-box; }

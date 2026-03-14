@@ -48,9 +48,15 @@ window.cerrarSesion=function() {
 // Toggle expand/collapse of operations list. Bound to the Expandir button in HTML.
 window.expandirTabla = function(){
     isExpanded = !isExpanded;
-    // update button label
-    const btn = document.querySelector('button[onclick="expandirTabla()"]');
-    if (btn) btn.textContent = isExpanded ? 'Contraer' : 'Expandir';
+    // update button label (keep icon)
+    const btn = document.getElementById('btn_expandir_ops') || document.querySelector('button[onclick="expandirTabla()"]');
+    if (btn) {
+        const label = btn.querySelector('.btn-label');
+        if (label) label.textContent = isExpanded ? 'Contraer' : 'Expandir';
+        btn.setAttribute('aria-expanded', String(isExpanded));
+        btn.setAttribute('aria-label', isExpanded ? 'Contraer operaciones' : 'Expandir operaciones');
+        btn.title = isExpanded ? 'Contraer' : 'Expandir';
+    }
     // toggle collapsed class for optional CSS visual
     const cont = document.getElementById('lista_operaciones');
     if (cont) cont.classList.toggle('collapsed', !isExpanded);
@@ -66,7 +72,15 @@ window.realizarOperacion = function(e){
     if (!section) return;
     section.hidden = !section.hidden;
     const btn = document.getElementById('btn_realiz_op');
-    if (btn) btn.textContent = section.hidden ? 'Realizar Operación' : 'Cerrar Operación';
+    if (btn) {
+        const label = btn.querySelector('.nav-card__title');
+        const nextText = section.hidden ? 'Realizar Operación' : 'Cerrar Operación';
+        if (label) label.textContent = nextText;
+        else btn.textContent = nextText;
+        btn.setAttribute('aria-expanded', String(!section.hidden));
+    }
+
+    document.body.classList.toggle('op-open', !section.hidden);
     if (!section.hidden){
         // Preparar listeners si aún no se inicializó
         prepararOperacionIngreso();

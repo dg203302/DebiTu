@@ -4,31 +4,39 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root{
-  --bg: #0f172a;
-  --bg-elev: #111827;
-  --input: #0b1220;
-  --text: #e5e7eb;
-  --muted: #9ca3af;
-  --heading: #f9fafb;
-  --border: #1f2937;
-  --primary: #3b82f6;
-  --primary-600: #2563eb;
-  --ring: rgba(59,130,246,0.45);
-  --success: #10b981;
-  --danger: #ef4444;
+  --bg: #0b0b0c;
+  --bg-elev: #121214;
+  --input: #18181b;
+  --text: #e5e5e5;
+  --muted: #a1a1aa;
+  --heading: #ffffff;
+  --border: #2a2a2f;
+  --primary: #ffffff;
+  --primary-600: #e4e4e7;
+  --on-primary: #0b0b0c;
+  --ring: rgba(255, 255, 255, 0.35);
+  --success: #ffffff;
+  --danger: #ffffff;
 	--footer-h: 64px;
+	color-scheme: dark;
 }
 
 /* Tema claro (se activa con :root[data-theme="light"]) */
 :root[data-theme="light"]{
-  --bg: #f8fafc;
-  --bg-elev: #ffffff;
-  --input: #f1f5f9;
-  --text: #111827;
-  --muted: #6b7280;
-  --heading: #0f172a;
-  --border: #e5e7eb;
-  --ring: rgba(59,130,246,0.30);
+  --bg: #ffffff;
+  --bg-elev: #fafafa;
+  --input: #f4f4f5;
+  --text: #0b0b0c;
+  --muted: #52525b;
+  --heading: #0b0b0c;
+  --border: #e4e4e7;
+  --primary: #0b0b0c;
+  --primary-600: #1f1f23;
+  --on-primary: #ffffff;
+  --ring: rgba(0, 0, 0, 0.18);
+  --success: #0b0b0c;
+  --danger: #0b0b0c;
+	color-scheme: light;
 }
 
 *{box-sizing:border-box}
@@ -52,7 +60,7 @@ section{background:var(--bg-elev);border:1px solid var(--border);border-radius:1
 
 #botones{display:flex;gap:8px;margin-bottom:12px}
 #botones{flex-wrap:wrap}
-#botones button{background:var(--primary);border:0;padding:10px 12px;border-radius:10px;color:#fff;cursor:pointer;white-space:nowrap}
+#botones button{background:var(--primary);border:0;padding:10px 12px;border-radius:10px;color:var(--on-primary);cursor:pointer;white-space:nowrap}
 #botones button:hover{background:var(--primary-600)}
 
 /* Search input */
@@ -77,9 +85,9 @@ footer a:hover,
 footer button:hover{background:rgba(255,255,255,0.04)}
 
 :root[data-theme="light"] footer a:hover,
-:root[data-theme="light"] footer button:hover{background:rgba(15, 23, 42, 0.04)}
+:root[data-theme="light"] footer button:hover{background:rgba(0,0,0,0.04)}
 
-:root[data-theme="light"] footer img{filter:invert(1)}
+footer svg{width:22px;height:22px;display:block}
 
 /* Small screens adjustments */
 @media (max-width:640px){
@@ -149,7 +157,7 @@ header img{width:22px;height:22px}
 
 .swal2-confirm{
   background:var(--primary) !important;
-  color:#fff !important;
+  color:var(--on-primary) !important;
   border:none !important;
   padding:10px 14px !important;
   border-radius:10px !important;
@@ -184,7 +192,7 @@ button,
 .btn {
   appearance: none;
   background: var(--primary);
-  color: #ffffff;
+  color: var(--on-primary);
   font-weight: 600;
   border: 0;
   border-radius: 10px;
@@ -199,6 +207,38 @@ button:focus-visible, .btn:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
+
+/* Botón de ícono (cerrar listas/detalles, etc.) */
+.icon-btn{
+  appearance:none;
+  background:transparent;
+  color:var(--text);
+  border:1px solid var(--border);
+  padding:10px;
+  border-radius:14px;
+  min-width:40px;
+  min-height:40px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  box-shadow:none;
+  transition: background-color 0.2s ease, transform 0.02s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.icon-btn:hover{background:rgba(255,255,255,0.04)}
+:root[data-theme="light"] .icon-btn:hover{background:rgba(0,0,0,0.04)}
+.icon-btn:active{transform:translateY(1px)}
+.icon-btn:focus-visible{outline:none;box-shadow:0 0 0 3px var(--ring);border-color:var(--primary)}
+
+#cabeceraLista,
+#headerDetalles{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+#cabeceraLista h1,
+#headerDetalles h2{margin:0}
 
 /* Tabs del panel de operaciones del cliente (coherentes con Inicio) */
 #operacionesCliente .tabs {
@@ -227,9 +267,10 @@ button:focus-visible, .btn:focus-visible {
   text-align:center;
 }
 #operacionesCliente .tab:hover { background: rgba(255,255,255,0.04); }
+:root[data-theme="light"] #operacionesCliente .tab:hover { background: rgba(0,0,0,0.04); }
 #operacionesCliente .tab:active { transform: translateY(1px); }
 #operacionesCliente .tab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-#operacionesCliente .tab.active { background: var(--primary); color: #fff; }
+#operacionesCliente .tab.active { background: var(--primary); color: var(--on-primary); }
 
 /* Botón expandir del cliente */
 #btn_expandir_cliente { margin: 8px 0 12px 0; }

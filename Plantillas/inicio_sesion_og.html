@@ -23,7 +23,18 @@
 
             <div class="contendedor_cont">
                 <input type="password" id="password" name="password" required>
-                <button class="botonalternar" type="button" id="togglePassword" style="width: 50px; height: 50px;">👁️</button>
+                <button class="botonalternar" type="button" id="togglePassword" aria-label="Mostrar contraseña" title="Mostrar/Ocultar contraseña">
+                    <svg class="icon icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    <svg class="icon icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden>
+                        <path d="M10.733 5.08A10.43 10.43 0 0 1 12 5c4.52 0 8.46 2.94 10 7a10.7 10.7 0 0 1-2.13 3.25" />
+                        <path d="M6.61 6.61A10.5 10.5 0 0 0 2 12c1.54 4.06 5.48 7 10 7 1.26 0 2.47-.23 3.61-.65" />
+                        <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                        <line x1="2" y1="2" x2="22" y2="22" />
+                    </svg>
+                </button>
             </div>
             <br><br>
             <button type="submit">Ingresar</button>
@@ -37,11 +48,16 @@
         const adminPassword = "1111a634526bf55e01a7f1ba4142c1678f22498744a84a73213f52dbe8bb4b68";
         const togglePassword = document.getElementById('togglePassword');
         const passwordField = document.getElementById('password');
+        const eyeIcon = togglePassword?.querySelector('.icon-eye');
+        const eyeOffIcon = togglePassword?.querySelector('.icon-eye-off');
     
         togglePassword.addEventListener('click', function () {
             const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordField.setAttribute('type', type);
-            this.textContent = type === 'password' ? '👁️' : '🙈';
+            const hidden = type === 'password';
+            if (eyeIcon) eyeIcon.hidden = !hidden;
+            if (eyeOffIcon) eyeOffIcon.hidden = hidden;
+            this.setAttribute('aria-label', hidden ? 'Mostrar contraseña' : 'Ocultar contraseña');
         });
 
         document.getElementById('form_login').addEventListener('submit', function(event) {
