@@ -1,35 +1,122 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Client Management System — Gestión profesional de clientes, deudas y pagos.">
     <script>
         (function () {
             try {
                 var t = (localStorage.getItem('CMS_THEME') || '').toString().trim().toLowerCase();
                 document.documentElement.dataset.theme = (t === 'light' || t === 'claro') ? 'light' : 'dark';
-            } catch (e) {}
+            } catch (e) { }
         })();
     </script>
     <link rel="stylesheet" href="/Estilos/estilos_login.css">
-    <title>Welcome</title>
+    <title>Client Management System — Inicio de Sesión</title>
 </head>
+
 <body>
-    <main>
-        <h1>Bienvenido</h1>
-        <!--agregar aqui:
-        toggle para el idioma, toggle para transparencia-->
-        <a class="btn-google" href="#" id="btn_google">
-            <span class="btn-google__icon" aria-hidden="true">
-                <img src="/icons/google-g.svg" alt="" width="20" height="20" loading="lazy" decoding="async">
-            </span>
-            <span class="btn-google__text">Iniciar sesión con Google</span>
-        </a>
-        <a href="/Plantillas/inicio_sesion_og.html">Iniciar Sesion con contraseaña - Temporal</a>
-    </main>
+
+    <header class="site-header">
+        <div class="site-header__inner">
+            <div class="site-header__brand">
+                <span class="site-header__logo" aria-hidden="true">⬡</span>
+                <h1 class="site-header__title">Client Management System</h1>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-layout">
+
+        <!-- Columna izquierda: descripción de la aplicación -->
+        <aside class="app-info">
+            <section class="app-info__section">
+                <h2 class="app-info__headline">¿Qué es CMS?</h2>
+                <p class="app-info__lead">
+                    <strong>Client Management System</strong> es una plataforma de gestión diseñada
+                    para que empresas y profesionales administren de manera centralizada y eficiente
+                    su cartera de clientes, sus compromisos financieros y el historial completo de
+                    pagos y deudas.
+                </p>
+            </section>
+
+            <section class="app-info__section">
+                <h3 class="app-info__subheading">Gestión de Clientes</h3>
+                <p>
+                    Registrá cada cliente con su información de contacto, categoría, estado de cuenta
+                    y notas internas. Accedé rápidamente al perfil completo de cualquier persona desde
+                    un único panel centralizado, sin importar el tamaño de tu cartera.
+                </p>
+            </section>
+
+            <section class="app-info__section">
+                <h3 class="app-info__subheading">Control de Deudas</h3>
+                <p>
+                    Cada deuda se registra con su monto, fecha de origen, descripción detallada,
+                    categoría. El sistema calcula automáticamente el saldo pendiente
+                    en tiempo real, dándote una visión financiera clara y sin ambigüedades.
+                </p>
+            </section>
+
+            <section class="app-info__section">
+                <h3 class="app-info__subheading">Registro de Pagos</h3>
+                <p>
+                    Cada pago queda vinculado a su deuda correspondiente e incluye: monto abonado,
+                    fecha de pago, método de pago utilizado y un campo de observaciones libre. De esta manera tenés
+                    trazabilidad completa
+                    de cada transacción sin depender de planillas externas.
+                </p>
+            </section>
+
+            <section class="app-info__section">
+                <h3 class="app-info__subheading">Historial y Reportes</h3>
+                <p>
+                    Consultá el historial cronológico de todos los movimientos de un cliente:
+                    deudas generadas, pagos realizados y saldos resultantes. El sistema ofrece
+                    filtros por período, estado y categoría para encontrar cualquier registro
+                    en segundos, facilitando auditorías y análisis financieros.
+                </p>
+            </section>
+
+            <ul class="app-info__features">
+                <li>✔ Panel unificado de clientes y cuentas</li>
+                <li>✔ Alta, edición y baja de deudas con detalle completo</li>
+                <li>✔ Registro de pagos vinculados a cada deuda</li>
+                <li>✔ Saldo pendiente calculado automáticamente</li>
+                <li>✔ Historial cronológico por cliente</li>
+                <li>✔ Filtros avanzados por estado, período y categoría</li>
+                <li>✔ Interfaz oscura y modo claro adaptable</li>
+                <li>✔ Acceso seguro mediante Google OAuth</li>
+            </ul>
+        </aside>
+
+        <!-- Columna derecha: panel de login -->
+        <main class="login-panel">
+            <!--agregar aqui:
+            toggle para el idioma, toggle para transparencia-->
+            <div class="login-panel__header">
+                <p class="login-panel__subtitle">Accedé a tu cuenta para continuar</p>
+            </div>
+
+            <a class="btn-google" href="#" id="btn_google">
+                <span class="btn-google__icon" aria-hidden="true">
+                    <img src="/icons/google-g.svg" alt="" width="20" height="20" loading="lazy" decoding="async">
+                </span>
+                <span class="btn-google__text">Iniciar sesión con Google</span>
+            </a>
+
+            <a href="/Plantillas/inicio_sesion_og.html">Iniciar Sesión con contraseña — Temporal</a>
+        </main>
+
+    </div>
+
     <footer>
-        <p>&copy;<p id="anio"></p> Client Management System. Todos los derechos reservados.</p>
+        <p>&copy; <span id="anio"></span> Client Management System. Todos los derechos reservados.</p>
     </footer>
+
     <script src="/Scripts/script_indice.js" type="module"></script>
 </body>
+
 </html>

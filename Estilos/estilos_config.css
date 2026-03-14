@@ -20,6 +20,7 @@
 	--danger: #ef4444;       /* red-500 */
 	--danger-600: #dc2626;   /* red-600 */
 	--footer-h: 64px;
+	--header-h: 64px;
 	--switch-thumb: var(--heading);
 }
 
@@ -67,11 +68,19 @@ header, main {
 }
 
 header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 100;
+	height: var(--header-h);
+	background: var(--bg);
+	border-bottom: 1px solid var(--border);
+	padding: 0 24px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding-top: 24px;
-	padding-bottom: 12px;
+	gap: 12px;
 }
 
 header h1 {
@@ -85,7 +94,47 @@ header h1 {
 main {
 	display: grid;
 	gap: 16px;
-	padding-bottom: calc(24px + var(--footer-h) + env(safe-area-inset-bottom, 0px));
+	padding-top: calc(var(--header-h) + 24px);
+	padding-bottom: 24px;
+}
+
+/* Acciones del header */
+.header-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.header-icon-btn {
+	appearance: none;
+	background: transparent;
+	color: var(--text);
+	border: 1px solid var(--border);
+	border-radius: 10px;
+	padding: 8px;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-decoration: none;
+	box-shadow: none;
+	transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.header-icon-btn:hover {
+	background: rgba(255,255,255,0.05);
+	border-color: rgba(255,255,255,0.12);
+}
+:root[data-theme="light"] .header-icon-btn:hover {
+	background: rgba(15, 23, 42, 0.05);
+}
+.header-icon-btn:active { transform: translateY(1px); }
+.header-icon-btn:focus-visible {
+	outline: none;
+	border-color: var(--primary);
+	box-shadow: 0 0 0 3px var(--ring);
+}
+:root[data-theme="light"] .header-icon-btn img {
+	filter: invert(1);
 }
 
 main > section {
@@ -266,51 +315,9 @@ main > section:last-of-type p {
 	font-weight: 600;
 }
 
-/* Footer */
-footer {
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	min-height: var(--footer-h);
-	background: var(--bg);
-	border-top: 1px solid var(--border);
-	padding: 8px 12px;
-	padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 14px;
-}
-
-footer a,
-footer button {
-	background: transparent;
-	color: var(--text);
-	border: 1px solid var(--border);
-	box-shadow: none;
-	padding: 10px;
-	border-radius: 14px;
-}
-
-footer a:hover,
-footer button:hover {
-	background: rgba(255,255,255,0.04);
-}
-
-:root[data-theme="light"] footer a:hover,
-:root[data-theme="light"] footer button:hover {
-	background: rgba(15, 23, 42, 0.04);
-}
-
 img {
-	width: 25px;
-	height: 25px;
-}
-
-/* En tema claro, los SVG embebidos (blancos) necesitan invertirse */
-:root[data-theme="light"] footer img {
-	filter: invert(1);
+	width: 22px;
+	height: 22px;
 }
 
 /* SweetAlert2 (coherente y compatible con ambos temas) */

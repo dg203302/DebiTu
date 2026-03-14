@@ -1,9 +1,8 @@
-
 /*
-	Login (Google OAuth)
-	Estética oscura coherente con el resto del sistema (Inicio)
+	Login (Google OAuth) — Diseño ejecutivo v2
 	- Tipografía Inter
-	- Tarjeta central con borde/sombra
+	- Header fijo con glassmorphism
+	- Layout de dos columnas: descripción + tarjeta de login
 	- Botón Google con icono y foco visible
 */
 
@@ -23,6 +22,7 @@
 	--success: #10b981;      /* emerald-500 */
 	--danger: #ef4444;       /* red-500 */
 	--footer-h: 56px;
+	--header-h: 64px;
 }
 
 /* Tema claro (se activa con :root[data-theme="light"]) */
@@ -38,7 +38,14 @@
 }
 
 * { box-sizing: border-box; }
-html, body { height: 100%; }
+
+html {
+	scroll-behavior: smooth;
+}
+
+html, body {
+	height: auto;
+}
 
 body {
 	margin: 0;
@@ -48,44 +55,205 @@ body {
 	color: var(--text);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	display: grid;
-	place-items: center;
-	padding: 24px;
-	padding-bottom: calc(24px + var(--footer-h) + env(safe-area-inset-bottom, 0px));
+	padding-top: var(--header-h);
+	padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom, 0px));
+	min-height: 100vh;
 }
 
-/* Scrollbar (oscuro) */
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--input); }
 ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
-
 :root[data-theme="light"] ::-webkit-scrollbar-thumb { background: #cbd5e1; }
 :root[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-main {
+/* ── Header fijo ─────────────────────────────────────────────────────────── */
+.site-header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: var(--header-h);
+	background: rgba(15, 23, 42, 0.85);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	border-bottom: 1px solid var(--border);
+	z-index: 100;
+	display: flex;
+	align-items: center;
+}
+
+:root[data-theme="light"] .site-header {
+	background: rgba(248, 250, 252, 0.85);
+}
+
+.site-header__inner {
+	position: relative;
 	width: 100%;
-	max-width: 420px;
+	max-width: 1280px;
+	margin: 0 auto;
+	padding: 0 32px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+}
+
+.site-header__tagline {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	margin: 0;
+	font-size: 0.875rem;
+	font-weight: 500;
+	color: var(--muted);
+	letter-spacing: 0.02em;
+	pointer-events: none;
+	white-space: nowrap;
+}
+
+.site-header__brand {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.site-header__logo {
+	font-size: 1.6rem;
+	color: var(--primary);
+	line-height: 1;
+	filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.5));
+}
+
+.site-header__title {
+	margin: 0;
+	font-size: 1.1rem;
+	font-weight: 700;
+	color: var(--heading);
+	letter-spacing: -0.02em;
+	white-space: nowrap;
+}
+
+/* tagline → ver definición dentro de .site-header__inner */
+
+/* ── Layout de dos columnas ──────────────────────────────────────────────── */
+.page-layout {
+	display: grid;
+	grid-template-columns: 1fr 400px;
+	gap: 48px;
+	align-items: center;
+	max-width: 1280px;
+	margin: 0 auto;
+	padding: 56px 32px;
+}
+
+/* ── Columna de información ──────────────────────────────────────────────── */
+.app-info {
+	display: flex;
+	flex-direction: column;
+	gap: 32px;
+	padding-top: 8px;
+	align-self: start;
+}
+
+.app-info__headline {
+	margin: 0 0 12px;
+	font-size: 2rem;
+	font-weight: 800;
+	color: var(--heading);
+	letter-spacing: -0.03em;
+	line-height: 1.2;
+}
+
+.app-info__lead {
+	margin: 0;
+	font-size: 1.05rem;
+	line-height: 1.75;
+	color: var(--text);
+}
+
+.app-info__section {
+	border-left: 3px solid var(--primary);
+	padding-left: 20px;
+}
+
+.app-info__subheading {
+	margin: 0 0 10px;
+	font-size: 0.8rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--primary);
+}
+
+.app-info__section p {
+	margin: 0;
+	font-size: 0.9375rem;
+	line-height: 1.75;
+	color: var(--muted);
+}
+
+.app-info__section em {
+	color: var(--text);
+	font-style: normal;
+	font-weight: 600;
+}
+
+.app-info__features {
+	list-style: none;
+	margin: 0;
+	padding: 20px 24px;
 	background: var(--bg-elev);
 	border: 1px solid var(--border);
-	border-radius: 16px;
-	padding: 24px;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 6px 24px rgba(0, 0, 0, 0.24);
+	border-radius: 14px;
 	display: grid;
-	gap: 14px;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px 24px;
+}
+
+.app-info__features li {
+	font-size: 0.875rem;
+	font-weight: 500;
+	color: var(--text);
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+/* ── Panel de login (columna derecha) ────────────────────────────────────── */
+.login-panel {
+	position: sticky;
+	top: calc(var(--header-h) + 32px);
+	width: 100%;
+	background: var(--bg-elev);
+	border: 1px solid var(--border);
+	border-radius: 20px;
+	padding: 32px;
+	box-shadow:
+		0 1px 2px rgba(0, 0, 0, 0.12),
+		0 8px 32px rgba(0, 0, 0, 0.32),
+		0 0 0 1px rgba(255, 255, 255, 0.03);
+	display: grid;
+	gap: 16px;
 	justify-items: stretch;
 	text-align: center;
 }
 
-h1 {
-	margin: 6px 0 4px;
-	font-size: 1.75rem;
-	line-height: 2.25rem;
-	font-weight: 800;
-	color: var(--heading);
+.login-panel__header {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
 }
 
-/* Botón Google */
+.login-panel__subtitle {
+	margin: 0;
+	font-size: 0.9375rem;
+	color: var(--muted);
+	font-weight: 500;
+}
+
+/* ── Botón Google ────────────────────────────────────────────────────────── */
 .btn-google {
 	display: inline-flex;
 	align-items: center;
@@ -93,18 +261,21 @@ h1 {
 	gap: 12px;
 	text-decoration: none;
 	width: 100%;
-	padding: 12px 14px;
+	padding: 13px 16px;
 	border-radius: 14px;
 	border: 1px solid var(--border);
 	background: var(--input);
 	color: var(--text);
+	font-family: inherit;
 	font-weight: 700;
+	font-size: 0.9375rem;
 	box-shadow: 0 1px 2px rgba(0,0,0,0.12), 0 6px 24px rgba(0,0,0,0.18);
-	transition: background-color 0.2s ease, transform 0.02s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+	transition: background-color 0.2s ease, transform 0.08s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .btn-google:hover {
-	background: rgba(255,255,255,0.04);
+	background: rgba(255,255,255,0.05);
+	border-color: rgba(255,255,255,0.12);
 }
 
 .btn-google:active {
@@ -118,9 +289,9 @@ h1 {
 }
 
 .btn-google__icon {
-	width: 40px;
-	height: 40px;
-	border-radius: 12px;
+	width: 36px;
+	height: 36px;
+	border-radius: 10px;
 	background: #fff;
 	display: grid;
 	place-items: center;
@@ -131,8 +302,8 @@ h1 {
 	line-height: 1.2;
 }
 
-/* Link secundario (inicio_sesion_og.html) */
-main > a:not(.btn-google) {
+/* ── Link secundario ─────────────────────────────────────────────────────── */
+.login-panel > a:not(.btn-google) {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -143,26 +314,51 @@ main > a:not(.btn-google) {
 	border: 1px solid var(--border);
 	background: transparent;
 	color: var(--muted);
-	font-weight: 700;
-	transition: background-color 0.2s ease, transform 0.02s ease, border-color 0.2s ease, color 0.2s ease;
+	font-family: inherit;
+	font-weight: 600;
+	font-size: 0.875rem;
+	transition: background-color 0.2s ease, transform 0.08s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
-main > a:not(.btn-google):hover {
+.login-panel > a:not(.btn-google):hover {
 	background: rgba(255,255,255,0.03);
 	color: var(--text);
 }
 
-main > a:not(.btn-google):active {
+.login-panel > a:not(.btn-google):active {
 	transform: translateY(1px);
 }
 
-main > a:not(.btn-google):focus-visible {
+.login-panel > a:not(.btn-google):focus-visible {
 	outline: none;
 	border-color: var(--primary);
 	box-shadow: 0 0 0 3px var(--ring);
 }
 
-/* SweetAlert2: tema oscuro coherente (toasts/alerts) */
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+footer {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	min-height: var(--footer-h);
+	background: var(--bg);
+	border-top: 1px solid var(--border);
+	color: var(--muted);
+	font-size: 0.8125rem;
+	padding: 8px 32px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+
+footer p {
+	margin: 0;
+}
+
+/* ── SweetAlert2 ─────────────────────────────────────────────────────────── */
 .swal2-popup {
 	background: var(--bg-elev) !important;
 	color: var(--text) !important;
@@ -191,28 +387,43 @@ main > a:not(.btn-google):focus-visible {
 }
 .swal2-actions .swal2-styled:focus { box-shadow: 0 0 0 3px var(--ring) !important; }
 
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+	.page-layout {
+		grid-template-columns: 1fr;
+		gap: 32px;
+		padding: 32px 20px;
+	}
+
+	.login-panel {
+		position: static;
+	}
+
+	.app-info__features {
+		grid-template-columns: 1fr;
+	}
+
+	.site-header__tagline {
+		position: static;
+		transform: none;
+		display: none;
+	}
+}
+
+@media (max-width: 480px) {
+	.site-header__inner {
+		padding: 0 16px;
+	}
+
+	.site-header__title {
+		font-size: 0.9rem;
+	}
+
+	.app-info__headline {
+		font-size: 1.5rem;
+	}
+}
+
 @media (prefers-reduced-motion: reduce) {
 	* { transition: none !important; }
 }
-
-footer {
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	min-height: var(--footer-h);
-	background: var(--bg);
-	color: var(--muted);
-	font-size: 0.875rem;
-	padding: 8px 12px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 6px;
-	flex-wrap: wrap;
-}
-
-footer p {
-	margin: 0;
-}
-

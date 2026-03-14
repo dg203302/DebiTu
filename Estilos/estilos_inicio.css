@@ -24,6 +24,7 @@
 	--success: #10b981;      /* emerald-500 */
 	--danger: #ef4444;       /* red-500 */
 	--footer-h: 64px;
+	--header-h: 64px;
 }
 
 /* Tema claro (se activa con :root[data-theme="light"]) */
@@ -61,21 +62,20 @@ body {
 :root[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
 /* Layout principal */
-header, main {
-	width: 100%;
-	max-width: 1100px;
-	margin-left: auto;
-	margin-right: auto;
-	padding-left: 16px;
-	padding-right: 16px;
-}
-
 header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 100;
+	height: var(--header-h);
+	background: var(--bg);
+	border-bottom: 1px solid var(--border);
+	padding: 0 24px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding-top: 24px;
-	padding-bottom: 16px;
+	gap: 12px;
 }
 
 header h1 {
@@ -100,13 +100,31 @@ header #bienvenida {
 }
 
 header #pfp {
-	width: 72px;
-	height: 72px;
-	border-radius: 18px;
+	width: 40px;
+	height: 40px;
+	border-radius: 10px;
 	border: 1px solid var(--border);
 	background: var(--input);
 	object-fit: cover;
-	box-shadow: 0 1px 2px rgba(0,0,0,0.12), 0 6px 24px rgba(0,0,0,0.18);
+	box-shadow: 0 1px 2px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.18);
+}
+
+/* Foto de perfil como enlace a Configuración */
+.pfp-link {
+	display: inline-flex;
+	border-radius: 10px;
+	outline-offset: 3px;
+	transition: opacity 0.2s ease, box-shadow 0.2s ease;
+}
+.pfp-link:hover {
+	opacity: 0.85;
+	box-shadow: 0 0 0 2px var(--primary);
+	border-radius: 10px;
+}
+.pfp-link:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 3px var(--ring);
+	border-radius: 10px;
 }
 
 /* Botón de cerrar sesión */
@@ -131,7 +149,8 @@ header button:focus-visible {
 main {
 	display: grid;
 	gap: 24px;
-	padding-bottom: calc(24px + var(--footer-h) + env(safe-area-inset-bottom, 0px));
+	padding-top: calc(var(--header-h) + 24px);
+	padding-bottom: 24px;
 }
 
 /* Sección KPI */
@@ -569,46 +588,10 @@ button:disabled, .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 	* { transition: none !important; }
 }
 
-footer{
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	min-height: var(--footer-h);
-	background: var(--bg);
-	border-top: 1px solid var(--border);
-	padding: 8px 12px;
-	padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 14px;
-}
-
-footer a,
-footer button {
-	background: transparent;
-	color: var(--text);
-	border: 1px solid var(--border);
-	box-shadow: none;
-	padding: 10px;
-	border-radius: 14px;
-}
-
-footer a:hover,
-footer button:hover {
-	background: rgba(255,255,255,0.04);
-}
-
-:root[data-theme="light"] footer a:hover,
-:root[data-theme="light"] footer button:hover {
-	background: rgba(15, 23, 42, 0.04);
-}
-
-:root[data-theme="light"] footer img {
+:root[data-theme="light"] .header-icon-btn img {
 	filter: invert(1);
 }
-img{
-	width: 25px;
-	height: 25px;
+img {
+	width: 22px;
+	height: 22px;
 }
