@@ -9,6 +9,25 @@ let currentClienteNombre = null;
 let currentClienteOpView = 'deudas'; // 'deudas' | 'pagos'
 let isExpandedCliente = false; // controla ver 4 vs todos
 
+function setResponsiveDetailsOpen(open){
+    if (window.innerWidth <= 1080) {
+        document.body.classList.toggle('mobile-details-open', !!open);
+    } else {
+        document.body.classList.remove('mobile-details-open');
+    }
+}
+
+function renderClientesEnContenedor(clientes){
+    const contenedorLista = document.getElementById('contenedorListaClientes');
+    if (!contenedorLista) return;
+    contenedorLista.innerHTML = '';
+    if (!clientes || clientes.length === 0){
+        contenedorLista.innerHTML = '<p>No hay clientes registrados.</p>';
+        return;
+    }
+    clientes.forEach((element) => insertarClienteEnLista(element, contenedorLista));
+}
+
 // Helpers compartidos
 function escapeHtml(str){
     if (str === undefined || str === null) return '';
@@ -119,15 +138,13 @@ async function agregarCliente(){
             await showErrorToast('Error al agregar el cliente: ' + error.message);
         } else {
             await showSuccessToast('Cliente agregado exitosamente');
+            await verTodosClientes();
         }
     }
 }
 window.agregarCliente = agregarCliente;
 
 async function verTodosClientes(){
-    if (document.getElementById('listaClientes').style.display != 'none'){
-        return;
-    }
     const {data, error} = await applyIdNegocioFilter(
         supabase
             .from('Clientes')
@@ -137,27 +154,14 @@ async function verTodosClientes(){
         showErrorToast('Error al obtener los clientes: ' + error.message);
         return;
     } else {
-        const contenedorprincipalLista = document.getElementById('listaClientes');
-        contenedorprincipalLista.style.display = 'block';
-        const contenedorLista = document.getElementById('contenedorListaClientes');
-        contenedorLista.innerHTML = '';
-        if (data.length === 0){
-            contenedorLista.innerHTML = '<p>No hay clientes registrados.</p>';
-            return;
-        }
-        data.forEach(element => {
-            insertarClienteEnLista(element, contenedorLista);
-        });
+        renderClientesEnContenedor(data || []);
     }
 }
 window.verTodosClientes = verTodosClientes;
 function cerrarListaClientes(){
-    const contenedorDetalles = document.getElementById('contenedorListaClientes');
-    contenedorDetalles.innerHTML = '';
-    const contenedorLista = document.getElementById('listaClientes');
-    contenedorLista.style.display = 'none';
     const input = document.getElementById('buscarClienteInput');
     if (input) input.value = '';
+    verTodosClientes();
 }
 window.cerrarListaClientes = cerrarListaClientes;
 
@@ -177,34 +181,30 @@ function insertarClienteEnLista(cliente, contenedor){
         </div>
     `;
     card.addEventListener('click', async () => {
-        // Mostrar detalles en modal que replica la UI del div de detalles
-        try {
-            await mostrarDetallesClienteModal(cliente);
-        } catch (err) {
-            console.error('Error mostrando modal, fallback al panel:', err);
-            // Fallback: abrir panel de detalles como antes
-            const contenedorDetalles = document.getElementById('detallesCliente');
-            contenedorDetalles.style.display = 'block';
-            document.getElementById('nombreCliente').innerHTML = `Nombre: <br>${nombre}`;
-            document.getElementById('telefonoCliente').innerHTML = `Teléfono: <br>${telefono}`;
-            // Formatear totales como ARS
-            const formatter = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
-            const totalPagado = await calcularMontoTotalPagado(telefono);
-            const totalAdeudado = cliente.Deuda_Activa !== undefined ? Number(cliente.Deuda_Activa) || 0 : 0;
-            document.getElementById('montototalPagado').innerHTML = formatter.format(totalPagado);
-            document.getElementById('montototalAdeudado').innerHTML = formatter.format(totalAdeudado);
+        document.querySelectorAll('.client-item[aria-selected="true"]').forEach((el) => el.removeAttribute('aria-selected'));
+        card.setAttribute('aria-selected', 'true');
+        setResponsiveDetailsOpen(true);
 
-            // Guardar estado del cliente actual
-            currentClienteTelefono = telefono;
-            currentClienteNombre = nombre;
-            currentClienteOpView = 'deudas';
-            isExpandedCliente = false;
+        document.getElementById('nombreCliente').innerHTML = `Nombre: <br>${nombre}`;
+        document.getElementById('telefonoCliente').innerHTML = `Teléfono: <br>${telefono}`;
 
-            // Preparar tabs y botones (expandir/refrescar/cerrar) para el panel del cliente
-            prepararTabsOperacionesCliente();
-            // Render inicial (deudas)
-            await mostrarOperacionesCliente('deudas');
-        }
+        // Formatear totales como ARS
+        const formatter = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
+        const totalPagado = await calcularMontoTotalPagado(telefono);
+        const totalAdeudado = cliente.Deuda_Activa !== undefined ? Number(cliente.Deuda_Activa) || 0 : 0;
+        document.getElementById('montototalPagado').innerHTML = formatter.format(totalPagado);
+        document.getElementById('montototalAdeudado').innerHTML = formatter.format(totalAdeudado);
+
+        // Guardar estado del cliente actual
+        currentClienteTelefono = telefono;
+        currentClienteNombre = nombre;
+        currentClienteOpView = 'deudas';
+        isExpandedCliente = false;
+
+        // Preparar tabs y botones para el panel del cliente
+        prepararTabsOperacionesCliente();
+        // Render inicial (deudas)
+        await mostrarOperacionesCliente('deudas');
     });
 
     // Borrar cliente (evitar que dispare el click del card)
@@ -256,6 +256,21 @@ async function calcularMontoTotalPagado(telefono){
         return 0;
     }
     return (data || []).reduce((total, pago) => total + (Number(pago.Monto) || 0), 0);
+}
+
+async function calcularMontoTotalAdeudado(telefono){
+    let q = supabase
+        .from('Clientes')
+        .select('Deuda_Activa')
+        .eq('Telefono', telefono)
+        .maybeSingle();
+    q = applyIdNegocioFilter(q);
+    const { data, error } = await q;
+    if (error) {
+        showErrorToast('Error al obtener la deuda activa: ' + error.message);
+        return 0;
+    }
+    return Number(data?.Deuda_Activa) || 0;
 }
 
 // -------- Operaciones del cliente seleccionado (tabs, lista, expandir, detalle) --------
@@ -761,24 +776,33 @@ async function refrescarOperacionesCliente(){
 
 // Cerrar contenedor de detalles del cliente
 function cerrarDetallesCliente(){
-    const det = document.getElementById('detallesCliente');
-    if (det) det.style.display = 'none';
+    setResponsiveDetailsOpen(false);
     const cont = document.getElementById('lista_operaciones_cliente');
-    if (cont) cont.innerHTML = '';
+    if (cont) cont.innerHTML = 'Selecciona un cliente para ver sus operaciones.';
+    const nombre = document.getElementById('nombreCliente');
+    const telefono = document.getElementById('telefonoCliente');
+    const totalPagado = document.getElementById('montototalPagado');
+    const totalAdeudado = document.getElementById('montototalAdeudado');
+    if (nombre) nombre.innerHTML = 'Nombre: <br>Cargando...';
+    if (telefono) telefono.innerHTML = 'Teléfono: <br>Cargando...';
+    if (totalPagado) totalPagado.textContent = '0.00';
+    if (totalAdeudado) totalAdeudado.textContent = '0.00';
+    document.querySelectorAll('.client-item[aria-selected="true"]').forEach((el) => el.removeAttribute('aria-selected'));
     currentClienteTelefono = null;
     currentClienteNombre = null;
 }
 window.cerrarDetallesCliente = cerrarDetallesCliente;
 
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 1080) {
+        document.body.classList.remove('mobile-details-open');
+    }
+});
+
 document.getElementById('buscarClienteInput').addEventListener('input', async (e) => {
     const query = (e.target.value || '').trim();
-    const lista = document.getElementById('listaClientes');
-    if (query.length === 0 && lista.style.display === 'none'){
+    if (query.length === 0){
         await verTodosClientes();
-        return;
-    }
-    // Si la lista ya está visible, respetamos tu lógica actual de no sobrescribir
-    if (lista.style.display !== 'none'){
         return;
     }
 
@@ -832,22 +856,11 @@ document.getElementById('buscarClienteInput').addEventListener('input', async (e
         });
     });
 
-    // Asegurar contenedor y render
-    const contenedorprincipalLista = lista;
-    contenedorprincipalLista.style.display = 'block';
-    let contenedorLista = document.getElementById('contenedorListaClientes');
-    if (!contenedorLista) {
-        contenedorLista = document.createElement('div');
-        contenedorLista.id = 'contenedorListaClientes';
-        contenedorprincipalLista.appendChild(contenedorLista);
-    }
-    contenedorLista.innerHTML = '';
-    if (!filtered || filtered.length === 0){
-        contenedorLista.innerHTML = '<p>No hay clientes registrados.</p>';
-        return;
-    }
-    filtered.forEach(element => insertarClienteEnLista(element, contenedorLista));
+    renderClientesEnContenedor(filtered || []);
 });
+
+// Carga inicial para el layout actual (lista visible por defecto)
+verTodosClientes();
 
 function enviarDeudaTotal(){
     if (!currentClienteTelefono || !currentClienteNombre) {

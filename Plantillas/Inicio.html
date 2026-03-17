@@ -56,8 +56,9 @@
     <main class="dashboard-layout">
         <section id="kpi_adeudado_mes" class="glass-panel">
             <div id="deuda_total">
-                <h2 class="kpi-subtitle">Deuda Total Activa</h2>
+                <p class="kpi-label">Deuda Total Activa</p>
                 <h1 id="total_adeudado_mes" class="text-gradient">Cargando...</h1>
+                <p class="kpi-meta">Saldo pendiente de clientes activos</p>
             </div>
             <button type="button" class="icon-btn btn-large" onclick="recargarMontos()" aria-label="Recargar montos" title="Actualizar KPI">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -94,12 +95,34 @@
                     <span class="nav-card__title">Nueva Operación</span>
                     <span class="nav-card__subtitle">Registrar un pago o deuda</span>
                 </div>
+                <span class="nav-card__status-dot" aria-hidden="true"></span>
             </button>
         </section>
 
         <section id="Operacion-ingreso" class="glass-panel" hidden>
             <h2 class="panel-title">Detalles de Operación</h2>
             <div class="op-reg">
+                <div class="op-lead">
+                    <p class="op-lead__title">Define el tipo antes de completar los datos</p>
+                    <p class="op-lead__subtitle">Selecciona si registraras un pago o una nueva deuda.</p>
+                </div>
+
+                <div class="type-row type-row--cards" role="radiogroup" aria-label="Tipo de operación">
+                    <label class="type-option" for="op_chkPago">
+                        <input type="radio" name="op_tipo" id="op_chkPago" value="pago">
+                        <span class="type-option__content">
+                            <span class="type-option__title">Pago Recibido</span>
+                            <span class="type-option__meta">Descuenta saldo pendiente</span>
+                        </span>
+                    </label>
+                    <label class="type-option" for="op_chkDeuda">
+                        <input type="radio" name="op_tipo" id="op_chkDeuda" value="deuda" checked>
+                        <span class="type-option__content">
+                            <span class="type-option__title">Cargar Deuda</span>
+                            <span class="type-option__meta">Registra un nuevo monto adeudado</span>
+                        </span>
+                    </label>
+                </div>
                 
                 <div class="input-wrapper">
                     <label for="op_clientSearch">Buscar Cliente</label>
@@ -142,17 +165,6 @@
                 <div class="reg-actions">
                     <button type="button" id="op_calc_back" class="btn-clear secondary" title="Borrar un dígito">⌫</button>
                     <button type="button" id="op_calc_clear" class="btn-clear danger">Limpiar (C)</button>
-                </div>
-
-                <div class="type-row glass-tabs" role="radiogroup" aria-label="Tipo de operación">
-                    <label class="type-option" for="op_chkPago">
-                        <input type="radio" name="op_tipo" id="op_chkPago" value="pago">
-                        <span>Pago Recibido</span>
-                    </label>
-                    <label class="type-option" for="op_chkDeuda">
-                        <input type="radio" name="op_tipo" id="op_chkDeuda" value="deuda" checked>
-                        <span>Cargar Deuda</span>
-                    </label>
                 </div>
 
                 <div class="op-submit">

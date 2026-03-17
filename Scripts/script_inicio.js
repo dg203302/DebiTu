@@ -916,14 +916,17 @@ function renderListaOperaciones(container, items, tipo){
         const montoRaw = item.Monto ?? item.monto ?? item.Amount ?? item.amount ?? 0;
         const monto = Number(montoRaw) || 0;
         const card = document.createElement('div');
-        card.className = 'op-item';
+        card.className = `op-item op-item--${tipo === 'deudas' ? 'deuda' : 'pago'}`;
+        const categoria = escapeHtml(String(item.Categoria || item.categoria || item.Detalle || item.detalle || ''));
+        const typeLabel = tipo === 'deudas' ? 'Deuda' : 'Pago';
+        const amountColor = tipo === 'deudas' ? 'var(--danger)' : 'var(--success)';
         card.innerHTML = `
             <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
                 <div>
-                    <div style="font-weight:600; color:${tipo==='deudas' ? 'var(--danger)' : 'var(--success)'}">${tipo==='deudas' ? 'Deuda' : 'Pago'}</div>
-                    <div class="muted" style="font-size:0.85rem;">${escapeHtml(String(fecha))}</div>
+                    <div style="font-weight:700; font-size:0.95rem;">${categoria || typeLabel}</div>
+                    <div class="muted" style="font-size:0.78rem; margin-top:2px;">${escapeHtml(String(fecha))}</div>
                 </div>
-                <div style="font-weight:700;">${formatter.format(monto)}</div>
+                <div style="font-weight:800; font-size:1.05rem; color:${amountColor};">${formatter.format(monto)}</div>
             </div>
         `;
         // click to show details
