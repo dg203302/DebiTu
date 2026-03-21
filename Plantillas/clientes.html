@@ -48,10 +48,6 @@
             </label>
 
             <div class="header-actions">
-                <div class="header-status" aria-hidden="true">
-                    <span class="status-dot"></span>
-                    <span>Módulo Crítico</span>
-                </div>
                 <button class="btn btn-primary" onclick="agregarCliente()" type="button">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -76,24 +72,10 @@
                 <button class="btn chip" type="button">Sin Deuda</button>
             </div>
 
-            <div id="botones" class="action-group compact">
-                <button class="btn btn-outline" onclick="verTodosClientes()" type="button">Ver Todos</button>
-            </div>
-
-            <div class="stats-row" aria-live="polite">
-                <span class="stats-label">Clientes mostrados</span>
-                <span class="stats-value">Actualizado por búsqueda</span>
-            </div>
 
             <section id="listaClientes" class="glass-panel list-panel">
                 <div id="cabeceraLista">
                     <h2 class="section-title">Clientes</h2>
-                    <button type="button" class="icon-btn" onclick="cerrarListaClientes()" aria-label="Ocultar lista" title="Ocultar">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <line x1="18" y1="6" x2="6" y2="18" />
-                            <line x1="6" y1="6" x2="18" y2="18" />
-                        </svg>
-                    </button>
                 </div>
                 <div id="contenedorListaClientes" aria-live="polite">
                     <div class="client-item skeleton" aria-hidden="true"></div>
@@ -106,12 +88,15 @@
         <section id="detallesCliente" class="glass-panel details-panel">
             <div id="headerDetalles">
                 <h2 class="section-title">Panel de Cliente</h2>
-                <button type="button" class="icon-btn" onclick="cerrarDetallesCliente()" aria-label="Cerrar detalles" title="Cerrar">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                </button>
+                <div class="action-group">
+                    <button id="btn_editar_cliente" class="btn btn-outline subtle" type="button">Editar</button>
+                    <button id="btn_cerrar_detalles" type="button" class="icon-btn" onclick="cerrarDetallesCliente()" aria-label="Cerrar detalles" title="Cerrar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <div class="empty-client-state" aria-hidden="true">
@@ -127,12 +112,11 @@
 
             <section id="datosCliente">
                 <div class="cliente-profile">
-                    <div class="profile-avatar" aria-hidden="true">CP</div>
+                    <div id="avatarCliente" class="profile-avatar" aria-hidden="true">CP</div>
                     <div class="profile-copy">
                         <p id="nombreCliente">Nombre: <br>Cargando...</p>
                         <p id="telefonoCliente">Teléfono: <br>Cargando...</p>
                     </div>
-                    <button class="btn btn-success-soft" type="button" onclick="enviarDeudaTotal()">WhatsApp</button>
                 </div>
 
                 <div id="infoCliente" class="sr-only">

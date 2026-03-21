@@ -8,6 +8,7 @@ let currentClienteTelefono = null;
 let currentClienteNombre = null;
 let currentClienteOpView = 'deudas'; // 'deudas' | 'pagos'
 let isExpandedCliente = false; // controla ver 4 vs todos
+let currentClientesFilter = 'all'; // 'all' | 'withDebt' | 'withoutDebt'
 
 function setResponsiveDetailsOpen(open){
     if (window.innerWidth <= 1080) {
@@ -15,6 +16,27 @@ function setResponsiveDetailsOpen(open){
     } else {
         document.body.classList.remove('mobile-details-open');
     }
+}
+
+function setDesktopNoClientSelected(noSelected){
+    // Solo aplica a escritorio; en móvil/tablet el comportamiento es distinto.
+    if (window.innerWidth > 1080) {
+        document.body.classList.toggle('desktop-no-client-selected', !!noSelected);
+    } else {
+        document.body.classList.remove('desktop-no-client-selected');
+    }
+}
+
+function syncDesktopNoClientSelected(){
+    setDesktopNoClientSelected(!currentClienteTelefono);
+}
+
+function syncEditButtonVisibility(){
+    const hasSelection = !!currentClienteTelefono;
+    const btnEditar = document.getElementById('btn_editar_cliente');
+    if (btnEditar) btnEditar.style.display = hasSelection ? '' : 'none';
+    const btnCerrar = document.getElementById('btn_cerrar_detalles');
+    if (btnCerrar) btnCerrar.style.display = hasSelection ? '' : 'none';
 }
 
 function renderClientesEnContenedor(clientes){
@@ -53,6 +75,168 @@ function normalizePhone(phone){
     const digits = (phone || '').toString().replace(/\D+/g, '');
     if (digits.length > 10) return digits.slice(-10);
     return digits;
+}
+
+function getAvatarLetters(nombre){
+    const raw = (nombre || '').toString().trim();
+    if (!raw) return 'CP';
+    const compact = raw.replace(/\s+/g, '');
+    const two = compact.slice(0, 2);
+    return two ? two.toUpperCase() : 'CP';
+}
+
+function autoSelectClientByPhone(phone){
+    const target = normalizePhone(phone);
+    if (!target) return false;
+    const items = Array.from(document.querySelectorAll('#contenedorListaClientes .client-item'))
+        .filter((el) => !el.classList.contains('skeleton'));
+    for (const el of items){
+        const meta = el.querySelector('.meta');
+        const digits = normalizePhone(meta ? meta.textContent : '');
+        if (digits && digits === target){
+            el.click();
+            return true;
+        }
+    }
+    return false;
+}
+
+async function editarClienteActual(){
+    if (!currentClienteTelefono){
+        await showErrorToast('No hay cliente seleccionado.');
+        return;
+    }
+
+    const oldNombre = (currentClienteNombre || '').toString();
+    const oldTelefono = normalizePhone(currentClienteTelefono);
+
+    const html = `
+    <div style="display:grid; gap:8px; width:100%; max-width:100%; box-sizing:border-box; overflow:hidden;">
+        <label class="muted" for="edit_nombre">Nombre completo</label>
+        <input class="swal2-input" type="text" id="edit_nombre" name="edit_nombre" required style="width:100%; max-width:100%; box-sizing:border-box;" value="${escapeHtml(oldNombre)}">
+
+        <label class="muted" for="edit_telefono">Teléfono</label>
+        <input class="swal2-input" type="tel" id="edit_telefono" name="edit_telefono" required style="width:100%; max-width:100%; box-sizing:border-box;" value="${escapeHtml(oldTelefono)}">
+
+        <p class="muted" style="margin:6px 0 0 0; font-size:0.78rem;">
+            Si cambiás el teléfono, también se actualizarán deudas y pagos asociados.
+        </p>
+    </div>`;
+
+    const { value: formValues } = await Swal.fire({
+        title: 'Editar cliente',
+        html,
+        width: 'min(560px, 92vw)',
+        showCancelButton: true,
+        confirmButtonText: 'Guardar',
+        cancelButtonText: 'Cancelar',
+        focusConfirm: false,
+        allowEnterKey: true,
+        didOpen: () => {
+            const input = Swal.getPopup().querySelector('#edit_nombre');
+            if (input) input.focus();
+        },
+        preConfirm: () => {
+            const nombre = (Swal.getPopup().querySelector('#edit_nombre').value || '').trim();
+            const telRaw = (Swal.getPopup().querySelector('#edit_telefono').value || '').trim();
+            const telefono = normalizePhone(telRaw);
+            if (!nombre) {
+                Swal.showValidationMessage('Ingrese el nombre del cliente');
+                return;
+            }
+            if (!telefono) {
+                Swal.showValidationMessage('Ingrese el teléfono del cliente (solo números)');
+                return;
+            }
+            return { nombre, telefono };
+        }
+    });
+
+    if (!formValues) return;
+
+    const newNombre = formValues.nombre;
+    const newTelefono = normalizePhone(formValues.telefono);
+
+    const changedNombre = newNombre !== oldNombre;
+    const changedTelefono = newTelefono !== oldTelefono;
+    if (!changedNombre && !changedTelefono){
+        await showinfo('Sin cambios', 'No se modificó ningún dato.');
+        return;
+    }
+
+    if (changedTelefono){
+        const confirm = await Swal.fire({
+            title: 'Confirmar cambio de teléfono',
+            text: 'Esto actualizará también las deudas y pagos del cliente.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Continuar',
+            cancelButtonText: 'Cancelar'
+        });
+        if (!confirm.isConfirmed) return;
+    }
+
+    // Actualizar en BD (multi-tenant)
+    try {
+        let upd = supabase
+            .from('Clientes')
+            .update({ Nombre: newNombre, Telefono: newTelefono })
+            .eq('Telefono', oldTelefono);
+        upd = applyIdNegocioFilter(upd);
+        const { error: errCliente } = await upd;
+        if (errCliente){
+            await showErrorToast('No se pudo actualizar el cliente: ' + errCliente.message);
+            return;
+        }
+
+        if (changedTelefono){
+            let updDeudas = supabase
+                .from('Deudas')
+                .update({ Telefono_cliente: newTelefono })
+                .eq('Telefono_cliente', oldTelefono);
+            updDeudas = applyIdNegocioFilter(updDeudas);
+            const { error: errDeudas } = await updDeudas;
+
+            let updPagos = supabase
+                .from('Pagos')
+                .update({ Telefono_cliente: newTelefono })
+                .eq('Telefono_cliente', oldTelefono);
+            updPagos = applyIdNegocioFilter(updPagos);
+            const { error: errPagos } = await updPagos;
+
+            if (errDeudas || errPagos){
+                // Best-effort rollback del cliente
+                let rb = supabase
+                    .from('Clientes')
+                    .update({ Nombre: oldNombre, Telefono: oldTelefono })
+                    .eq('Telefono', newTelefono);
+                rb = applyIdNegocioFilter(rb);
+                await rb;
+                const msg = (errDeudas ? `Deudas: ${errDeudas.message}` : '') + (errPagos ? ` Pagos: ${errPagos.message}` : '');
+                await showErrorToast('Se actualizó el cliente, pero falló la actualización de operaciones. Se revirtió el cambio. ' + msg);
+                return;
+            }
+        }
+
+        // Actualizar estado/UI
+        currentClienteNombre = newNombre;
+        currentClienteTelefono = newTelefono;
+        const elNombre = document.getElementById('nombreCliente');
+        const elTelefono = document.getElementById('telefonoCliente');
+        const avatar = document.getElementById('avatarCliente');
+        if (elNombre) elNombre.innerHTML = `Nombre: <br>${newNombre}`;
+        if (elTelefono) elTelefono.innerHTML = `Teléfono: <br>${newTelefono}`;
+        if (avatar) avatar.textContent = getAvatarLetters(newNombre);
+
+        await showSuccessToast('Cliente actualizado');
+
+        // Refrescar lista y re-seleccionar
+        await verTodosClientes();
+        requestAnimationFrame(() => autoSelectClientByPhone(newTelefono));
+    } catch (err){
+        console.error('Editar cliente error', err);
+        await showErrorToast('Error al editar el cliente');
+    }
 }
 
 // --- Multi-tenant helper (ID_Negocio) ---
@@ -145,6 +329,13 @@ async function agregarCliente(){
 window.agregarCliente = agregarCliente;
 
 async function verTodosClientes(){
+    const data = await fetchAllClientes();
+    if (!data) return;
+    renderClientesEnContenedor(filtrarClientes(data, currentClientesFilter));
+}
+window.verTodosClientes = verTodosClientes;
+
+async function fetchAllClientes(){
     const {data, error} = await applyIdNegocioFilter(
         supabase
             .from('Clientes')
@@ -152,12 +343,70 @@ async function verTodosClientes(){
     );
     if (error){
         showErrorToast('Error al obtener los clientes: ' + error.message);
-        return;
-    } else {
-        renderClientesEnContenedor(data || []);
+        return null;
     }
+    return data || [];
 }
-window.verTodosClientes = verTodosClientes;
+
+function getDeudaActivaFromCliente(cliente){
+    const v = cliente?.Deuda_Activa ?? cliente?.deuda_activa ?? cliente?.deudaActiva ?? 0;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+}
+
+function filtrarClientes(clientes, filter){
+    if (!Array.isArray(clientes)) return [];
+    if (filter === 'withDebt'){
+        return clientes.filter((c) => getDeudaActivaFromCliente(c) > 0);
+    }
+    if (filter === 'withoutDebt'){
+        return clientes.filter((c) => getDeudaActivaFromCliente(c) <= 0);
+    }
+    return clientes;
+}
+
+async function aplicarFiltroClientes(filter){
+    currentClientesFilter = filter || 'all';
+
+    // UX simple: al filtrar se parte del universo completo (sin búsqueda)
+    const input = document.getElementById('buscarClienteInput');
+    if (input) input.value = '';
+
+    // Estado visual del chip activo
+    document.querySelectorAll('.filters-wrap .chip').forEach((btn) => {
+        const f = btn.dataset.filter;
+        btn.classList.toggle('is-active', f === currentClientesFilter);
+    });
+
+    const data = await fetchAllClientes();
+    if (!data) return;
+    renderClientesEnContenedor(filtrarClientes(data, currentClientesFilter));
+    cerrarDetallesCliente();
+}
+
+function initFiltrosClientes(){
+    const wrap = document.querySelector('.filters-wrap');
+    if (!wrap) return;
+    const chips = Array.from(wrap.querySelectorAll('.chip'));
+    for (const chip of chips){
+        const label = (chip.textContent || '').toString().trim().toLowerCase();
+        let filter = 'all';
+        if (label.includes('con') && label.includes('deuda')) filter = 'withDebt';
+        else if (label.includes('sin') && label.includes('deuda')) filter = 'withoutDebt';
+        else if (label.includes('todos')) filter = 'all';
+        chip.dataset.filter = filter;
+        chip.addEventListener('click', () => {
+            aplicarFiltroClientes(filter);
+        });
+    }
+
+    // Dejar el estado inicial consistente con el marcado en HTML
+    const initialActive = chips.find((c) => c.classList.contains('is-active'));
+    if (initialActive?.dataset?.filter) currentClientesFilter = initialActive.dataset.filter;
+    document.querySelectorAll('.filters-wrap .chip').forEach((btn) => {
+        btn.classList.toggle('is-active', btn.dataset.filter === currentClientesFilter);
+    });
+}
 function cerrarListaClientes(){
     const input = document.getElementById('buscarClienteInput');
     if (input) input.value = '';
@@ -184,9 +433,12 @@ function insertarClienteEnLista(cliente, contenedor){
         document.querySelectorAll('.client-item[aria-selected="true"]').forEach((el) => el.removeAttribute('aria-selected'));
         card.setAttribute('aria-selected', 'true');
         setResponsiveDetailsOpen(true);
+        setDesktopNoClientSelected(false);
 
         document.getElementById('nombreCliente').innerHTML = `Nombre: <br>${nombre}`;
         document.getElementById('telefonoCliente').innerHTML = `Teléfono: <br>${telefono}`;
+        const avatar = document.getElementById('avatarCliente');
+        if (avatar) avatar.textContent = getAvatarLetters(nombre);
 
         // Formatear totales como ARS
         const formatter = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
@@ -200,6 +452,7 @@ function insertarClienteEnLista(cliente, contenedor){
         currentClienteNombre = nombre;
         currentClienteOpView = 'deudas';
         isExpandedCliente = false;
+        syncEditButtonVisibility();
 
         // Preparar tabs y botones para el panel del cliente
         prepararTabsOperacionesCliente();
@@ -781,15 +1034,19 @@ function cerrarDetallesCliente(){
     if (cont) cont.innerHTML = 'Selecciona un cliente para ver sus operaciones.';
     const nombre = document.getElementById('nombreCliente');
     const telefono = document.getElementById('telefonoCliente');
+    const avatar = document.getElementById('avatarCliente');
     const totalPagado = document.getElementById('montototalPagado');
     const totalAdeudado = document.getElementById('montototalAdeudado');
     if (nombre) nombre.innerHTML = 'Nombre: <br>Cargando...';
     if (telefono) telefono.innerHTML = 'Teléfono: <br>Cargando...';
+    if (avatar) avatar.textContent = 'CP';
     if (totalPagado) totalPagado.textContent = '0.00';
     if (totalAdeudado) totalAdeudado.textContent = '0.00';
     document.querySelectorAll('.client-item[aria-selected="true"]').forEach((el) => el.removeAttribute('aria-selected'));
     currentClienteTelefono = null;
     currentClienteNombre = null;
+    syncDesktopNoClientSelected();
+    syncEditButtonVisibility();
 }
 window.cerrarDetallesCliente = cerrarDetallesCliente;
 
@@ -797,7 +1054,15 @@ window.addEventListener('resize', () => {
     if (window.innerWidth > 1080) {
         document.body.classList.remove('mobile-details-open');
     }
+    syncDesktopNoClientSelected();
+    syncEditButtonVisibility();
 });
+
+// Wire UI actions
+const btnEditarCliente = document.getElementById('btn_editar_cliente');
+if (btnEditarCliente){
+    btnEditarCliente.addEventListener('click', editarClienteActual);
+}
 
 document.getElementById('buscarClienteInput').addEventListener('input', async (e) => {
     const query = (e.target.value || '').trim();
@@ -861,6 +1126,9 @@ document.getElementById('buscarClienteInput').addEventListener('input', async (e
 
 // Carga inicial para el layout actual (lista visible por defecto)
 verTodosClientes();
+syncDesktopNoClientSelected();
+syncEditButtonVisibility();
+initFiltrosClientes();
 
 function enviarDeudaTotal(){
     if (!currentClienteTelefono || !currentClienteNombre) {
