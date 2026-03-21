@@ -49,13 +49,13 @@
         <section class="glass-panel prefs-panel">
             <h2 class="section-title">Preferencias</h2>
             <div class="prefs-grid">
-                <div class="pref-item">
+                <!--<div class="pref-item">
                     <div>
                         <h3>Idioma</h3>
                         <p>Personaliza el contenido de la interfaz.</p>
                     </div>
                     <button id="idioma-btn">Cambiar Idioma</button>
-                </div>
+                </div>-->
 
                 <div class="pref-item pref-item--visual">
                     <div>
@@ -67,7 +67,7 @@
                         <button id="modo-oscuro-btn" class="ios-switch" type="button" role="switch" aria-checked="false" aria-label="Cambiar tema"></button>
                         <span class="theme-toggle__label theme-toggle__label--dark">Oscuro</span>
                     </div>
-                    <button id="transparencia-btn" class="secondary-btn">Transparencia</button>
+                    <!--<button id="transparencia-btn" class="secondary-btn">Transparencia</button>-->
                 </div>
 
                 <div class="pref-item pref-item--danger">
@@ -81,7 +81,11 @@
         </section>
 
         <section class="glass-panel footer-panel">
-            <p>&copy; <a href="https://djsolutionss.netlify.app">DJ Solutions</a> <span id="anio"></span> Client Management System</p>
+            <div class="credits-head" aria-label="Información de la aplicación">
+                <img class="app-icon" src="/icons/Icon.png" alt="Icono de la app" loading="lazy" decoding="async">
+                <h1 class="app-title">Client Management System</h1>
+            </div>
+            <p>&copy; <a href="https://djsolutionss.netlify.app">DJ Solutions</a> <span id="anio"></span></p>
         </section>
     </main>
 

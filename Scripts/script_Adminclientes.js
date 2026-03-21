@@ -1,4 +1,4 @@
-import {showError,showErrorToast,showSuccess,showSuccessToast,showInfoHTML,showinfo, loadSweetAlert2} from './sweetalert2.js'
+import {showError,showErrorToast,showSuccess,showSuccessToast,showinfo, loadSweetAlert2} from './sweetalert2.js'
 import {loadSupabase} from './supabase.js';
 const Swal = await loadSweetAlert2();
 const supabase = await loadSupabase();
@@ -652,30 +652,226 @@ function expandirTablaCliente(){
 }
 
 async function showOperacionDetalleCliente(item, tipo){
-    const lines = [];
-    const montoRaw = item.Monto ?? item.monto ?? item.Amount ?? item.amount ?? '';
-    const creadoRaw = item.Creado ?? item.creado ?? item.fecha ?? item.created_at ?? '';
-    lines.push(`<strong>Monto:</strong> ${escapeHtml(String(montoRaw))}`);
-    lines.push(`<strong>Fecha:</strong> ${escapeHtml(formatDate(creadoRaw))}`);
+    openOperacionDetalleDrawer(item, tipo);
+}
 
-    const ignored = new Set([
-        'Monto','monto','Amount','amount',
-        'Creado','creado','fecha','created_at',
-        'Telefono_cliente','Cliente','cliente','client'
-    ]);
-    Object.keys(item).forEach(k => {
-        if (ignored.has(k)) return;
-        const v = item[k];
-        let display;
-        if (v === null || v === undefined) display = '';
-        else if (typeof v === 'object') { try { display = JSON.stringify(v); } catch { display = String(v); } }
-        else display = String(v);
-        lines.push(`<strong>${escapeHtml(String(k))}:</strong> ${escapeHtml(display)}`);
+// --- Drawer: detalle de deuda/pago (sin SweetAlert) ---
+let opDrawerEls = null;
+
+function ensureOperacionDetalleDrawer(){
+    if (opDrawerEls) return opDrawerEls;
+
+    let backdrop = document.getElementById('opDetailBackdrop');
+    let drawer = document.getElementById('opDetailDrawer');
+    if (!backdrop){
+        backdrop = document.createElement('div');
+        backdrop.id = 'opDetailBackdrop';
+        backdrop.className = 'op-detail-backdrop';
+        document.body.appendChild(backdrop);
+    }
+    if (!drawer){
+        drawer = document.createElement('div');
+        drawer.id = 'opDetailDrawer';
+        drawer.className = 'op-detail-drawer';
+        drawer.setAttribute('role', 'dialog');
+        drawer.setAttribute('aria-modal', 'true');
+        drawer.setAttribute('aria-label', 'Detalle de operación');
+        drawer.innerHTML = `
+            <div class="op-detail-drawer__header">
+                <div>
+                    <h3 class="op-detail-drawer__title" id="opDetailTitle">Detalle</h3>
+                    <div class="op-detail-drawer__subtitle" id="opDetailSubtitle">—</div>
+                </div>
+                <button type="button" class="icon-btn" id="opDetailClose" aria-label="Cerrar" title="Cerrar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="op-detail-drawer__body">
+                <div class="op-detail-grid" id="opDetailGrid"></div>
+                <div class="op-detail-actions">
+                    <button type="button" class="btn btn-danger-soft" id="opDetailDelete">Eliminar registro</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(drawer);
+    }
+
+    const close = () => closeOperacionDetalleDrawer();
+    backdrop.addEventListener('click', close);
+    const closeBtn = drawer.querySelector('#opDetailClose');
+    closeBtn?.addEventListener('click', close);
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeOperacionDetalleDrawer();
     });
 
-    const html = lines.join('<br>');
-    try{ await showInfoHTML(html); } 
-    catch(e){ alert(html.replace(/<br\s*\/?>/g, '\n').replace(/<[^>]+>/g, '')); }
+    opDrawerEls = {
+        backdrop,
+        drawer,
+        title: drawer.querySelector('#opDetailTitle'),
+        subtitle: drawer.querySelector('#opDetailSubtitle'),
+        grid: drawer.querySelector('#opDetailGrid'),
+        deleteBtn: drawer.querySelector('#opDetailDelete'),
+        currentItem: null,
+        currentTipo: null
+    };
+    return opDrawerEls;
+}
+
+function closeOperacionDetalleDrawer(){
+    document.body.classList.remove('op-detail-open');
+    const els = ensureOperacionDetalleDrawer();
+    els.currentItem = null;
+    els.currentTipo = null;
+}
+
+function renderOpDetailRow(label, value, opts = {}){
+    const amount = !!opts.amount;
+    const safeValue = (value === null || value === undefined || value === '') ? '—' : String(value);
+    return `
+        <div class="op-detail-row">
+            <div class="op-detail-label">${escapeHtml(label)}</div>
+            <div class="op-detail-value ${amount ? 'op-detail-amount' : ''}">${escapeHtml(safeValue)}</div>
+        </div>
+    `;
+}
+
+function openOperacionDetalleDrawer(item, tipo){
+    const els = ensureOperacionDetalleDrawer();
+    els.currentItem = item;
+    els.currentTipo = tipo;
+
+    const isDeuda = tipo === 'deudas';
+    const formatter = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
+    const montoRaw = item?.Monto ?? item?.monto ?? item?.Amount ?? item?.amount ?? 0;
+    const monto = Number(montoRaw) || 0;
+    const creadoRaw = item?.Creado ?? item?.creado ?? item?.fecha ?? item?.created_at ?? '';
+    const fecha = formatDate(creadoRaw);
+    const categoria = item?.Categoria ?? item?.categoria ?? item?.Concepto ?? item?.concepto ?? '';
+
+    if (els.title) els.title.textContent = isDeuda ? 'Detalle de Deuda' : 'Detalle de Pago';
+    if (els.subtitle) els.subtitle.textContent = currentClienteNombre ? `Cliente: ${currentClienteNombre}` : '—';
+
+    const rows = [];
+    rows.push(renderOpDetailRow('Monto', formatter.format(monto), { amount: true }));
+    rows.push(renderOpDetailRow('Fecha', fecha));
+    rows.push(renderOpDetailRow('Categoría', categoria || '—'));
+
+    // Mostrar solo campos no sensibles/no IDs (embellecido y sin ids)
+    const ignoredKeys = new Set([
+        'Monto','monto','Amount','amount',
+        'Creado','creado','fecha','created_at',
+        'Telefono_cliente','Cliente','cliente','client',
+        'ID_Negocio','id_negocio','idNegocio'
+    ]);
+    const idLike = (k) => /^id(_|$)/i.test(String(k)) || /_id$/i.test(String(k));
+    Object.keys(item || {}).forEach((k) => {
+        if (ignoredKeys.has(k)) return;
+        if (idLike(k)) return; // elimina id_deuda / id_pago / id
+        if (k === 'Categoria' || k === 'categoria' || k === 'Concepto' || k === 'concepto') return;
+        const v = item[k];
+        if (v === null || v === undefined || v === '') return;
+        let display;
+        if (typeof v === 'object') { try { display = JSON.stringify(v); } catch { display = String(v); } }
+        else display = String(v);
+        rows.push(renderOpDetailRow(String(k), display));
+    });
+
+    if (els.grid) els.grid.innerHTML = rows.join('');
+
+    if (els.deleteBtn){
+        els.deleteBtn.textContent = 'Eliminar registro';
+        els.deleteBtn.onclick = async () => {
+            await confirmarYEliminarOperacionDesdeDrawer();
+        };
+    }
+
+    document.body.classList.add('op-detail-open');
+}
+
+async function eliminarOperacionIndiv(item, tipo, telefono){
+    try{
+        const table = (tipo === 'deudas') ? 'Deudas' : 'Pagos';
+        const candidates = (tipo === 'deudas')
+            ? ['id_deuda','idDeuda','id','ID','Id']
+            : ['id_pago','idPago','id','ID','Id'];
+
+        let usedKey = null;
+        let idVal = null;
+        for (const k of candidates){
+            if (item && item[k] !== undefined && item[k] !== null){ usedKey = k; idVal = item[k]; break; }
+        }
+
+        let del = supabase.from(table).delete();
+        if (usedKey){
+            del = del.eq(usedKey, idVal);
+        } else {
+            const matchObj = { };
+            if (telefono) matchObj['Telefono_cliente'] = telefono;
+            const monto = (item?.Monto ?? item?.monto);
+            if (monto !== undefined) matchObj['Monto'] = Number(monto) || 0;
+            const fecha = (item?.Creado ?? item?.created_at ?? item?.fecha ?? item?.creado);
+            if (fecha !== undefined) matchObj['Creado'] = fecha;
+            del = del.match(matchObj);
+        }
+        del = applyIdNegocioFilter(del);
+        const { error } = await del;
+        if (error){ await showErrorToast('No se pudo eliminar el registro: ' + error.message); return false; }
+        return true;
+    }catch(err){
+        console.error('Eliminar operacion indiv error', err);
+        await showErrorToast('Error eliminando el registro');
+        return false;
+    }
+}
+
+async function confirmarYEliminarOperacionDesdeDrawer(){
+    const els = ensureOperacionDetalleDrawer();
+    const item = els.currentItem;
+    const tipo = els.currentTipo;
+    if (!item || !tipo){
+        await showErrorToast('No hay operación seleccionada.');
+        return;
+    }
+    if (!currentClienteTelefono){
+        await showErrorToast('No hay cliente seleccionado.');
+        return;
+    }
+
+    const formatter = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
+    const monto = Number(item?.Monto ?? item?.monto ?? 0) || 0;
+    const fecha = formatDate(item?.Creado ?? item?.created_at ?? item?.fecha ?? item?.creado ?? '');
+    const titulo = (tipo === 'deudas') ? 'Eliminar deuda' : 'Eliminar pago';
+    const confirm = await Swal.fire({
+        title: titulo,
+        html: `Al eliminar el pago/deuda <strong>solo se elimina el registro</strong>.<br><br><span class="muted">La deuda acumulada (Deuda Activa) del cliente no cambiará.</span>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Eliminar',
+        cancelButtonText: 'Cancelar'
+    });
+    if (!confirm.isConfirmed) return;
+
+    const ok = await eliminarOperacionIndiv(item, tipo, currentClienteTelefono);
+    if (!ok) return;
+
+    // refrescar panel
+    try{
+        const formatter2 = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
+        const totalPagado = await calcularMontoTotalPagado(currentClienteTelefono);
+        const elPagado = document.getElementById('montototalPagado');
+        if (elPagado) elPagado.innerHTML = formatter2.format(totalPagado);
+        // deuda activa viene de Clientes; no se toca
+        await mostrarOperacionesCliente(currentClienteOpView);
+    }catch(e){
+        console.warn('Refresco post-eliminar falló', e);
+    }
+
+    closeOperacionDetalleDrawer();
+    await showSuccessToast(`${(tipo === 'deudas') ? 'Deuda' : 'Pago'} eliminado (${formatter.format(monto)} • ${fecha})`);
 }
 
 // Mostrar detalles del cliente en un modal que replica la UI/funcionalidad del div de detalles

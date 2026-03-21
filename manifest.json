@@ -6,7 +6,7 @@
   "orientation": "portrait",
   "scope": "/",
   "short_name": "administracion clientes",
-  "start_url": "https://adminkiosco.netlify.app/",
+  "start_url": "https://clientmanagmentsystem.netlify.app/",
   "theme_color": "#ffffff",
   "id": "1739",
   "description": "App para adminstrar cuentas corrientes de clientes de un negocio",

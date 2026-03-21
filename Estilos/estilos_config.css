@@ -724,6 +724,36 @@ button.ios-switch::after {
 .footer-panel {
 	text-align: center;
 	color: var(--muted);
+	display: grid;
+	justify-items: center;
+	gap: 10px;
+}
+
+.footer-panel .credits-head {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.footer-panel .app-icon {
+	width: 56px;
+	height: 56px;
+	border-radius: 16px;
+	border: 1px solid var(--border);
+	background: var(--input);
+	object-fit: cover;
+	box-shadow: 0 10px 24px -14px rgba(0, 0, 0, 0.7);
+}
+
+.footer-panel .app-title {
+	margin: 0;
+	font-size: 1.1rem;
+	line-height: 1.35;
+	font-weight: 800;
+	color: var(--heading);
+	overflow-wrap: anywhere;
 }
 
 .footer-panel p {

@@ -116,36 +116,55 @@
                 </div>
 
                 <div class="input-wrapper amount-wrapper">
-                    <label for="op_amount">Monto de Operación ($)</label>
-                    <input id="op_amount" class="modern-input reg-amount" value="0" inputmode="decimal">
+                    <label for="op_total_amount">Monto total a registrar ($)</label>
+                    <input id="op_total_amount" class="modern-input reg-amount" value="0" inputmode="decimal" autocomplete="off" spellcheck="false">
+                    <input id="op_total_amount_value" type="hidden" value="0">
                 </div>
 
-                <div id="op_calc" class="calc-grid" aria-label="Calculadora">
-                    <button type="button" class="calc-btn" data-key="7">7</button>
-                    <button type="button" class="calc-btn" data-key="8">8</button>
-                    <button type="button" class="calc-btn" data-key="9">9</button>
-                    <button type="button" class="calc-op" data-op="/">÷</button>
+                <details id="op_calc_shell" class="calc-shell" open>
+                    <summary class="calc-summary" aria-controls="op_calc_body">
+                        <span class="calc-summary__title">Calculadora</span>
+                        <span class="calc-summary__chev" aria-hidden="true">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9" />
+                            </svg>
+                        </span>
+                    </summary>
 
-                    <button type="button" class="calc-btn" data-key="4">4</button>
-                    <button type="button" class="calc-btn" data-key="5">5</button>
-                    <button type="button" class="calc-btn" data-key="6">6</button>
-                    <button type="button" class="calc-op" data-op="*">×</button>
+                    <div id="op_calc_body" class="calc-body">
+                        <div class="input-wrapper">
+                            <label for="op_amount">Operación</label>
+                            <input id="op_amount" class="modern-input calc-display" value="0" inputmode="text" autocomplete="off" spellcheck="false">
+                        </div>
 
-                    <button type="button" class="calc-btn" data-key="1">1</button>
-                    <button type="button" class="calc-btn" data-key="2">2</button>
-                    <button type="button" class="calc-btn" data-key="3">3</button>
-                    <button type="button" class="calc-op" data-op="-">-</button>
+                        <div id="op_calc" class="calc-grid" aria-label="Calculadora">
+                            <button type="button" class="calc-btn" data-key="7">7</button>
+                            <button type="button" class="calc-btn" data-key="8">8</button>
+                            <button type="button" class="calc-btn" data-key="9">9</button>
+                            <button type="button" class="calc-op" data-op="/">÷</button>
 
-                    <button type="button" class="calc-btn" data-key="0">0</button>
-                    <button type="button" class="calc-btn" data-key=".">.</button>
-                    <button type="button" id="op_calc_eq">=</button>
-                    <button type="button" class="calc-op" data-op="+">+</button>
-                </div>
+                            <button type="button" class="calc-btn" data-key="4">4</button>
+                            <button type="button" class="calc-btn" data-key="5">5</button>
+                            <button type="button" class="calc-btn" data-key="6">6</button>
+                            <button type="button" class="calc-op" data-op="*">×</button>
 
-                <div class="reg-actions">
-                    <button type="button" id="op_calc_back" class="btn-clear secondary" title="Borrar un dígito">⌫</button>
-                    <button type="button" id="op_calc_clear" class="btn-clear danger">Limpiar (C)</button>
-                </div>
+                            <button type="button" class="calc-btn" data-key="1">1</button>
+                            <button type="button" class="calc-btn" data-key="2">2</button>
+                            <button type="button" class="calc-btn" data-key="3">3</button>
+                            <button type="button" class="calc-op" data-op="-">-</button>
+
+                            <button type="button" class="calc-btn" data-key="0">0</button>
+                            <button type="button" class="calc-btn" data-key=".">.</button>
+                            <button type="button" id="op_calc_eq">=</button>
+                            <button type="button" class="calc-op" data-op="+">+</button>
+                        </div>
+
+                        <div class="reg-actions">
+                            <button type="button" id="op_calc_back" class="btn-clear secondary" title="Borrar un dígito">⌫</button>
+                            <button type="button" id="op_calc_clear" class="btn-clear danger">Limpiar (C)</button>
+                        </div>
+                    </div>
+                </details>
 
                 <div class="op-submit">
                     <button type="button" id="op_registrar" class="btn btn-primary large">Registrar Operación</button>

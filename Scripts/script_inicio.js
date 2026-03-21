@@ -98,6 +98,8 @@ function prepararOperacionIngreso(){
     const input = document.getElementById('op_clientSearch');
     const matches = document.getElementById('op_clientMatches');
     const catInput = document.getElementById('op_category');
+    const totalAmount = document.getElementById('op_total_amount');
+    const totalAmountValue = document.getElementById('op_total_amount_value');
     const amount = document.getElementById('op_amount');
     const chkPago = document.getElementById('op_chkPago');
     const chkDeuda = document.getElementById('op_chkDeuda');
@@ -108,7 +110,9 @@ function prepararOperacionIngreso(){
     const clear = document.getElementById('op_calc_clear');
     const back = document.getElementById('op_calc_back');
 
-    if (!input || !matches || !catInput || !amount || !chkPago || !chkDeuda || !btnRegistrar || !calc || !eq || !clear || !back) {
+    const calcShell = document.getElementById('op_calc_shell');
+
+    if (!input || !matches || !catInput || !totalAmount || !totalAmountValue || !amount || !chkPago || !chkDeuda || !btnRegistrar || !calc || !eq || !clear || !back) {
         console.warn('No se pudo inicializar Operacion-ingreso: faltan elementos del formulario.');
         return;
     }
@@ -164,134 +168,368 @@ function prepararOperacionIngreso(){
         debounceTimer = setTimeout(() => loadMatches(input.value.trim()), 250);
     });
 
-    // --- LÓGICA DE CALCULADORA ---
+    // --- LÓGICA DE CALCULADORA (expresión completa) ---
     const btns = calc.querySelectorAll('.calc-btn');
     const ops = calc.querySelectorAll('.calc-op');
 
-    let currentDisplay = '0';
-    let firstOperand = null;
-    let operator = null;
-    let waitingForSecondOperand = false;
+    let expr = '0'; // expresión normalizada: 0-9.+-*/ (sin espacios, sin × ÷)
+    let lastResult = 0;
+    let showingResult = false; // si el display muestra "... = ..."
+    let syncingFromCode = false;
 
-    function getOperatorSymbol(op) {
-        if (op === '+') return '+';
-        if (op === '-') return '-';
-        if (op === '*') return '×';
-        if (op === '/') return '÷';
-        return '';
+    function parseNumberInput(s){
+        const v = String(s ?? '').trim().replace(/\s+/g, '').replace(/,/g, '.');
+        const n = parseFloat(v);
+        return Number.isFinite(n) ? n : NaN;
     }
 
-    function updateDisplay(value) {
-        currentDisplay = String(value);
-        amount.value = currentDisplay;
+    function toDisplayExpr(normalized){
+        return String(normalized)
+            .replace(/\*/g, '×')
+            .replace(/\//g, '÷');
+    }
+
+    function fromDisplayExpr(display){
+        return String(display)
+            .replace(/×/g, '*')
+            .replace(/÷/g, '/')
+            .replace(/,/g, '.')
+            .replace(/\s+/g, '');
+    }
+
+    function isOperatorChar(ch){
+        return ch === '+' || ch === '-' || ch === '*' || ch === '/';
+    }
+
+    function roundMoney(n){
+        return parseFloat(Number(n).toFixed(2));
+    }
+
+    function formatMoney(n){
+        if (!Number.isFinite(n)) return 'Error';
+        const s = roundMoney(n).toFixed(2);
+        if (s.endsWith('.00')) return s.slice(0, -3);
+        if (s.endsWith('0')) return s.slice(0, -1);
+        return s;
+    }
+
+    function formatAmountForInput(n){
+        if (!Number.isFinite(n)) return '0.00';
+        return roundMoney(n).toFixed(2);
+    }
+
+    function setDisplay(displayText){
+        syncingFromCode = true;
+        amount.value = displayText;
         amount.placeholder = '';
+        syncingFromCode = false;
     }
 
-    function calculate(first, second, op) {
-        first = parseFloat(first);
-        second = parseFloat(second);
-        if (op === '+') return first + second;
-        if (op === '-') return first - second;
-        if (op === '*') return first * second;
-        if (op === '/') return second === 0 ? first : first / second;
-        return second;
+    function setTotalAmount(n){
+        const safe = Number.isFinite(n) ? roundMoney(n) : 0;
+        totalAmountValue.value = String(safe);
+        totalAmount.value = formatAmountForInput(safe);
     }
 
-    function handleDigit(digit) {
-        if (waitingForSecondOperand) {
-            currentDisplay = digit;
-            waitingForSecondOperand = false;
+    function addToTotalAmount(delta){
+        const current = parseNumberInput(totalAmount.value);
+        const base = Number.isFinite(current) ? current : parseNumberInput(totalAmountValue.value);
+        const next = (Number.isFinite(base) ? base : 0) + (Number.isFinite(delta) ? delta : 0);
+        setTotalAmount(next);
+    }
+
+    function setExpr(nextExpr){
+        expr = String(nextExpr || '0');
+        if (expr === '' || expr === '-') {
+            setDisplay(expr);
+            return;
+        }
+        const numeric = parseFloat(expr);
+        if (Number.isFinite(numeric) && !/[+\-*/]/.test(expr.slice(1))) {
+            // es un número simple (permite un '-' inicial)
+            lastResult = numeric;
+            setDisplay(toDisplayExpr(expr));
         } else {
-            if (currentDisplay === '0') currentDisplay = digit;
-            else currentDisplay += digit;
+            setDisplay(toDisplayExpr(expr));
         }
-        updateDisplay(currentDisplay);
     }
 
-    function handleDecimal() {
-        if (waitingForSecondOperand) {
-            currentDisplay = '0.';
-            waitingForSecondOperand = false;
-            updateDisplay(currentDisplay);
-            return;
-        }
-        if (!currentDisplay.includes('.')) currentDisplay += '.';
-        updateDisplay(currentDisplay);
+    function sanitizeExpressionRaw(raw){
+        const cleaned = fromDisplayExpr(raw)
+            .replace(/[^0-9+\-*/.]/g, '');
+        return cleaned;
     }
 
-    function handleOperator(nextOperator) {
-        if (nextOperator !== '+' && nextOperator !== '-' && nextOperator !== '*' && nextOperator !== '/') return;
-
-        const inputValue = parseFloat(currentDisplay);
-        if (operator && waitingForSecondOperand) {
-            operator = nextOperator;
-            amount.value = String(currentDisplay) + ' ' + getOperatorSymbol(operator);
-            return;
-        }
-
-        if (firstOperand === null) {
-            firstOperand = inputValue;
-        } else if (operator) {
-            const result = calculate(firstOperand, inputValue, operator);
-            firstOperand = result;
-            updateDisplay(firstOperand.toFixed(2));
-        }
-
-        amount.value = String(currentDisplay) + ' ' + getOperatorSymbol(nextOperator);
-        waitingForSecondOperand = true;
-        operator = nextOperator;
-    }
-
-    function handleEquals() {
-        if (operator === null || waitingForSecondOperand) return;
-        const inputValue = parseFloat(currentDisplay);
-        const result = calculate(firstOperand, inputValue, operator);
-        updateDisplay(result.toFixed(2));
-        firstOperand = result;
-        operator = null;
-        waitingForSecondOperand = true;
-    }
-
-    function clearCalculator() {
-        currentDisplay = '0';
-        firstOperand = null;
-        operator = null;
-        waitingForSecondOperand = false;
-        updateDisplay(currentDisplay);
-        amount.placeholder = '';
-    }
-
-    function backspace() {
-        if (waitingForSecondOperand) {
-            if (operator) {
-                operator = null;
-                waitingForSecondOperand = false;
-                amount.value = String(currentDisplay);
-                return;
+    function tokenizeExpression(normalized){
+        const tokens = [];
+        const s = String(normalized || '');
+        let i = 0;
+        while (i < s.length) {
+            const ch = s[i];
+            if (ch >= '0' && ch <= '9' || ch === '.') {
+                let num = '';
+                while (i < s.length) {
+                    const c = s[i];
+                    if ((c >= '0' && c <= '9') || c === '.') {
+                        num += c;
+                        i++;
+                    } else break;
+                }
+                if (num === '.' || num === '') return null;
+                tokens.push({ type: 'num', value: parseFloat(num) });
+                continue;
             }
-            waitingForSecondOperand = false;
-        }
 
-        if (!currentDisplay || currentDisplay === '0') return;
-        if (currentDisplay.length <= 1 || (currentDisplay.length === 2 && currentDisplay.startsWith('-'))) {
-            updateDisplay('0');
-        } else {
-            updateDisplay(currentDisplay.slice(0, -1));
+            if (isOperatorChar(ch)) {
+                // unary minus => se pega al número siguiente
+                const prev = tokens[tokens.length - 1];
+                if (ch === '-' && (!prev || prev.type === 'op')) {
+                    i++;
+                    let num = '-';
+                    while (i < s.length) {
+                        const c = s[i];
+                        if ((c >= '0' && c <= '9') || c === '.') {
+                            num += c;
+                            i++;
+                        } else break;
+                    }
+                    if (num === '-' || num === '-.' ) return null;
+                    tokens.push({ type: 'num', value: parseFloat(num) });
+                    continue;
+                }
+                tokens.push({ type: 'op', value: ch });
+                i++;
+                continue;
+            }
+            // cualquier otra cosa se ignora
+            i++;
         }
+        return tokens;
     }
 
+    function precedence(op){
+        return (op === '*' || op === '/') ? 2 : 1;
+    }
+
+    function applyOp(op, a, b){
+        if (!Number.isFinite(a) || !Number.isFinite(b)) return NaN;
+        if (op === '+') return a + b;
+        if (op === '-') return a - b;
+        if (op === '*') return a * b;
+        if (op === '/') return b === 0 ? NaN : a / b;
+        return NaN;
+    }
+
+    function evaluateExpression(normalized){
+        const tokens = tokenizeExpression(normalized);
+        if (!tokens || tokens.length === 0) return NaN;
+        if (tokens[tokens.length - 1].type === 'op') return NaN;
+
+        const values = [];
+        const opsStack = [];
+
+        for (const t of tokens) {
+            if (t.type === 'num') {
+                values.push(t.value);
+                continue;
+            }
+            if (t.type === 'op') {
+                while (opsStack.length > 0 && precedence(opsStack[opsStack.length - 1]) >= precedence(t.value)) {
+                    const op = opsStack.pop();
+                    const b = values.pop();
+                    const a = values.pop();
+                    values.push(applyOp(op, a, b));
+                }
+                opsStack.push(t.value);
+            }
+        }
+
+        while (opsStack.length > 0) {
+            const op = opsStack.pop();
+            const b = values.pop();
+            const a = values.pop();
+            values.push(applyOp(op, a, b));
+        }
+
+        if (values.length !== 1) return NaN;
+        const r = values[0];
+        return Number.isFinite(r) ? r : NaN;
+    }
+
+    function currentNumberHasDot(){
+        const s = expr;
+        let i = s.length - 1;
+        while (i >= 0) {
+            const ch = s[i];
+            if (isOperatorChar(ch)) break;
+            i--;
+        }
+        const part = s.slice(i + 1);
+        return part.includes('.');
+    }
+
+    function handleDigit(d){
+        if (showingResult) {
+            expr = '0';
+            showingResult = false;
+        }
+        if (expr === '0') expr = d;
+        else expr += d;
+        setExpr(expr);
+    }
+
+    function handleDecimal(){
+        if (showingResult) {
+            expr = '0';
+            showingResult = false;
+        }
+        if (currentNumberHasDot()) return;
+        const last = expr.slice(-1);
+        if (expr === '' || expr === '0') {
+            expr = '0.';
+        } else if (isOperatorChar(last)) {
+            expr += '0.';
+        } else {
+            expr += '.';
+        }
+        setExpr(expr);
+    }
+
+    function handleOperator(op){
+        if (!isOperatorChar(op)) return;
+        if (showingResult) {
+            showingResult = false;
+            expr = String(roundMoney(lastResult));
+        }
+
+        if (expr === '0' && op === '-') {
+            expr = '-';
+            setExpr(expr);
+            return;
+        }
+
+        if (expr === '' || expr === '-') return;
+
+        const last = expr.slice(-1);
+        if (isOperatorChar(last)) {
+            // permitir "2* -3" (unary minus)
+            if (op === '-' && last !== '-') {
+                expr += '-';
+            } else {
+                expr = expr.slice(0, -1) + op;
+            }
+            setExpr(expr);
+            return;
+        }
+
+        expr += op;
+        setExpr(expr);
+    }
+
+    async function handleEquals(){
+        if (!expr || expr === '-' || isOperatorChar(expr.slice(-1))) return;
+        const result = evaluateExpression(expr);
+        if (!Number.isFinite(result)) {
+            await showErrorToast('Operación inválida');
+            return;
+        }
+        const rounded = roundMoney(result);
+        lastResult = rounded;
+        showingResult = true;
+        // Tras "=", mostrar solo el resultado y sumarlo al monto total.
+        expr = String(rounded);
+        setDisplay(formatMoney(rounded));
+        addToTotalAmount(rounded);
+    }
+
+    function clearCalculator(){
+        expr = '0';
+        lastResult = 0;
+        showingResult = false;
+        setDisplay('0');
+    }
+
+    function backspace(){
+        if (showingResult) {
+            showingResult = false;
+            expr = String(roundMoney(lastResult));
+            setExpr(expr);
+            return;
+        }
+        if (!expr || expr === '0') return;
+        expr = expr.slice(0, -1);
+        if (expr === '' || expr === '-') expr = '0';
+        setExpr(expr);
+    }
+
+    // Teclado (botones)
     btns.forEach(b => b.addEventListener('click', () => {
         const k = b.dataset.key;
         if (k === '.') handleDecimal();
         else handleDigit(k);
     }));
-
     ops.forEach(o => o.addEventListener('click', () => handleOperator(o.dataset.op)));
-    eq.addEventListener('click', handleEquals);
+    eq.addEventListener('click', () => { handleEquals(); });
     clear.addEventListener('click', clearCalculator);
     back.addEventListener('click', backspace);
 
-    if (amount.value !== '0') currentDisplay = amount.value;
+    // Entrada manual (escribir/pastear "2+2")
+    amount.addEventListener('input', () => {
+        if (syncingFromCode) return;
+        const raw = amount.value;
+        const normalized = sanitizeExpressionRaw(raw);
+        showingResult = false;
+        expr = normalized || '0';
+        // re-escribe con símbolos bonitos sin romper el cursor (mínimo)
+        const pretty = toDisplayExpr(expr);
+        if (amount.value !== pretty) {
+            const pos = amount.selectionStart;
+            syncingFromCode = true;
+            amount.value = pretty;
+            if (typeof pos === 'number') {
+                const safePos = Math.min(pretty.length, pos);
+                amount.setSelectionRange(safePos, safePos);
+            }
+            syncingFromCode = false;
+        }
+        // si lo ingresado es número simple, permitir '=' para sumarlo sin problemas
+        const asNumber = parseFloat(expr);
+        if (Number.isFinite(asNumber) && !/[+\-*/]/.test(expr.slice(1))) lastResult = asNumber;
+    });
+
+    amount.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleEquals();
+        }
+    });
+
+    // Estado inicial
+    const initial = sanitizeExpressionRaw(amount.value);
+    expr = initial || '0';
+    setExpr(expr);
+
+    // Input de monto total (manual)
+    totalAmount.addEventListener('input', () => {
+        const n = parseNumberInput(totalAmount.value);
+        if (Number.isFinite(n)) totalAmountValue.value = String(roundMoney(n));
+    });
+
+    totalAmount.addEventListener('blur', () => {
+        const n = parseNumberInput(totalAmount.value);
+        if (!Number.isFinite(n)) {
+            setTotalAmount(parseNumberInput(totalAmountValue.value));
+            return;
+        }
+        setTotalAmount(n);
+    });
+
+    // Si el contenedor se colapsa, no tocar el total
+    if (calcShell) {
+        calcShell.addEventListener('toggle', () => {
+            // placeholder: no-op, el chevrón rota vía CSS
+        });
+    }
 
     // --- Registrar operación ---
     btnRegistrar.addEventListener('click', async () => {
@@ -300,7 +538,19 @@ function prepararOperacionIngreso(){
             const tipo = chkPago.checked ? 'pago' : 'deuda';
             const name = input.value.trim();
             const categoria = catInput.value.trim();
-            const monto = parseFloat(amount.value);
+            // El monto real a guardar es el Monto total (arriba de la calculadora)
+            let monto = parseNumberInput(totalAmount.value);
+            if (!Number.isFinite(monto)) monto = parseNumberInput(totalAmountValue.value);
+            if (!Number.isFinite(monto) || monto <= 0) {
+                // Fallback: si el usuario solo usó la calculadora y nunca tocó el total, intentar evaluar lo que esté en pantalla
+                const displayRaw = String(amount.value || '').trim();
+                const normalized = sanitizeExpressionRaw(displayRaw);
+                const r = (/[+\-*/]/.test(normalized.replace(/^-/, '')))
+                    ? evaluateExpression(normalized)
+                    : parseFloat(normalized);
+                monto = Number.isFinite(r) ? roundMoney(r) : NaN;
+                if (Number.isFinite(monto) && monto > 0) setTotalAmount(monto);
+            }
 
             if (isNaN(monto) || monto <= 0) {
                 await showErrorToast('Ingrese un monto válido mayor a 0');
@@ -380,6 +630,7 @@ function prepararOperacionIngreso(){
             matches.innerHTML = '';
             matches.selectedClient = null;
             chkDeuda.checked = true;
+            setTotalAmount(0);
             clearCalculator();
         }catch(err){
             console.error(err);
@@ -972,78 +1223,153 @@ function formatDate(value){
 }
 
 async function showOperacionDetalle(item, tipo) {
-    // 1. Build the HTML summary using <strong> and <br>
-    const lines = [];
+    openOperacionDetalleDrawerInicio(item, tipo);
+}
 
-    // Flatten known fields (case-insensitive)
-    const montoRaw = item.Monto ?? item.monto ?? item.Amount ?? item.amount ?? '';
-    // Asegúrate de que escapeHtml y formatDate estén definidas en tu entorno
-    const monto = escapeHtml(String(montoRaw)); 
+// ── Drawer detalle operación (Inicio) ──
+let opdInicioEls = null;
+
+function ensureOperacionDetalleDrawerInicio(){
+    if (opdInicioEls) return opdInicioEls;
+
+    let backdrop = document.getElementById('opdBackdrop');
+    if (!backdrop){
+        backdrop = document.createElement('div');
+        backdrop.id = 'opdBackdrop';
+        backdrop.className = 'opd-backdrop';
+        document.body.appendChild(backdrop);
+    }
+
+    let drawer = document.getElementById('opdDrawer');
+    if (!drawer){
+        drawer = document.createElement('div');
+        drawer.id = 'opdDrawer';
+        drawer.className = 'opd-drawer';
+        drawer.setAttribute('role', 'dialog');
+        drawer.setAttribute('aria-modal', 'true');
+        drawer.setAttribute('aria-label', 'Detalle de operación');
+        drawer.innerHTML = `
+            <div class="opd-header">
+                <div class="opd-title">
+                    <h3 id="opdTitle">Detalle</h3>
+                    <p id="opdSubtitle">—</p>
+                </div>
+                <button type="button" class="icon-btn" id="opdClose" aria-label="Cerrar" title="Cerrar">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="opd-body">
+                <h4 class="opd-section-title">Información</h4>
+                <div class="opd-list" id="opdList"></div>
+            </div>
+        `;
+        document.body.appendChild(drawer);
+    }
+
+    const close = () => closeOperacionDetalleDrawerInicio();
+    backdrop.addEventListener('click', close);
+    drawer.querySelector('#opdClose')?.addEventListener('click', close);
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeOperacionDetalleDrawerInicio();
+    });
+
+    opdInicioEls = {
+        backdrop,
+        drawer,
+        title: drawer.querySelector('#opdTitle'),
+        subtitle: drawer.querySelector('#opdSubtitle'),
+        list: drawer.querySelector('#opdList'),
+    };
+    return opdInicioEls;
+}
+
+function closeOperacionDetalleDrawerInicio(){
+    document.body.classList.remove('opd-open');
+}
+
+function buildOpdItem(label, sub, value, valueClass){
+    const safeLabel = escapeHtml(String(label ?? ''));
+    const safeSub = escapeHtml(String(sub ?? ''));
+    const safeValue = escapeHtml(String(value ?? ''));
+    return `
+        <div class="opd-item">
+            <div>
+                <h4>${safeLabel}</h4>
+                ${safeSub ? `<small>${safeSub}</small>` : ''}
+            </div>
+            <div class="opd-value ${valueClass || ''}">${safeValue}</div>
+        </div>
+    `;
+}
+
+async function openOperacionDetalleDrawerInicio(item, tipo){
+    const els = ensureOperacionDetalleDrawerInicio();
+    const isDeuda = tipo === 'deudas';
+    const formatter = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
+
+    const montoRaw = item.Monto ?? item.monto ?? item.Amount ?? item.amount ?? 0;
+    const montoNum = Number(montoRaw) || 0;
+    const monto = formatter.format(montoNum);
 
     const creadoRaw = item.Creado ?? item.creado ?? item.fecha ?? item.created_at ?? '';
-    const creado = escapeHtml(formatDate(creadoRaw));
+    const fecha = formatDate(creadoRaw);
 
-    // --- Campos Principales ---
-    const cliente = item.Cliente ?? item.cliente ?? item.client;
-    if (cliente !== undefined && cliente !== null && String(cliente).trim() !== '') {
-        // Usamos <strong> para la negrita en HTML
-        lines.push(`<strong>Cliente:</strong> ${escapeHtml(String(cliente))}`);
-    }
+    if (els.title) els.title.textContent = isDeuda ? 'Detalle de Deuda' : 'Detalle de Pago';
+    if (els.subtitle) els.subtitle.textContent = String(fecha || '');
 
-    // Llama a la función asíncrona para obtener el nombre
-    const nombreCliente = await obtenerNombreCliente(item.Telefono_cliente);
-    if (nombreCliente) {
-        lines.push(`<strong>Nombre Cliente:</strong> ${escapeHtml(String(nombreCliente))}`);
-    }
+    const valueClass = isDeuda ? 'opd-value--danger' : 'opd-value--success';
 
-    // No mostrar el campo "Tipo" para registros de tipo 'deudas' o 'pagos' según solicitud
-    if (tipo !== 'deudas' && tipo !== 'pagos') {
-        lines.push(`<strong>Tipo:</strong> ${tipo === 'deudas' ? 'Deuda' : 'Pago'}`);
-    }
-    
-    lines.push(`<strong>Monto:</strong> ${monto}`);
-    lines.push(`<strong>Fecha:</strong> ${creado}`);
+    const categoria = String(item.Categoria || item.categoria || item.Detalle || item.detalle || '').trim();
+    const telefono = String(item.Telefono_cliente || item.telefono_cliente || '').trim();
 
-    // --- Otros Campos ---
-    // Campos a ignorar (comprobación case-insensitive). Añadimos id_deuda y tipo
-    const ignoredList = [
-        'Monto', 'monto', 'Amount', 'amount',
-        'Creado', 'creado', 'fecha', 'created_at',
-        'Cliente', 'cliente', 'client', 'Telefono_cliente',
-        'id_deuda', 'idDeuda', 'idDeuda', 'id_pago', 'idPago', 'idPago', 'tipo', 'Tipo'
-        
-    ];
-    const ignored = new Set(ignoredList.map(x => String(x).toLowerCase()));
+    let html = '';
+    html += buildOpdItem('Monto', isDeuda ? 'Deuda registrada' : 'Pago recibido', monto, valueClass);
+    if (categoria) html += buildOpdItem('Categoría', 'Concepto o detalle', categoria);
+    if (telefono) html += buildOpdItem('Teléfono', 'Cliente asociado', telefono);
+    html += buildOpdItem('Cliente', 'Nombre (si está cargado)', 'Cargando…');
 
-    Object.keys(item).forEach((k) => {
-        if (ignored.has(String(k).toLowerCase())) return;
+    // Otros campos (sin IDs)
+    const ignored = new Set([
+        'monto','amount','creado','created_at','fecha','categoria','detalle','telefono_cliente','cliente','client',
+        'id','id_deuda','id_pago','id_negocio','tipo'
+    ]);
+
+    Object.keys(item || {}).forEach((k) => {
+        const key = String(k);
+        const lower = key.toLowerCase();
+        if (ignored.has(lower)) return;
+        if (lower.startsWith('id_') || lower.endsWith('_id') || lower === 'idnegocio') return;
         const v = item[k];
-        let display;
-        if (v === null || v === undefined) {
-            display = '';
-        } else if (typeof v === 'object') {
-            try {
-                display = JSON.stringify(v);
-            } catch (e) {
-                display = String(v);
-            }
+        if (v === null || v === undefined) return;
+        let display = '';
+        if (typeof v === 'object') {
+            try { display = JSON.stringify(v); } catch(e) { display = String(v); }
         } else {
             display = String(v);
         }
-        // Usamos <strong> y </strong> para la clave
-        lines.push(`<strong>${escapeHtml(String(k))}:</strong> ${escapeHtml(display)}`);
+        if (!String(display).trim()) return;
+        html += buildOpdItem(key, '', display);
     });
 
-    // 2. Unir las líneas con <br> (salto de línea de HTML)
-    const htmlContent = lines.join('<br>');
+    if (els.list) els.list.innerHTML = html;
+    document.body.classList.add('opd-open');
 
-    // 3. Usar Swal.fire con la opción 'html'
-    try {
-        await showInfoHTML(htmlContent);
-    } catch (e) {
-        // Fallback a alert: convierte el HTML a texto plano con \n
-        const textPlain = htmlContent.replace(/<br\s*\/?>/g, '\n').replace(/<[^>]+>/g, '');
-        alert(textPlain);
+    // Reemplazar el placeholder de Cliente
+    try{
+        const nombre = await obtenerNombreCliente(item.Telefono_cliente);
+        if (nombre && els.list){
+            const items = els.list.querySelectorAll('.opd-item');
+            const clienteRow = Array.from(items).find(x => (x.querySelector('h4')?.textContent || '') === 'Cliente');
+            if (clienteRow){
+                const val = clienteRow.querySelector('.opd-value');
+                if (val) val.textContent = nombre;
+            }
+        }
+    }catch(e){
+        // no-op
     }
 }
 
