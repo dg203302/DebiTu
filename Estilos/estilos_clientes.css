@@ -1177,13 +1177,12 @@ body.op-detail-open .op-detail-drawer {
 /* =====================
    Footer Dock
    ===================== */
-.bottom-nav,
-footer {
+.bottom-nav {
   position: fixed;
   left: 50%;
   bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%);
-  z-index: 140;
+  z-index: 120;
   min-height: var(--footer-h);
   width: min(420px, calc(100vw - 20px));
   border: 1px solid var(--border);
@@ -1209,20 +1208,27 @@ footer {
 
 .bottom-nav .icon-btn:hover,
 .bottom-nav a.icon-btn:hover {
-  border-color: color-mix(in srgb, var(--accent) 44%, transparent);
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border-color: var(--accent-glow);
+  background: var(--glass-soft);
 }
 
-.bottom-nav .icon-btn:first-child,
-.bottom-nav a.icon-btn:first-child {
-  border-color: color-mix(in srgb, var(--accent) 42%, transparent);
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
+.bottom-nav a {
+  color: inherit;
+  text-decoration: none;
 }
 
-.nav-clients.active {
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 20%, transparent);
-  color: var(--accent);
+.bottom-nav .icon-btn.active,
+.bottom-nav a.icon-btn.active {
+  border-color: var(--accent-glow);
+  background: var(--glass-soft);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.bottom-nav .icon-btn.danger:hover,
+.bottom-nav a.icon-btn.danger:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+  background: var(--glass-soft);
 }
 
 /* =====================

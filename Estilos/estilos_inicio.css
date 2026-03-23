@@ -263,6 +263,20 @@ header.navbar {
     background: var(--input-hover);
 }
 
+.bottom-nav .icon-btn.active,
+.bottom-nav a.icon-btn.active {
+    border-color: var(--accent-glow);
+    background: var(--input-hover);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.bottom-nav .icon-btn.danger:hover,
+.bottom-nav a.icon-btn.danger:hover {
+    color: var(--danger);
+    border-color: var(--danger);
+    background: var(--input-hover);
+}
+
 .bottom-nav a {
     color: inherit;
     text-decoration: none;
