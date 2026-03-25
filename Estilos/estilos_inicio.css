@@ -116,6 +116,7 @@ body {
     inset: 0;
     z-index: -1;
     overflow: hidden;
+    pointer-events: none;
     background: var(--bg-color);
 }
 
