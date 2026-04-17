@@ -3,13 +3,5 @@
   edge_functions = "edge-functions"
 
 [[edge_functions]]
-  function = "inicio"
-  path = "/api/inicio"
-
-[[edge_functions]]
-  function = "adminclientes"
-  path = "/api/adminclientes"
-
-[[edge_functions]]
-  function = "config"
-  path = "/api/config"
+  function = "delete-user"
+  path = "/api/delete-user"

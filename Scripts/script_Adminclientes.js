@@ -14,6 +14,12 @@ let isEditingCliente = false;
 
 let clientePanelSheet = null;
 
+function isTouchDevice(){
+    try{
+        return ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints && navigator.msMaxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer:coarse)').matches);
+    }catch(e){ return false; }
+}
+
 function setResponsiveDetailsOpen(open){
     // En pantallas pequeñas mostramos el panel de cliente dentro del bottom-sheet compartido.
     if (window.innerWidth <= 1080) {
@@ -199,7 +205,7 @@ async function abrirEdicionCliente(){
 
     setClienteEditMode(true);
     syncEditButtonVisibility();
-    requestAnimationFrame(() => nombreInput.focus());
+    requestAnimationFrame(() => { try{ if (!isTouchDevice()) nombreInput.focus(); }catch(_){} });
 }
 
 function cancelarEdicionCliente(){
@@ -322,7 +328,8 @@ async function guardarEdicionCliente(){
         const elAdeudado = document.getElementById('montototalAdeudado');
         if (elAdeudado) elAdeudado.textContent = formatter.format(Number(deudaParsed) || 0);
 
-        await showSuccessToast('Cliente actualizado');
+        // Mostrar toast sin bloquear el flujo (no esperar a que desaparezca)
+        showSuccessToast('Cliente actualizado');
 
         // Refrescar lista y re-seleccionar
         await verTodosClientes();
@@ -997,33 +1004,21 @@ async function agregarCliente(){
         }
         try {
             const payload = {
-                action: 'agregarCliente',
                 nombre: formValues.nombre,
                 telefono: formValues.telefono,
-                userId: getLocalUserId()
             };
-
-            const resp = await fetch('/api/adminclientes', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            const resJson = await resp.json().catch(() => ({}));
-            if (!resp.ok) {
-                await showErrorToast('Error al agregar el cliente: ' + (resJson?.error || resp.statusText));
+            const {error} = await supabase
+                .from('Clientes')
+                .insert({ Nombre: payload.nombre, Telefono: payload.telefono, ID_Negocio: idNegocio });
+            if (error){
+                showErrorToast('Error al agregar el cliente: ' + error.message);
                 return;
             }
-            if (resJson?.error) {
-                await showErrorToast('Error al agregar el cliente: ' + resJson.error);
-                return;
-            }
-
-            await showSuccessToast('Cliente agregado exitosamente');
-            await verTodosClientes();
-        } catch (err) {
-            console.error('agregarCliente error', err);
-            await showErrorToast('Error al agregar el cliente');
+            showSuccessToast('Cliente agregado');
+            window.location.reload();
+        } catch (err){
+            console.error('Agregar cliente error', err);
+            showErrorToast('Error al agregar el cliente');
         }
     }
 }
@@ -1196,9 +1191,20 @@ async function borrarCliente(telefono, nombre, cardEl){
         await showErrorToast('Error al borrar cliente: ' + error.message);
         return;
     }
+    let delDeudas = supabase
+        .from('Deudas')
+        .delete()
+        .eq('Telefono_cliente', tel);
+    delDeudas = applyIdNegocioFilter(delDeudas);
+    await delDeudas;
+    let delPagos = supabase
+        .from('Pagos')
+        .delete()
+        .eq('Telefono_cliente', tel);
+    delPagos = applyIdNegocioFilter(delPagos);
+    await delPagos;
     showSuccessToast('Cliente borrado correctamente');
-    cerrarListaClientes();
-    cerrarDetallesCliente();
+    window.location.reload();
 }
 async function calcularMontoTotalPagado(telefono){
     let q = supabase

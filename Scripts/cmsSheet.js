@@ -177,7 +177,22 @@ function attachSheetDragHandler(drawer, handle, closeFn){
     if (handle._dragHandlerAttached) return;
     let dragging = false; let startY = 0; let currentY = 0; let pointerId = null;
     function isVerticalMode(){ try{ const r = drawer.getBoundingClientRect(); return r.top > (window.innerHeight * 0.25); }catch(e){ return true; } }
-    function onPointerDown(e){ if (e.pointerType === 'mouse' && e.button !== 0) return; if (!isVerticalMode()) return; try{ if (e && e.target && typeof e.target.closest === 'function'){ const interactive = e.target.closest && e.target.closest('button, a, input, textarea, select, [role="button"]'); if (interactive) return; } }catch(_){} const clientY = (typeof e.clientY === 'number') ? e.clientY : (e.touches && e.touches[0] && e.touches[0].clientY) || (e.changedTouches && e.changedTouches[0] && e.changedTouches[0].clientY) || 0; try{ if (e.preventDefault) e.preventDefault(); }catch(_){ } try{ if (typeof e.pointerId === 'number') handle.setPointerCapture(e.pointerId); }catch(_){ }
+    function onPointerDown(e){
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        // Permitir arrastrar siempre si el evento proviene del handle/header proporcionado,
+        // incluso si el drawer está en una posición no "vertical" (ej. muy arriba).
+        let fromHandle = false;
+        try{ fromHandle = !!(e && e.target && handle && typeof handle.contains === 'function' && handle.contains(e.target)); }catch(_) { fromHandle = false; }
+        if (!isVerticalMode() && !fromHandle) return;
+        try{
+            if (e && e.target && typeof e.target.closest === 'function'){
+                const interactive = e.target.closest && e.target.closest('button, a, input, textarea, select, [role="button"]');
+                if (interactive) return;
+            }
+        }catch(_){}
+        const clientY = (typeof e.clientY === 'number') ? e.clientY : (e.touches && e.touches[0] && e.touches[0].clientY) || (e.changedTouches && e.changedTouches[0] && e.changedTouches[0].clientY) || 0;
+        try{ if (e.preventDefault) e.preventDefault(); }catch(_){ }
+        try{ if (typeof e.pointerId === 'number') handle.setPointerCapture(e.pointerId); }catch(_){ }
         pointerId = (typeof e.pointerId === 'number') ? e.pointerId : null; dragging = true; startY = clientY; currentY = startY; drawer.style.transition = 'none'; drawer.style.willChange = 'transform'; document.body.classList.add('sheet-dragging');
     }
     function onPointerMove(e){ if (!dragging) return; const clientY = (typeof e.clientY === 'number') ? e.clientY : (e.touches && e.touches[0] && e.touches[0].clientY) || (e.changedTouches && e.changedTouches[0] && e.changedTouches[0].clientY) || currentY; if (typeof e.pointerId === 'number' && pointerId != null && e.pointerId !== pointerId) return; currentY = clientY; const delta = Math.max(0, currentY - startY); drawer.style.transform = `translateY(${delta}px)`; const backdropId = (drawer.id === 'cmsSheetDrawer') ? 'cmsSheetBackdrop' : 'opdBackdrop'; const backdrop = document.getElementById(backdropId); if (backdrop){ const h = drawer.getBoundingClientRect().height || window.innerHeight; const ratio = Math.max(0, Math.min(1, 1 - (delta / (h * 0.8)))); backdrop.style.opacity = String(0.55 * ratio); } }

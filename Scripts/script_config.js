@@ -368,37 +368,49 @@ async function eliminarCuenta(){
     })
 
     try{
-        // Función dedicada de Supabase (requiere service_role)
-        const { error } = await client.auth.admin.deleteUser(userId)
-        if (error){
-            closeCfgSheet()
-            await openCfgMessage({
-                title: 'Error al eliminar la cuenta',
-                subtitle: 'No se pudo completar la operación.',
-                messageHtml: escapeHtml(error.message || String(error)),
-                okText: 'Aceptar'
-            })
-            return
-        }
+        // Llamada al endpoint server-side que usa la service_role (no exponer la clave al cliente)
+        // Extraer token de sesión del cliente y enviarlo al endpoint para validación
+        let accessToken = null
+        try{
+            const sessRes = await client.auth.getSession()
+            if (sessRes && sessRes.data && sessRes.data.session && sessRes.data.session.access_token) {
+                accessToken = sessRes.data.session.access_token
+            }
+        }catch(e){ /* ignore */ }
 
-        try { await client.auth.signOut() } catch { /* ignore */ }
-        localStorage.clear()
+        try{
+            if (!accessToken){
+                showToast('No se pudo obtener el token de sesión. Cerrando sesión localmente...', 'error')
+            } else {
+                const res = await fetch('/api/delete-user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + accessToken
+                    },
+                    body: JSON.stringify({ userId })
+                })
+
+                if (!res.ok){
+                    let payload = null
+                    try{ payload = await res.json() } catch { payload = { error: await res.text() } }
+                    showToast('Error al eliminar la cuenta en el servidor: ' + (payload?.error || payload?.detail || res.status), 'error')
+                } else {
+                    showToast('Cuenta eliminada. Cerrando sesión...', 'success')
+                }
+            }
+        }catch(e){
+            showToast('Error de red al comunicarse con el servidor. Cerrando sesión localmente...', 'error')
+        }finally{
+            try { await client.auth.signOut() } catch { /* ignore */ }
+            localStorage.clear()
+            closeCfgSheet()
+            window.location.href = '/index.html'
+        }
+    }
+    catch(e){
         closeCfgSheet()
-        await openCfgMessage({
-            title: 'Cuenta eliminada',
-            subtitle: 'Operación completada.',
-            messageHtml: 'Tu cuenta fue eliminada correctamente.',
-            okText: 'Continuar'
-        })
-        window.location.href = '/index.html'
-    }catch(e){
-        closeCfgSheet()
-        await openCfgMessage({
-            title: 'Error al eliminar la cuenta',
-            subtitle: 'Ocurrió un problema inesperado.',
-            messageHtml: escapeHtml(e?.message || String(e)),
-            okText: 'Aceptar'
-        })
+        showToast('Ocurrió un error inesperado. Por favor, intenta nuevamente.', 'error')
     }
 }
 

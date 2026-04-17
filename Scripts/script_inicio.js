@@ -1,5 +1,11 @@
 import {loadSupabase} from './supabase.js'
 import { ensureCmsSheet, openCmsSheet, closeCmsSheet, attachSheetDragHandler, showErrorToast, showSuccessToast, showInfoSheet, confirmSheet } from './cmsSheet.js';
+
+function isTouchDevice(){
+    try{
+        return ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints && navigator.msMaxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer:coarse)').matches);
+    }catch(e){ return false; }
+}
 const client= await loadSupabase();
 let currentOpView = 'deudas'; // 'deudas' | 'pagos'
 let isExpanded = false; // controls whether list shows all items or limited
@@ -94,6 +100,11 @@ window.realizarOperacion = function(e){
     // limpiar contenido y mover el nodo
     content.innerHTML = '';
     content.appendChild(section);
+    // Al mostrarse dentro del sheet, cerrar por defecto la calculadora (details)
+    try{
+        const calcShell = section.querySelector && section.querySelector('#op_calc_shell');
+        if (calcShell && typeof calcShell.open !== 'undefined') calcShell.open = false;
+    }catch(_){ }
     section.hidden = false;
 
     // Actualizar botón visual (aria-expanded)
@@ -103,7 +114,7 @@ window.realizarOperacion = function(e){
     // Inicializar comportamientos del formulario
     prepararOperacionIngreso();
     const input = document.getElementById('op_clientSearch');
-    if (input) setTimeout(() => input.focus(), 0);
+    if (input) setTimeout(() => { try{ if (!isTouchDevice()) input.focus(); }catch(_){} }, 0);
 
     // Al cerrar el sheet, restaurar la sección a su posición original y ocultarla
     s.closed.then(() => {
@@ -624,7 +635,8 @@ function prepararOperacionIngreso(){
                 const { data: clientData, error: selectError } = await qClient.single();
                 if (selectError) {
                     console.error('Error al obtener deuda actual del cliente', selectError);
-                    await showSuccessToast('Operación registrada');
+                    // Mostrar toast sin bloquear el flujo
+                    showSuccessToast('Operación registrada');
                     await showErrorToast('No se pudo obtener la deuda actual del cliente: ' + (selectError.message || selectError));
                 } else {
                     const current = Number(clientData?.Deuda_Activa ?? 0) || 0;
@@ -640,14 +652,15 @@ function prepararOperacionIngreso(){
                     const { error: updError } = await upd;
                     if (updError){
                         console.error('Error al actualizar deuda del cliente', updError);
-                        await showSuccessToast('Operación registrada');
+                        // Mostrar toast sin bloquear el flujo
+                        showSuccessToast('Operación registrada');
                         await showErrorToast('No se pudo actualizar la deuda del cliente: ' + (updError.message || updError));
                     } else {
-                        await showSuccessToast('Operación registrada correctamente');
+                        showSuccessToast('Operación registrada correctamente');
                     }
                 }
             } else {
-                await showSuccessToast('Operación registrada correctamente');
+                showSuccessToast('Operación registrada correctamente');
             }
 
             try { await recargarMontos(); } catch(e){}
