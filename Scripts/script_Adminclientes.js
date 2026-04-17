@@ -1,5 +1,6 @@
 import {showError,showErrorToast,showSuccess,showSuccessToast,showinfo, loadSweetAlert2} from './sweetalert2.js'
 import {loadSupabase} from './supabase.js';
+import { openCmsSheet } from './cmsSheet.js';
 const Swal = await loadSweetAlert2();
 const supabase = await loadSupabase();
 
@@ -11,11 +12,122 @@ let isExpandedCliente = false; // controla ver 4 vs todos
 let currentClientesFilter = 'all'; // 'all' | 'withDebt' | 'withoutDebt'
 let isEditingCliente = false;
 
+let clientePanelSheet = null;
+
 function setResponsiveDetailsOpen(open){
+    // En pantallas pequeñas mostramos el panel de cliente dentro del bottom-sheet compartido.
     if (window.innerWidth <= 1080) {
-        document.body.classList.toggle('mobile-details-open', !!open);
+        if (open) {
+            document.body.classList.add('mobile-details-open');
+            const section = document.getElementById('detallesCliente');
+            if (!section) return;
+            // Guardar padre original para restaurar luego
+            if (!section._originalParent) {
+                section._originalParent = section.parentNode;
+                section._originalNext = section.nextSibling;
+            }
+
+            // Si ya está dentro del sheet, no hacemos nada
+            const content = document.getElementById('cmsSheetContent');
+            if (content && content.contains(section) && document.body.classList.contains('cms-sheet-open')) return;
+
+            try{
+                const s = openCmsSheet({ title: 'Panel de Cliente', subtitle: currentClienteNombre || '', contentHtml: '' });
+                clientePanelSheet = s;
+                s.els.content.innerHTML = '';
+                s.els.content.appendChild(section);
+                section.hidden = false;
+
+                // Guardar estilos inline originales para restaurar luego
+                section._originalStyle = {
+                    position: section.style.position || '',
+                    left: section.style.left || '',
+                    right: section.style.right || '',
+                    bottom: section.style.bottom || '',
+                    transform: section.style.transform || '',
+                    opacity: section.style.opacity || '',
+                    visibility: section.style.visibility || '',
+                    pointerEvents: section.style.pointerEvents || '',
+                    maxHeight: section.style.maxHeight || '',
+                    width: section.style.width || '',
+                    zIndex: section.style.zIndex || '',
+                    display: section.style.display || ''
+                };
+
+                // Aplicar estilos para que el panel fluya dentro del sheet
+                section.style.position = 'static';
+                section.style.left = '';
+                section.style.right = '';
+                section.style.bottom = '';
+                section.style.transform = 'none';
+                section.style.opacity = '1';
+                section.style.visibility = 'visible';
+                section.style.pointerEvents = 'auto';
+                section.style.maxHeight = 'none';
+                section.style.width = '100%';
+                section.style.zIndex = '';
+
+                // Ocultar el header interno y el botón X mientras se muestra como sheet
+                const btnClose = section.querySelector('#btn_cerrar_detalles');
+                const hdr = section.querySelector('#headerDetalles');
+                if (btnClose) btnClose.style.display = 'none';
+                if (hdr) hdr.style.display = 'none';
+
+                // Mover el botón de editar al lado del nombre (dentro de .cliente-profile)
+                const btnEditar = document.getElementById('btn_editar_cliente');
+                if (btnEditar) {
+                    if (!btnEditar._originalParent) {
+                        btnEditar._originalParent = btnEditar.parentNode;
+                        btnEditar._originalNext = btnEditar.nextSibling;
+                    }
+                    const clienteProfile = section.querySelector('.cliente-profile');
+                    if (clienteProfile) {
+                        clienteProfile.appendChild(btnEditar);
+                        btnEditar.classList.add('inline-edit-button');
+                    } else {
+                        section.querySelector('.profile-copy')?.appendChild(btnEditar);
+                        btnEditar.classList.add('inline-edit-button');
+                    }
+                }
+
+                s.closed.then(() => {
+                    try {
+                        // Restaurar al DOM original
+                        if (section._originalParent) section._originalParent.insertBefore(section, section._originalNext);
+                        // Restaurar visibilidad/estilos
+                        section.hidden = true;
+                        if (btnClose) btnClose.style.display = '';
+                        if (hdr) hdr.style.display = '';
+                        // Restaurar el botón editar a su padre original
+                        try {
+                            const b = document.getElementById('btn_editar_cliente');
+                            if (b && b._originalParent) {
+                                b._originalParent.insertBefore(b, b._originalNext);
+                                b.classList.remove('inline-edit-button');
+                                delete b._originalParent;
+                                delete b._originalNext;
+                            }
+                        } catch (_) {}
+                        if (section._originalStyle) {
+                            Object.assign(section.style, section._originalStyle);
+                            delete section._originalStyle;
+                        }
+                    } catch (err) {
+                        console.warn('Error al restaurar detallesCliente', err);
+                    }
+                    clientePanelSheet = null;
+                    document.body.classList.remove('mobile-details-open');
+                });
+            }catch(e){ console.error('No se pudo abrir cms sheet para panel de cliente', e); }
+
+        } else {
+            document.body.classList.remove('mobile-details-open');
+            if (clientePanelSheet){ try{ clientePanelSheet.close('close'); }catch(e){ clientePanelSheet = null; } }
+        }
     } else {
+        // En desktop mantenemos el comportamiento previo
         document.body.classList.remove('mobile-details-open');
+        if (clientePanelSheet){ try{ clientePanelSheet.close('close'); }catch(e){} }
     }
 }
 
@@ -319,7 +431,6 @@ function Regresar(){
 }
 window.Regresar = Regresar;
 
-let addClientSheetState = null;
 let confirmSheetState = null;
 let promptSheetState = null;
 
@@ -347,33 +458,11 @@ async function ajustarDeudaActivaCliente(telefono, delta){
     }
 }
 
-function ensureAddClientSheet(){
-    if (addClientSheetState?.sheet && addClientSheetState?.backdrop) return addClientSheetState;
-
-    const backdrop = document.createElement('div');
-    backdrop.className = 'add-client-backdrop';
-    backdrop.style.display = 'none';
-
-    const sheet = document.createElement('section');
-    sheet.className = 'glass-panel details-panel add-client-sheet';
-    sheet.setAttribute('role', 'dialog');
-    sheet.setAttribute('aria-modal', 'true');
-    sheet.setAttribute('aria-label', 'Registrar cliente');
-    sheet.style.display = 'none';
-
-    sheet.innerHTML = `
-        <div class="add-client-sheet__header">
-            <div>
-                <h2 class="section-title">Registrar cliente</h2>
-                <p class="section-subtitle">Completá los datos del nuevo cliente.</p>
-            </div>
-            <button type="button" class="icon-btn" data-close aria-label="Cerrar" title="Cerrar">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-            </button>
-        </div>
+// Abrir sheet de "Agregar cliente" usando el módulo compartido cmsSheet
+async function openAddClientSheet(){
+    const container = document.createElement('div');
+    container.className = 'cms-addclient';
+    container.innerHTML = `
 
         <div class="edit-grid" role="form" aria-label="Formulario registrar cliente">
             <div class="edit-field">
@@ -394,174 +483,59 @@ function ensureAddClientSheet(){
         </div>
     `;
 
-    document.body.appendChild(backdrop);
-    document.body.appendChild(sheet);
+    // Abrir drawer compartido y pegar el contenido
+    const s = openCmsSheet({ title: 'Registrar cliente', subtitle: '', contentHtml: '' });
+    s.els.content.innerHTML = '';
+    s.els.content.appendChild(container);
 
-    const nombreInput = sheet.querySelector('#addClientNombre');
-    const telefonoInput = sheet.querySelector('#addClientTelefono');
-    const validation = sheet.querySelector('.add-client-validation');
-    const btnSubmit = sheet.querySelector('[data-submit]');
-    const btnClose = sheet.querySelector('[data-close]');
-
-    addClientSheetState = {
-        backdrop,
-        sheet,
-        nombreInput,
-        telefonoInput,
-        validation,
-        btnSubmit,
-        btnClose,
-        sessionSeq: 0,
-        activeSession: 0,
-        transitionSeq: 0,
-        resolve: null
-    };
-
-    function requestClose(result){
-        const r = addClientSheetState?.resolve;
-        if (typeof r === 'function'){
-            addClientSheetState.resolve = null;
-            r(result);
-        }
-        closeAddClientSheet();
-    }
+    const nombreInput = container.querySelector('#addClientNombre');
+    const telefonoInput = container.querySelector('#addClientTelefono');
+    const validation = container.querySelector('.add-client-validation');
+    const btnSubmit = container.querySelector('[data-submit]');
+    const btnClose = container.querySelector('[data-close]');
 
     function showValidation(message){
         if (!validation) return;
         const msg = (message || '').toString().trim();
-        if (!msg){
-            validation.hidden = true;
-            validation.textContent = '';
-            return;
-        }
-        validation.textContent = msg;
-        validation.hidden = false;
+        if (!msg){ validation.hidden = true; validation.textContent = ''; return; }
+        validation.textContent = msg; validation.hidden = false;
     }
-
-    function submit(){
-        const nombre = (nombreInput?.value || '').trim();
-        const telefonoRaw = (telefonoInput?.value || '').trim();
-        const telefono = normalizePhone(telefonoRaw);
-
-        if (!nombre){
-            showValidation('Ingrese el nombre del cliente.');
-            nombreInput?.focus();
-            return;
-        }
-
-        if (!telefono){
-            showValidation('Ingrese el teléfono del cliente (solo números).');
-            telefonoInput?.focus();
-            return;
-        }
-
-        showValidation('');
-        requestClose({ nombre, telefono });
-    }
-
-    backdrop.addEventListener('click', () => requestClose(null));
-    btnClose?.addEventListener('click', () => requestClose(null));
-    btnSubmit?.addEventListener('click', submit);
-
-    sheet.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape'){
-            e.preventDefault();
-            requestClose(null);
-            return;
-        }
-        if (e.key === 'Enter'){
-            const tag = (e.target?.tagName || '').toLowerCase();
-            if (tag === 'input'){
-                e.preventDefault();
-                submit();
-            }
-        }
-    });
-
-    document.addEventListener('keydown', (e) => {
-        if (!document.body.classList.contains('add-client-open')) return;
-        if (e.key === 'Escape'){
-            e.preventDefault();
-            requestClose(null);
-        }
-    });
-
-    return addClientSheetState;
-}
-
-function openAddClientSheet(){
-    const state = ensureAddClientSheet();
-    if (!state) return Promise.resolve(null);
-
-    // Cerrar otros overlays que puedan superponerse
-    document.body.classList.remove('mobile-details-open');
-    document.body.classList.remove('op-detail-open');
-
-    state.sessionSeq += 1;
-    const sessionId = state.sessionSeq;
-    state.activeSession = sessionId;
-
-    state.backdrop.style.display = 'block';
-    state.sheet.style.display = 'flex';
-
-    // Forzar reflow para que la transición se aplique correctamente
-    void state.sheet.getBoundingClientRect();
-
-    document.body.classList.add('add-client-open');
-
-    if (state.nombreInput) state.nombreInput.value = '';
-    if (state.telefonoInput) state.telefonoInput.value = '';
-    if (state.validation){
-        state.validation.hidden = true;
-        state.validation.textContent = '';
-    }
-
-    requestAnimationFrame(() => state.nombreInput?.focus());
 
     return new Promise((resolve) => {
-        state.resolve = (result) => {
-            // Evitar resolver si otra apertura tomó el control
-            if (state.activeSession !== sessionId) return;
-            state.activeSession = 0;
-            resolve(result);
+        let finished = false;
+        function cleanup(){
+            if (finished) return; finished = true;
+            try{ btnSubmit?.removeEventListener('click', onSubmit); btnClose?.removeEventListener('click', onCancel); }catch(e){}
+            try{ container.remove(); }catch(e){}
+        }
+
+        const onSubmit = () => {
+            const nombre = (nombreInput?.value || '').trim();
+            const telefonoRaw = (telefonoInput?.value || '').trim();
+            const telefono = normalizePhone(telefonoRaw);
+            if (!nombre){ showValidation('Ingrese el nombre del cliente.'); nombreInput?.focus(); return; }
+            if (!telefono){ showValidation('Ingrese el teléfono del cliente (solo números).'); telefonoInput?.focus(); return; }
+            showValidation('');
+            cleanup();
+            try{ s.close('submit'); }catch(e){}
+            resolve({ nombre, telefono });
         };
+
+        const onCancel = () => { cleanup(); try{ s.close('cancel'); }catch(e){} resolve(null); };
+
+        btnSubmit?.addEventListener('click', onSubmit);
+        btnClose?.addEventListener('click', onCancel);
+
+        container.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter'){
+                const tag = (e.target?.tagName || '').toLowerCase();
+                if (tag === 'input'){ e.preventDefault(); onSubmit(); }
+            }
+        });
+
+        s.closed.then(() => { if (!finished){ finished = true; cleanup(); resolve(null); } });
+        requestAnimationFrame(() => nombreInput?.focus());
     });
-}
-
-function closeAddClientSheet(){
-    const state = addClientSheetState;
-    if (!state?.sheet || !state?.backdrop) return;
-
-    const sheet = state.sheet;
-    const backdrop = state.backdrop;
-    state.transitionSeq += 1;
-    const closeId = state.transitionSeq;
-
-    document.body.classList.remove('add-client-open');
-
-    const finalize = () => {
-        if (!addClientSheetState || addClientSheetState.transitionSeq !== closeId) return;
-        sheet.style.display = 'none';
-        backdrop.style.display = 'none';
-    };
-
-    let done = false;
-    const onEnd = (e) => {
-        if (done) return;
-        if (e.target !== sheet) return;
-        if (e.propertyName && e.propertyName !== 'transform' && e.propertyName !== 'opacity') return;
-        done = true;
-        sheet.removeEventListener('transitionend', onEnd);
-        finalize();
-    };
-
-    sheet.addEventListener('transitionend', onEnd);
-    window.setTimeout(() => {
-        if (done) return;
-        done = true;
-        sheet.removeEventListener('transitionend', onEnd);
-        finalize();
-    }, 420);
 }
 
 function ensureConfirmSheet(){

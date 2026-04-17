@@ -1,259 +1,10 @@
 import {loadSupabase} from './supabase.js'
+import { ensureCmsSheet, openCmsSheet, closeCmsSheet, attachSheetDragHandler, showErrorToast, showSuccessToast, showInfoSheet, confirmSheet } from './cmsSheet.js';
 const client= await loadSupabase();
 let currentOpView = 'deudas'; // 'deudas' | 'pagos'
 let isExpanded = false; // controls whether list shows all items or limited
 let operacionIngresoInit = false;
-
-// ── Bottom sheet (reemplazo de SweetAlert en Inicio) ──
-let cmsSheetEls = null;
-let cmsSheetResolve = null;
-let cmsSheetAutoCloseTimer = null;
-let cmsSheetId = 0;
-
-function ensureCmsSheet(){
-    if (cmsSheetEls) return cmsSheetEls;
-
-    let backdrop = document.getElementById('cmsSheetBackdrop');
-    if (!backdrop){
-        backdrop = document.createElement('div');
-        backdrop.id = 'cmsSheetBackdrop';
-        backdrop.className = 'cms-sheet-backdrop';
-        backdrop.style.display = 'none';
-        document.body.appendChild(backdrop);
-    }
-
-    let drawer = document.getElementById('cmsSheetDrawer');
-    if (!drawer){
-        drawer = document.createElement('div');
-        drawer.id = 'cmsSheetDrawer';
-        drawer.className = 'cms-sheet-drawer';
-        drawer.setAttribute('role', 'dialog');
-        drawer.setAttribute('aria-modal', 'true');
-        drawer.setAttribute('aria-label', 'Mensaje');
-        drawer.style.display = 'none';
-        drawer.innerHTML = `
-            <div class="opd-header">
-                <div class="opd-title">
-                    <h3 id="cmsSheetTitle">Mensaje</h3>
-                    <p id="cmsSheetSubtitle"></p>
-                </div>
-                <button type="button" class="icon-btn" id="cmsSheetClose" aria-label="Cerrar" title="Cerrar">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                </button>
-            </div>
-            <div class="opd-body">
-                <div id="cmsSheetContent"></div>
-                <div id="cmsSheetActions" class="cms-sheet-actions"></div>
-            </div>
-        `;
-        document.body.appendChild(drawer);
-    }
-
-    function close(){
-        closeCmsSheet('close');
-    }
-
-    backdrop.addEventListener('click', close);
-    drawer.querySelector('#cmsSheetClose')?.addEventListener('click', close);
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeCmsSheet('escape');
-    });
-
-    cmsSheetEls = {
-        backdrop,
-        drawer,
-        title: drawer.querySelector('#cmsSheetTitle'),
-        subtitle: drawer.querySelector('#cmsSheetSubtitle'),
-        content: drawer.querySelector('#cmsSheetContent'),
-        actions: drawer.querySelector('#cmsSheetActions'),
-    };
-    return cmsSheetEls;
-}
-
-function showCmsSheetElements(){
-    const els = ensureCmsSheet();
-    els.backdrop.style.display = 'block';
-    els.drawer.style.display = 'grid';
-    // Forzar reflow para que la transición arranque correctamente.
-    // eslint-disable-next-line no-unused-expressions
-    els.drawer.offsetHeight;
-    return els;
-}
-
-function hideCmsSheetElementsAfterTransition(localId){
-    const els = ensureCmsSheet();
-    const drawer = els.drawer;
-
-    const onEnd = (e) => {
-        if (e.target !== drawer) return;
-        if (e.propertyName !== 'transform') return;
-        drawer.removeEventListener('transitionend', onEnd);
-
-        // Si el sheet se reabrió durante el cierre, no ocultar.
-        if (cmsSheetId !== localId) return;
-        if (document.body.classList.contains('cms-sheet-open')) return;
-
-        els.drawer.style.display = 'none';
-        els.backdrop.style.display = 'none';
-    };
-
-    drawer.addEventListener('transitionend', onEnd);
-}
-
-function closeCmsSheet(reason){
-    document.body.classList.remove('cms-sheet-open');
-
-    // Cuando termine la animación de cierre, ocultar el contenedor.
-    hideCmsSheetElementsAfterTransition(cmsSheetId);
-
-    if (cmsSheetAutoCloseTimer){
-        clearTimeout(cmsSheetAutoCloseTimer);
-        cmsSheetAutoCloseTimer = null;
-    }
-    if (typeof cmsSheetResolve === 'function'){
-        const r = cmsSheetResolve;
-        cmsSheetResolve = null;
-        r({ action: reason || 'close' });
-    }
-}
-
-function setCmsSheetActions(actions){
-    const els = ensureCmsSheet();
-    if (!els.actions) return;
-    const list = Array.isArray(actions) ? actions : [];
-
-    if (list.length === 0){
-        els.actions.innerHTML = '';
-        return;
-    }
-
-    els.actions.innerHTML = '';
-    list.forEach((a) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.textContent = String(a?.label ?? 'OK');
-        btn.className = a?.className || 'btn btn-primary';
-        btn.addEventListener('click', () => {
-            const value = a?.value ?? 'ok';
-            closeCmsSheet(value);
-        });
-        els.actions.appendChild(btn);
-    });
-}
-
-function openCmsSheet(opts){
-    cmsSheetId++;
-    const localId = cmsSheetId;
-
-    const els = showCmsSheetElements();
-    const title = String(opts?.title ?? 'Mensaje');
-    const subtitle = String(opts?.subtitle ?? '');
-    const contentHtml = String(opts?.contentHtml ?? '');
-    const actions = opts?.actions;
-    const autoCloseMs = Number(opts?.autoCloseMs ?? 0);
-
-    if (els.title) els.title.textContent = title;
-    if (els.subtitle) els.subtitle.textContent = subtitle;
-    if (els.content) els.content.innerHTML = contentHtml;
-    setCmsSheetActions(actions);
-
-    document.body.classList.add('cms-sheet-open');
-
-    if (cmsSheetAutoCloseTimer){
-        clearTimeout(cmsSheetAutoCloseTimer);
-        cmsSheetAutoCloseTimer = null;
-    }
-
-    const closed = new Promise((resolve) => {
-        cmsSheetResolve = resolve;
-    });
-
-    if (Number.isFinite(autoCloseMs) && autoCloseMs > 0){
-        cmsSheetAutoCloseTimer = setTimeout(() => closeCmsSheet('auto'), autoCloseMs);
-    }
-
-    return {
-        els,
-        closed,
-        setTitle: (t) => { if (els.title) els.title.textContent = String(t ?? ''); },
-        setSubtitle: (s) => { if (els.subtitle) els.subtitle.textContent = String(s ?? ''); },
-        setContent: (html) => { if (els.content) els.content.innerHTML = String(html ?? ''); },
-        setActions: (a) => setCmsSheetActions(a),
-        close: (reason) => {
-            // Mantener coherencia si se intenta cerrar desde una referencia vieja.
-            if (cmsSheetId !== localId) return;
-            closeCmsSheet(reason);
-        },
-    };
-}
-
-function sheetText(message, tone){
-    const cls = tone === 'success'
-        ? 'opd-value--success'
-        : tone === 'error'
-            ? 'opd-value--danger'
-            : '';
-    return `
-        <div class="opd-list">
-            <div class="opd-item">
-                <div>
-                    <h4>Mensaje</h4>
-                    <small>—</small>
-                </div>
-                <div class="opd-value ${cls}" style="white-space:normal; text-align:left; margin-left:0; width:100%;">${escapeHtml(String(message ?? ''))}</div>
-            </div>
-        </div>
-    `;
-}
-
-async function showErrorToast(message){
-    const s = openCmsSheet({
-        title: 'Error',
-        subtitle: '',
-        contentHtml: sheetText(message, 'error'),
-        actions: [],
-        autoCloseMs: 1800,
-    });
-    await s.closed;
-}
-
-async function showSuccessToast(message){
-    const s = openCmsSheet({
-        title: 'Listo',
-        subtitle: '',
-        contentHtml: sheetText(message, 'success'),
-        actions: [],
-        autoCloseMs: 1400,
-    });
-    await s.closed;
-}
-
-async function showInfoSheet(message, title){
-    const s = openCmsSheet({
-        title: title || 'Información',
-        subtitle: '',
-        contentHtml: sheetText(message, 'info'),
-        actions: [{ label: 'OK', value: 'ok', className: 'btn btn-primary' }],
-    });
-    await s.closed;
-}
-
-async function confirmSheet(message, opts){
-    const s = openCmsSheet({
-        title: opts?.title || 'Confirmar',
-        subtitle: opts?.subtitle || '',
-        contentHtml: sheetText(message, opts?.tone || 'info'),
-        actions: [
-            { label: opts?.cancelText || 'Cancelar', value: 'cancel', className: 'btn-clear secondary' },
-            { label: opts?.confirmText || 'Aceptar', value: 'confirm', className: 'btn btn-primary' },
-        ],
-    });
-    const res = await s.closed;
-    return res?.action === 'confirm';
-}
+// Bottom-sheet functionality moved to Scripts/cmsSheet.js
 
 // --- Multi-tenant helper (ID_Negocio) ---
 // Regla:
@@ -321,23 +72,51 @@ window.realizarOperacion = function(e){
     if (e && typeof e.preventDefault === 'function') e.preventDefault();
     const section = document.getElementById('Operacion-ingreso');
     if (!section) return;
-    section.hidden = !section.hidden;
-    const btn = document.getElementById('btn_realiz_op');
-    if (btn) {
-        const label = btn.querySelector('.nav-card__title');
-        const nextText = section.hidden ? 'Realizar Operación' : 'Cerrar Operación';
-        if (label) label.textContent = nextText;
-        else btn.textContent = nextText;
-        btn.setAttribute('aria-expanded', String(!section.hidden));
+
+    // Guardar referencia al padre original para restaurar al cerrar
+    if (!section._originalParent) {
+        section._originalParent = section.parentNode;
+        section._originalNext = section.nextSibling;
     }
 
-    document.body.classList.toggle('op-open', !section.hidden);
-    if (!section.hidden){
-        // Preparar listeners si aún no se inicializó
-        prepararOperacionIngreso();
-        const input = document.getElementById('op_clientSearch');
-        if (input) setTimeout(() => input.focus(), 0);
+    // Asegurar el sheet
+    const els = ensureCmsSheet();
+    const content = els.content;
+
+    // Si la sección ya está dentro del sheet, cerrar
+    if (content.contains(section) && document.body.classList.contains('cms-sheet-open')){
+        closeCmsSheet('close');
+        return;
     }
+
+    // Abrir el sheet y mover la sección dentro
+    const s = openCmsSheet({ title: 'Registrar Operación', subtitle: '', contentHtml: '' });
+    // limpiar contenido y mover el nodo
+    content.innerHTML = '';
+    content.appendChild(section);
+    section.hidden = false;
+
+    // Actualizar botón visual (aria-expanded)
+    const btn = document.getElementById('btn_realiz_op');
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+
+    // Inicializar comportamientos del formulario
+    prepararOperacionIngreso();
+    const input = document.getElementById('op_clientSearch');
+    if (input) setTimeout(() => input.focus(), 0);
+
+    // Al cerrar el sheet, restaurar la sección a su posición original y ocultarla
+    s.closed.then(() => {
+        try {
+            if (section._originalParent) {
+                section._originalParent.insertBefore(section, section._originalNext);
+            }
+            section.hidden = true;
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        } catch (err) {
+            console.warn('Error al restaurar sección Operacion-ingreso', err);
+        }
+    });
 }
 
 function prepararOperacionIngreso(){
@@ -1063,17 +842,12 @@ function ensureOperacionDetalleDrawerInicio(){
         drawer.setAttribute('aria-label', 'Detalle de operación');
         drawer.style.display = 'none';
         drawer.innerHTML = `
+            <div class="sheet-handle" id="opdHandle" aria-hidden="true"><div class="sheet-handle-bar"></div></div>
             <div class="opd-header">
                 <div class="opd-title">
                     <h3 id="opdTitle">Detalle</h3>
                     <p id="opdSubtitle">—</p>
                 </div>
-                <button type="button" class="icon-btn" id="opdClose" aria-label="Cerrar" title="Cerrar">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                </button>
             </div>
             <div class="opd-body">
                 <h4 class="opd-section-title">Información</h4>
@@ -1085,10 +859,16 @@ function ensureOperacionDetalleDrawerInicio(){
 
     const close = () => closeOperacionDetalleDrawerInicio();
     backdrop.addEventListener('click', close);
-    drawer.querySelector('#opdClose')?.addEventListener('click', close);
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeOperacionDetalleDrawerInicio();
     });
+
+    // Añadir handle drag-to-close (solo una vez)
+    // Adjuntar tanto al handle visual como al header (ambos pueden usarse como handle)
+    const h = drawer.querySelector('#opdHandle');
+    if (h) attachSheetDragHandler(drawer, h, closeOperacionDetalleDrawerInicio);
+    const hdr = drawer.querySelector('.opd-header');
+    if (hdr) attachSheetDragHandler(drawer, hdr, closeOperacionDetalleDrawerInicio);
 
     opdInicioEls = {
         backdrop,
@@ -1129,9 +909,24 @@ function hideOperacionDetalleDrawerInicioElementsAfterTransition(localId){
     drawer.addEventListener('transitionend', onEnd);
 }
 
-function closeOperacionDetalleDrawerInicio(){
+function closeOperacionDetalleDrawerInicio(reason, immediate){
     document.body.classList.remove('opd-open');
-    hideOperacionDetalleDrawerInicioElementsAfterTransition(opdInicioId);
+    if (immediate){
+        try{
+            const els = ensureOperacionDetalleDrawerInicio();
+            if (els.drawer){
+                els.drawer.style.display = 'none';
+                els.drawer.style.transform = '';
+                els.drawer.style.transition = '';
+            }
+            if (els.backdrop){
+                els.backdrop.style.display = 'none';
+                els.backdrop.style.opacity = '';
+            }
+        }catch(e){}
+    } else {
+        hideOperacionDetalleDrawerInicioElementsAfterTransition(opdInicioId);
+    }
 }
 
 function buildOpdItem(label, sub, value, valueClass){

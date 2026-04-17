@@ -623,6 +623,8 @@ header.navbar {
     top: calc(var(--header-h) + 14px);
     bottom: calc(var(--footer-h) + 34px + env(safe-area-inset-bottom, 0px));
     width: min(440px, calc(100vw - 28px));
+    /* Limitar altura total para evitar que el drawer sobresalga del viewport */
+    max-height: calc(100vh - (var(--header-h) + var(--footer-h) + 48px));
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: 24px;
@@ -647,6 +649,8 @@ body.opd-open .opd-drawer{ transform: translateX(0); }
     gap: 12px;
     padding: 16px 16px 12px;
     border-bottom: 1px solid var(--glass-border);
+    cursor: grab;
+    touch-action: none;
 }
 
 .opd-title{
@@ -671,6 +675,8 @@ body.opd-open .opd-drawer{ transform: translateX(0); }
 .opd-body{
     padding: 14px 16px 16px;
     overflow: auto;
+    /* Asegurar que el contenido haga scroll internamente sin expandir el drawer */
+    -webkit-overflow-scrolling: touch;
 }
 
 .opd-section-title{
@@ -731,6 +737,9 @@ body.opd-open .opd-drawer{ transform: translateX(0); }
         top: auto;
         bottom: calc(var(--footer-h) + 34px + env(safe-area-inset-bottom, 0px));
         transform: translateY(110%);
+        /* En móvil limitar la altura al viewport y usar scroll interno */
+        max-height: calc(90vh - (var(--footer-h) + 34px + env(safe-area-inset-bottom, 0px)));
+        width: calc(100vw - 20px);
         border-radius: 22px;
     }
     body.opd-open .opd-drawer{ transform: translateY(0); }
@@ -779,6 +788,28 @@ body.cms-sheet-open .cms-sheet-drawer{ transform: translateY(0); }
     justify-content: flex-end;
     flex-wrap: wrap;
 }
+
+/* Handle para arrastrar y cerrar bottom-sheets */
+.sheet-handle{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:12px 12px 8px 12px;
+    cursor: grab;
+    -webkit-user-select: none;
+    user-select: none;
+    pointer-events: auto;
+    touch-action: none;
+}
+.sheet-handle:active{ cursor: grabbing; }
+.sheet-handle-bar{
+    width:56px;
+    height:6px;
+    border-radius:999px;
+    background: rgba(255,255,255,0.09);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
 
 @media (max-width: 480px){
     .cms-sheet-actions{ justify-content: stretch; }

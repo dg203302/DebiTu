@@ -933,6 +933,13 @@ body.prompt-sheet-open .prompt-sheet {
 }
 
 .stats-row {
+.inline-edit-button {
+  min-width: auto;
+  padding: 6px 10px;
+  height: 36px;
+  border-radius: 10px;
+  align-self: center;
+}
   margin-top: 12px;
   margin-bottom: 12px;
   border: 1px dashed var(--border);
