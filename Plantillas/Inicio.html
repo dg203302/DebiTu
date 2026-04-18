@@ -8,6 +8,8 @@
             try {
                 var t = (localStorage.getItem('CMS_THEME') || '').toString().trim().toLowerCase();
                 document.documentElement.dataset.theme = (t === 'light' || t === 'claro') ? 'light' : 'dark';
+                var a = localStorage.getItem('CMS_ANIM');
+                if (a === 'false') document.documentElement.dataset.anim = 'false'; var tr = localStorage.getItem('CMS_TRANS'); if (tr === 'false') document.documentElement.dataset.trans = 'false';
             } catch (e) {}
         })();
     </script>
@@ -27,8 +29,7 @@
     <header class="navbar">
         <div class="header-inner">
             <div class="header-text">
-                <h1>Inicio</h1>
-                <p id="bienvenida"></p>
+                <h1 id="header_titulo">Inicio</h1>
             </div>
         </div>
     </header>
@@ -40,16 +41,25 @@
                 <h1 id="total_adeudado_mes" class="text-gradient">Cargando...</h1>
                 <p class="kpi-meta">Saldo pendiente de clientes activos</p>
             </div>
-            <button type="button" class="icon-btn btn-large" onclick="recargarMontos()" aria-label="Recargar montos" title="Actualizar KPI">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                    <path d="M3 3v5h5" />
-                </svg>
-            </button>
+            <div class="kpi-actions" style="display: flex; gap: 12px; align-items: center;">
+                <button type="button" class="icon-btn btn-large" onclick="recargarMontos()" aria-label="Recargar montos" title="Actualizar KPI">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                        <path d="M3 3v5h5" />
+                    </svg>
+                </button>
+                <button type="button" id="btn_realiz_op_mob" class="icon-btn btn-large pulse-glow mobile-op-btn" onclick="realizarOperacion(event)" aria-label="Nueva Operación" title="Nueva Operación">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color: var(--accent-color);">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M8 12h8" />
+                        <path d="M12 8v8" />
+                    </svg>
+                </button>
+            </div>
         </section>
         
         <section id="btnes_nav" class="nav-grid">
-            <a class="nav-card glass-panel interactive-panel" href="/Plantillas/administracion_clientes.html">
+            <!--<a class="nav-card glass-panel interactive-panel" href="/Plantillas/administracion_clientes.html">
                 <div class="nav-icon bg-blue-gradient">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -62,8 +72,8 @@
                     <span class="nav-card__title">Directorio de Clientes</span>
                     <span class="nav-card__subtitle">Gestión de perfiles y estados</span>
                 </div>
-            </a>
-            <button type="button" class="nav-card nav-card--primary glass-panel interactive-panel pulse-glow" id="btn_realiz_op" onclick="realizarOperacion(event)" aria-expanded="false" aria-controls="Operacion-ingreso">
+            </a>-->
+            <button type="button" class="nav-card nav-card--primary glass-panel interactive-panel pulse-glow desktop-op-btn" id="btn_realiz_op" onclick="realizarOperacion(event)" aria-expanded="false" aria-controls="Operacion-ingreso">
                 <div class="nav-icon bg-accent-gradient">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <circle cx="12" cy="12" r="10" />

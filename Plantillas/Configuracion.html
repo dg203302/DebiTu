@@ -9,10 +9,15 @@
             try {
                 var t = (localStorage.getItem('CMS_THEME') || '').toString().trim().toLowerCase();
                 document.documentElement.dataset.theme = (t === 'light' || t === 'claro') ? 'light' : 'dark';
+                var a = localStorage.getItem('CMS_ANIM');
+                if (a === 'false') document.documentElement.dataset.anim = 'false';
+                var tr = localStorage.getItem('CMS_TRANS');
+                if (tr === 'false') document.documentElement.dataset.trans = 'false';
             } catch (e) { }
         })();
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="/Estilos/estilos_config.css">
     <title>Configuración | CMS Premium</title>
 </head>
@@ -35,6 +40,15 @@
     </header>
 
     <main class="config-layout">
+
+        <section class="glass-panel header-panel">
+            <div class="credits-head" aria-label="Información de la aplicación">
+                <img class="app-icon" src="/icons/Icon.png" alt="Icono de la app" loading="lazy" decoding="async">
+                <h1 class="app-title">Debi<span style="color: greenyellow;">Tú</span></h1>
+            </div>
+            <p>&copy; <a href="https://djsolutionss.netlify.app">DJ Solutions</a> <span id="anio"></span></p>
+        </section>
+
         <section class="glass-panel profile-panel">
             <h2 class="section-title">Datos Personales</h2>
             <div class="profile-row">
@@ -49,49 +63,56 @@
         <section class="glass-panel prefs-panel">
             <h2 class="section-title">Preferencias</h2>
             <div class="prefs-grid">
-                <!--<div class="pref-item">
-                    <div>
-                        <h3>Idioma</h3>
-                        <p>Personaliza el contenido de la interfaz.</p>
-                    </div>
-                    <button id="idioma-btn">Cambiar Idioma</button>
-                </div>-->
 
                 <div class="pref-item pref-item--visual">
-                    <div>
+                    <div style="text-align: start;">
                         <h3>Apariencia</h3>
                         <p>Elige entre modo claro u oscuro.</p>
                     </div>
                     <div class="theme-toggle" aria-label="Tema">
                         <span class="theme-toggle__label theme-toggle__label--light">Claro</span>
-                        <button id="modo-oscuro-btn" class="ios-switch" type="button" role="switch" aria-checked="false" aria-label="Cambiar tema"></button>
+                        <button id="modo-oscuro-btn" class="ios-switch" type="button" role="switch" aria-checked="false"
+                            aria-label="Cambiar tema"></button>
                         <span class="theme-toggle__label theme-toggle__label--dark">Oscuro</span>
                     </div>
-                    <!--<button id="transparencia-btn" class="secondary-btn">Transparencia</button>-->
+                </div>
+
+                <div class="pref-item pref-item--visual">
+                    <div style="text-align: start;">
+                        <h3>Animaciones</h3>
+                        <p>Fondo dinámico y efectos.</p>
+                    </div>
+                    <div class="theme-toggle" aria-label="Animaciones" style="border: none;background: none;">
+                        <button id="animaciones-btn" class="ios-switch" type="button" role="switch"
+                            aria-checked="true" aria-label="Alternar animaciones"></button>
+                    </div>
+                </div>
+
+                <div class="pref-item pref-item--visual">
+                    <div style="text-align: start;">
+                        <h3>Transparencias</h3>
+                        <p>Efectos de cristal en paneles.</p>
+                    </div>
+                    <div class="theme-toggle" aria-label="Transparencias" style="border: none;background: none;">
+                        <button id="transparencias-btn" class="ios-switch" type="button" role="switch"
+                            aria-checked="true" aria-label="Alternar transparencias"></button>
+                    </div>
                 </div>
 
                 <div class="pref-item pref-item--danger">
-                    <div>
+                    <div style="text-align: start;">
                         <h3>Cuenta</h3>
                         <p>Elimina permanentemente todos los datos.</p>
                     </div>
                     <button id="eliminar-cuenta-btn">Eliminar Cuenta</button>
                 </div>
-            </div>
-        </section>
-
-        <section class="glass-panel footer-panel">
-            <div class="credits-head" aria-label="Información de la aplicación">
-                <img class="app-icon" src="/icons/Icon.png" alt="Icono de la app" loading="lazy" decoding="async">
-                <h1 class="app-title">DebiTú</h1>
-            </div>
-            <p>&copy; <a href="https://djsolutionss.netlify.app">DJ Solutions</a> <span id="anio"></span></p>
         </section>
     </main>
 
     <footer class="bottom-nav" aria-label="Navegación">
         <a class="icon-btn" href="/Plantillas/administracion_clientes.html" aria-label="Clientes" title="Clientes">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                 <circle cx="9" cy="7" r="4" />
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -99,19 +120,26 @@
             </svg>
         </a>
         <a class="icon-btn" href="/Plantillas/Inicio.html" aria-label="Inicio" title="Inicio">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
                 <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
-                <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <path
+                    d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
             </svg>
         </a>
-        <a class="icon-btn active" href="/Plantillas/Configuracion.html" aria-label="Configuración" title="Configuración">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <a class="icon-btn active" href="/Plantillas/Configuracion.html" aria-label="Configuración"
+            title="Configuración">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
                 <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09A1.65 1.65 0 0 0 19.4 15z" />
+                <path
+                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09A1.65 1.65 0 0 0 19.4 15z" />
             </svg>
         </a>
-        <button type="button" class="icon-btn danger" onclick="cerrarSesion()" aria-label="Cerrar sesión" title="Cerrar sesión">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <button type="button" class="icon-btn danger" onclick="cerrarSesion()" aria-label="Cerrar sesión"
+            title="Cerrar sesión">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                 <polyline points="16 17 21 12 16 7" />
                 <line x1="21" y1="12" x2="9" y2="12" />

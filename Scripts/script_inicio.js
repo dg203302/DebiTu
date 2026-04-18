@@ -41,7 +41,8 @@ window.onload = async function() {
     /*if (!localStorage.getItem('UserID')) {
         window.location.href = '/index.html';
     }*/
-    document.getElementById("bienvenida").textContent = textoB();
+    const titulo = document.getElementById("header_titulo");
+    if (titulo) titulo.textContent = textoB();
     const pfp = document.getElementById("pfp");
     if (pfp) pfp.src = localStorage.getItem("UserPhoto") || '';
     await cargarMontoAdeudadoMensual();
@@ -1149,8 +1150,7 @@ __deudaTotalEl.addEventListener("click", async function() {
 
 function textoB(){
     const tiempo_actual = new Date();
-    const texo_cont = document.getElementById("bienvenida");
-    const nombre = localStorage.getItem("UserName");
+    const nombre = localStorage.getItem("UserName") || 'Usuario';
     if (tiempo_actual.getHours() >= 5 && tiempo_actual.getHours() < 12) {
         return `¡Buenos días, ${nombre}!`;
     } else if (tiempo_actual.getHours() >= 12 && tiempo_actual.getHours() < 18) {

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,13 +9,17 @@
             try {
                 var t = (localStorage.getItem('CMS_THEME') || '').toString().trim().toLowerCase();
                 document.documentElement.dataset.theme = (t === 'light' || t === 'claro') ? 'light' : 'dark';
-            } catch (e) {}
+                var a = localStorage.getItem('CMS_ANIM');
+                if (a === 'false') document.documentElement.dataset.anim = 'false'; var tr = localStorage.getItem('CMS_TRANS'); if (tr === 'false') document.documentElement.dataset.trans = 'false';
+            } catch (e) { }
         })();
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="/Estilos/estilos_clientes.css">
     <title>Clientes | CMS Premium</title>
 </head>
+
 <body>
     <div class="ambient-background" aria-hidden="true">
         <div class="blob blob-1"></div>
@@ -27,22 +32,25 @@
         <div class="header-inner">
             <div class="brand-cluster">
                 <div class="header-copy">
-                    <h1>Clientes</h1>
+                    <h1>Administración</h1>
                 </div>
             </div>
 
             <label class="header-search" aria-label="Buscar clientes">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" aria-hidden="true">
                     <circle cx="11" cy="11" r="7"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <input type="text" placeholder="Buscar por nombre o teléfono" id="buscarClienteInput" autocomplete="off" inputmode="search">
+                <input type="text" placeholder="Buscar por nombre o teléfono" id="buscarClienteInput" autocomplete="off"
+                    inputmode="search">
                 <span class="search-meta">Búsqueda inmediata</span>
             </label>
 
             <div class="header-actions">
                 <button class="btn btn-primary" onclick="agregarCliente()" type="button">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
@@ -82,8 +90,10 @@
                 <h2 class="section-title">Panel de Cliente</h2>
                 <div class="action-group">
                     <button id="btn_editar_cliente" class="btn btn-outline subtle" type="button">Editar</button>
-                    <button id="btn_cerrar_detalles" type="button" class="icon-btn" onclick="cerrarDetallesCliente()" aria-label="Cerrar detalles" title="Cerrar">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <button id="btn_cerrar_detalles" type="button" class="icon-btn" onclick="cerrarDetallesCliente()"
+                        aria-label="Cerrar detalles" title="Cerrar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <line x1="18" y1="6" x2="6" y2="18" />
                             <line x1="6" y1="6" x2="18" y2="18" />
                         </svg>
@@ -93,7 +103,8 @@
 
             <div class="empty-client-state" aria-hidden="true">
                 <div class="empty-ill">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
                         <circle cx="12" cy="8" r="4"></circle>
                         <path d="M5.5 20a6.5 6.5 0 0 1 13 0"></path>
                     </svg>
@@ -126,7 +137,8 @@
                             <span class="label">Deuda Activa</span>
                             <span id="montototalAdeudado" class="amount">0.00</span>
                         </div>
-                        <button class="btn btn-danger-soft" onclick="enviarDeudaTotal()" type="button">Enviar por WhatsApp</button>
+                        <button class="btn btn-danger-soft" onclick="enviarDeudaTotal()" type="button">Enviar por
+                            WhatsApp</button>
                     </div>
                 </div>
             </section>
@@ -145,12 +157,14 @@
 
                     <label class="edit-field">
                         <span class="edit-label">Teléfono</span>
-                        <input id="edit_telefono_inline" type="tel" inputmode="numeric" autocomplete="tel" placeholder="Solo números">
+                        <input id="edit_telefono_inline" type="tel" inputmode="numeric" autocomplete="tel"
+                            placeholder="Solo números">
                     </label>
 
                     <label class="edit-field">
                         <span class="edit-label">Deuda activa</span>
-                        <input id="edit_deuda_inline" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+                        <input id="edit_deuda_inline" type="text" inputmode="decimal" autocomplete="off"
+                            placeholder="0">
                         <span class="muted">Se guardará como Deuda Activa del cliente.</span>
                     </label>
                 </div>
@@ -165,11 +179,14 @@
             <section id="operacionesCliente">
                 <div class="section-header">
                     <div class="tabs" role="tablist" aria-label="Tipo de operación">
-                        <button id="btn_ver_deudas_cliente" class="tab active" type="button" role="tab" aria-selected="true">Deudas</button>
-                        <button id="btn_ver_pagos_cliente" class="tab" type="button" role="tab" aria-selected="false">Pagos</button>
+                        <button id="btn_ver_deudas_cliente" class="tab active" type="button" role="tab"
+                            aria-selected="true">Deudas</button>
+                        <button id="btn_ver_pagos_cliente" class="tab" type="button" role="tab"
+                            aria-selected="false">Pagos</button>
                     </div>
                     <div class="actions">
-                        <button id="btn_refrescar_cliente" class="btn btn-outline subtle" type="button">Refrescar</button>
+                        <button id="btn_refrescar_cliente" class="btn btn-outline subtle"
+                            type="button">Refrescar</button>
                     </div>
                 </div>
                 <div id="lista_operaciones_cliente">Cargando...</div>
@@ -177,8 +194,10 @@
         </section>
     </main>
     <footer class="bottom-nav" aria-label="Navegación">
-        <a class="icon-btn active" href="/Plantillas/administracion_clientes.html" aria-label="Clientes" title="Clientes" aria-current="page">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <a class="icon-btn active" href="/Plantillas/administracion_clientes.html" aria-label="Clientes"
+            title="Clientes" aria-current="page">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                 <circle cx="9" cy="7" r="4" />
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -187,21 +206,27 @@
         </a>
 
         <a class="icon-btn" href="/Plantillas/Inicio.html" aria-label="Inicio" title="Inicio">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
                 <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
-                <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <path
+                    d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
             </svg>
         </a>
 
         <a class="icon-btn" href="/Plantillas/Configuracion.html" aria-label="Configuración" title="Configuración">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
                 <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09A1.65 1.65 0 0 0 19.4 15z" />
+                <path
+                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09A1.65 1.65 0 0 0 19.4 15z" />
             </svg>
         </a>
-        
-        <button type="button" class="icon-btn danger" onclick="cerrarSesion()" aria-label="Cerrar sesión" title="Cerrar sesión">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+
+        <button type="button" class="icon-btn danger" onclick="cerrarSesion()" aria-label="Cerrar sesión"
+            title="Cerrar sesión">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                 <polyline points="16 17 21 12 16 7" />
                 <line x1="21" y1="12" x2="9" y2="12" />
@@ -209,5 +234,31 @@
         </button>
     </footer>
     <script src="/Scripts/script_Adminclientes.js" type="module"></script>
+    <script>
+        function updateLayoutForMobile() {
+            const isMobile = window.innerWidth <= 767;
+            const searchBar = document.querySelector('.header-search');
+            const actionsBlock = document.querySelector('.header-actions');
+            const headerInner = document.querySelector('.header-inner');
+            const controlPanel = document.querySelector('#accionesClientes');
+            const headingRow = document.querySelector('#accionesClientes .section-heading-row');
+
+            if (isMobile) {
+                if (searchBar && searchBar.parentElement === headerInner) {
+                    headingRow.insertAdjacentElement('afterend', searchBar);
+                    headingRow.insertBefore(actionsBlock, headingRow.firstChild);
+                }
+            } else {
+                if (searchBar && searchBar.parentElement !== headerInner) {
+                    headerInner.appendChild(searchBar);
+                    headerInner.appendChild(actionsBlock);
+                }
+            }
+        }
+        window.addEventListener('resize', updateLayoutForMobile);
+        document.addEventListener('DOMContentLoaded', updateLayoutForMobile);
+        updateLayoutForMobile();
+    </script>
 </body>
+
 </html>

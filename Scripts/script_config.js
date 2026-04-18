@@ -456,15 +456,52 @@ if (modoOscuroBtn){
     })
 }
 
-const transparenciaBtn = document.getElementById('transparencia-btn')
-if (transparenciaBtn){
-    transparenciaBtn.addEventListener('click', async () => {
-        await openCfgMessage({
-            title: 'Próximamente',
-            messageHtml: 'Esta opción estará disponible en una próxima actualización.',
-            okText: 'Aceptar'
-        })
-    })
+// Inicializar y manejar estado de animaciones
+const animacionesBtn = document.getElementById('animaciones-btn');
+if (animacionesBtn) {
+    const isAnimDisabled = localStorage.getItem('CMS_ANIM') === 'false';
+    animacionesBtn.setAttribute('aria-checked', String(!isAnimDisabled));
+
+    animacionesBtn.addEventListener('click', () => {
+        const currentlyChecked = animacionesBtn.getAttribute('aria-checked') === 'true';
+        const nextChecked = !currentlyChecked;
+        
+        animacionesBtn.setAttribute('aria-checked', String(nextChecked));
+        
+        if (!nextChecked) {
+            localStorage.setItem('CMS_ANIM', 'false');
+            document.documentElement.dataset.anim = 'false';
+            showToast('Animaciones desactivadas', 'info');
+        } else {
+            localStorage.removeItem('CMS_ANIM');
+            delete document.documentElement.dataset.anim;
+            showToast('Animaciones activadas', 'success');
+        }
+    });
+}
+
+// Inicializar y manejar estado de transparencias
+const transparenciasBtn = document.getElementById('transparencias-btn');
+if (transparenciasBtn) {
+    const isTransDisabled = localStorage.getItem('CMS_TRANS') === 'false';
+    transparenciasBtn.setAttribute('aria-checked', String(!isTransDisabled));
+
+    transparenciasBtn.addEventListener('click', () => {
+        const currentlyChecked = transparenciasBtn.getAttribute('aria-checked') === 'true';
+        const nextChecked = !currentlyChecked;
+        
+        transparenciasBtn.setAttribute('aria-checked', String(nextChecked));
+        
+        if (!nextChecked) {
+            localStorage.setItem('CMS_TRANS', 'false');
+            document.documentElement.dataset.trans = 'false';
+            showToast('Transparencias desactivadas', 'info');
+        } else {
+            localStorage.removeItem('CMS_TRANS');
+            delete document.documentElement.dataset.trans;
+            showToast('Transparencias activadas', 'success');
+        }
+    });
 }
 
 const eliminarCuentaBtn = document.getElementById('eliminar-cuenta-btn')
