@@ -16,6 +16,7 @@
     </script>
     <link rel="stylesheet" href="/Estilos/estilos_inicio.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dashboard | DebiTú</title>
 </head>
 <body>
@@ -40,7 +41,6 @@
             <div id="deuda_total">
                 <p class="kpi-label">Deuda Total Activa</p>
                 <h1 id="total_adeudado_mes" class="text-gradient">Cargando...</h1>
-                <p class="kpi-meta">Saldo pendiente de clientes activos</p>
             </div>
             <div class="kpi-actions" style="display: flex; gap: 12px; align-items: center;">
                 <button type="button" class="icon-btn btn-large" onclick="recargarMontos()" aria-label="Recargar montos" title="Actualizar KPI">
@@ -93,10 +93,6 @@
         <section id="Operacion-ingreso" class="glass-panel" hidden>
             <h2 class="panel-title">Detalles de Operación</h2>
             <div class="op-reg">
-                <div class="op-lead">
-                    <p class="op-lead__title">Define el tipo antes de completar los datos</p>
-                    <p class="op-lead__subtitle">Selecciona si registraras un pago o una nueva deuda.</p>
-                </div>
 
                 <div class="type-row type-row--cards" role="radiogroup" aria-label="Tipo de operación">
                     <label class="type-option" for="op_chkPago">
@@ -232,7 +228,6 @@
             </svg>
         </a>
 
-        <!--
         <a class="icon-btn" href="/Plantillas/Estadisticas.html" aria-label="Estadísticas"
             title="Estadísticas">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -242,7 +237,6 @@
                     <line x1="18" y1="20" x2="18" y2="10" />
                 </svg>
         </a>
-        -->
 
         <a class="icon-btn" href="/Plantillas/Configuracion.html" aria-label="Configuración" title="Configuración">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

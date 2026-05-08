@@ -11,6 +11,7 @@ let currentClienteOpView = 'deudas'; // 'deudas' | 'pagos'
 let isExpandedCliente = false; // controla ver 4 vs todos
 let currentClientesFilter = 'all'; // 'all' | 'withDebt' | 'withoutDebt'
 let isEditingCliente = false;
+let clientStatsCharts = [];
 
 let clientePanelSheet = null;
 
@@ -96,6 +97,19 @@ function setResponsiveDetailsOpen(open){
                     }
                 }
 
+                const btnStats = document.getElementById('btn_stats_cliente');
+                if (btnStats) {
+                    if (!btnStats._originalParent) {
+                        btnStats._originalParent = btnStats.parentNode;
+                        btnStats._originalNext = btnStats.nextSibling;
+                    }
+                    const clienteProfile = section.querySelector('.cliente-profile');
+                    if (clienteProfile) {
+                        clienteProfile.appendChild(btnStats);
+                        btnStats.classList.add('inline-edit-button');
+                    }
+                }
+
                 s.closed.then(() => {
                     try {
                         // Restaurar al DOM original
@@ -112,6 +126,15 @@ function setResponsiveDetailsOpen(open){
                                 b.classList.remove('inline-edit-button');
                                 delete b._originalParent;
                                 delete b._originalNext;
+                            }
+                        } catch (_) {}
+                        try {
+                            const bStats = document.getElementById('btn_stats_cliente');
+                            if (bStats && bStats._originalParent) {
+                                bStats._originalParent.insertBefore(bStats, bStats._originalNext);
+                                bStats.classList.remove('inline-edit-button');
+                                delete bStats._originalParent;
+                                delete bStats._originalNext;
                             }
                         } catch (_) {}
                         if (section._originalStyle) {
@@ -154,6 +177,8 @@ function syncEditButtonVisibility(){
     const hasSelection = !!currentClienteTelefono;
     const btnEditar = document.getElementById('btn_editar_cliente');
     if (btnEditar) btnEditar.style.display = hasSelection ? '' : 'none';
+    const btnStats = document.getElementById('btn_stats_cliente');
+    if (btnStats) btnStats.style.display = hasSelection ? '' : 'none';
     const btnCerrar = document.getElementById('btn_cerrar_detalles');
     if (btnCerrar) btnCerrar.style.display = hasSelection ? '' : 'none';
 }
@@ -1292,13 +1317,7 @@ async function mostrarOperacionesCliente(tipo){
     if (!cont || !currentClienteTelefono) return;
     cont.textContent = 'Cargando...';
     try{
-        const tabla = (tipo === 'deudas') ? 'Deudas' : 'Pagos';
-        let q = supabase
-            .from(tabla)
-            .select('*')
-            .eq('Telefono_cliente', currentClienteTelefono);
-        q = applyIdNegocioFilter(q);
-        const { data, error } = await q.order('Creado', { ascending: false });
+        const { data, error } = await fetchOperacionesClienteByTipo(tipo, currentClienteTelefono, false);
         if (error){
             showErrorToast(error.message);
             cont.textContent = 'Error al cargar.';
@@ -1309,6 +1328,301 @@ async function mostrarOperacionesCliente(tipo){
         console.error(err);
         showErrorToast('No se pudieron cargar las operaciones');
         cont.textContent = 'Error al cargar.';
+    }
+}
+
+async function fetchOperacionesClienteByTipo(tipo, telefono, asc = true){
+    const tabla = (tipo === 'deudas') ? 'Deudas' : 'Pagos';
+    let q = supabase
+        .from(tabla)
+        .select('*')
+        .eq('Telefono_cliente', telefono);
+    q = applyIdNegocioFilter(q);
+    return await q.order('Creado', { ascending: !!asc });
+}
+
+function normalizeMontoOperacion(item){
+    const montoRaw = item?.Monto ?? item?.monto ?? item?.Amount ?? item?.amount ?? 0;
+    const monto = Number(montoRaw);
+    return Number.isFinite(monto) ? monto : 0;
+}
+
+function normalizeFechaOperacion(item){
+    const raw = item?.Creado ?? item?.creado ?? item?.fecha ?? item?.created_at ?? null;
+    if (!raw) return null;
+    const date = new Date(raw);
+    return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function monthKey(date){
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function monthLabel(date){
+    return date.toLocaleDateString('es-AR', { month: 'short', year: 'numeric' });
+}
+
+function buildMonthlySeries(items){
+    const bucket = new Map();
+    for (const item of (items || [])) {
+        const date = normalizeFechaOperacion(item);
+        if (!date) continue;
+        const key = monthKey(date);
+        const current = bucket.get(key) || { date, label: monthLabel(date), total: 0 };
+        current.total += normalizeMontoOperacion(item);
+        bucket.set(key, current);
+    }
+    return Array.from(bucket.values()).sort((a, b) => a.date - b.date);
+}
+
+function clamp(value, min, max){
+    return Math.max(min, Math.min(max, value));
+}
+
+function computePaymentIndicators({ pagos, deudas, deudaActiva }){
+    const totalPagado = (pagos || []).reduce((acc, item) => acc + normalizeMontoOperacion(item), 0);
+    const totalDeudaRegistrada = (deudas || []).reduce((acc, item) => acc + normalizeMontoOperacion(item), 0);
+    const cobertura = totalDeudaRegistrada > 0 ? clamp(totalPagado / totalDeudaRegistrada, 0, 1.4) : (totalPagado > 0 ? 1 : 0);
+
+    const ultimoPago = (pagos || [])
+        .map((item) => normalizeFechaOperacion(item))
+        .filter(Boolean)
+        .sort((a, b) => b - a)[0] || null;
+    const diasSinPagar = ultimoPago ? Math.round((Date.now() - ultimoPago.getTime()) / 86400000) : 365;
+    const recencia = clamp(1 - (diasSinPagar / 180), 0, 1);
+    const deudaPresion = totalDeudaRegistrada > 0 ? clamp((Number(deudaActiva) || 0) / totalDeudaRegistrada, 0, 1.2) : 0;
+
+    const rawScore = 300 + (cobertura * 320) + (recencia * 200) + ((1 - deudaPresion) * 120);
+    const score = Math.round(clamp(rawScore, 300, 850));
+    const probabilidad = Math.round(clamp(((score - 300) / 550) * 100, 0, 99));
+
+    let tone = 'low';
+    let label = 'Riesgo alto';
+    if (probabilidad >= 70) {
+        tone = 'high';
+        label = 'Perfil estable';
+    } else if (probabilidad >= 45) {
+        tone = 'mid';
+        label = 'Riesgo medio';
+    }
+
+    return { score, probabilidad, tone, label, totalPagado, totalDeudaRegistrada, diasSinPagar };
+}
+
+function destroyClientStatsCharts(){
+    for (const chart of clientStatsCharts) {
+        try { chart?.destroy(); } catch (_) {}
+    }
+    clientStatsCharts = [];
+}
+
+async function ensureChartJs(){
+    if (window.Chart) return window.Chart;
+    await new Promise((resolve, reject) => {
+        const existing = document.querySelector('script[data-lib="chartjs"]');
+        if (existing) {
+            existing.addEventListener('load', () => resolve());
+            existing.addEventListener('error', () => reject(new Error('No se pudo cargar Chart.js')));
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';
+        script.async = true;
+        script.defer = true;
+        script.dataset.lib = 'chartjs';
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('No se pudo cargar Chart.js'));
+        document.head.appendChild(script);
+    });
+    return window.Chart;
+}
+
+function pushLineChart(canvasId, labels, values, color, fillA, fillB){
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || !window.Chart) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height || 220);
+    gradient.addColorStop(0, fillA);
+    gradient.addColorStop(1, fillB);
+    const chart = new window.Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                data: values,
+                borderColor: color,
+                backgroundColor: gradient,
+                pointRadius: 2.5,
+                pointHoverRadius: 5,
+                tension: 0.34,
+                fill: true,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx2) => ` ${new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(ctx2.parsed.y || 0)}`,
+                    },
+                },
+            },
+            scales: {
+                x: { ticks: { color: 'rgba(255,255,255,0.72)' }, grid: { color: 'rgba(255,255,255,0.08)' } },
+                y: {
+                    ticks: {
+                        color: 'rgba(255,255,255,0.72)',
+                        callback: (v) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(v),
+                    },
+                    grid: { color: 'rgba(255,255,255,0.08)' },
+                },
+            },
+        },
+    });
+    clientStatsCharts.push(chart);
+}
+
+let clientStatsDrawerEls = null;
+
+function ensureClientStatsDrawer(){
+    if (clientStatsDrawerEls) return clientStatsDrawerEls;
+
+    let backdrop = document.getElementById('clientStatsBackdrop');
+    let drawer = document.getElementById('clientStatsDrawer');
+
+    if (!backdrop) {
+        backdrop = document.createElement('div');
+        backdrop.id = 'clientStatsBackdrop';
+        backdrop.className = 'op-detail-backdrop client-stats-backdrop';
+        document.body.appendChild(backdrop);
+    }
+
+    if (!drawer) {
+        drawer = document.createElement('div');
+        drawer.id = 'clientStatsDrawer';
+        drawer.className = 'op-detail-drawer client-stats-drawer';
+        drawer.setAttribute('role', 'dialog');
+        drawer.setAttribute('aria-modal', 'true');
+        drawer.setAttribute('aria-label', 'Estadísticas individuales');
+        drawer.innerHTML = `
+            <div class="op-detail-drawer__header">
+                <div>
+                    <h3 class="op-detail-drawer__title" id="clientStatsTitle">Estadísticas individuales</h3>
+                    <div class="op-detail-drawer__subtitle" id="clientStatsSubtitle">—</div>
+                </div>
+                <button type="button" class="icon-btn" id="clientStatsClose" aria-label="Cerrar" title="Cerrar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="op-detail-drawer__body" id="clientStatsBody"></div>
+        `;
+        document.body.appendChild(drawer);
+    }
+
+    const close = () => closeClientStatsDrawer();
+    backdrop.addEventListener('click', close);
+    drawer.querySelector('#clientStatsClose')?.addEventListener('click', close);
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeClientStatsDrawer();
+    });
+
+    clientStatsDrawerEls = {
+        backdrop,
+        drawer,
+        title: drawer.querySelector('#clientStatsTitle'),
+        subtitle: drawer.querySelector('#clientStatsSubtitle'),
+        body: drawer.querySelector('#clientStatsBody'),
+    };
+    return clientStatsDrawerEls;
+}
+
+function closeClientStatsDrawer(){
+    document.body.classList.remove('client-stats-open');
+    destroyClientStatsCharts();
+}
+
+async function abrirEstadisticasCliente(){
+    if (!currentClienteTelefono) {
+        await showErrorToast('Selecciona un cliente primero.');
+        return;
+    }
+
+    const currency = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
+    const els = ensureClientStatsDrawer();
+    if (els.title) els.title.textContent = 'Estadísticas individuales';
+    if (els.subtitle) els.subtitle.textContent = currentClienteNombre ? `Cliente: ${currentClienteNombre}` : 'Cliente seleccionado';
+    if (els.body) {
+        els.body.innerHTML = `
+            <div class="client-stats-sheet">
+                <div class="client-stats-summary">
+                    <article class="client-stats-kpi">
+                        <span class="client-stats-kpi__label">Probabilidad de pagar</span>
+                        <div class="client-stats-kpi__value" id="client_stats_prob">--%</div>
+                        <div class="client-stats-kpi__meta">Estimación basada en su historial de pagos/deudas.</div>
+                    </article>
+                    <article class="client-stats-kpi">
+                        <span class="client-stats-kpi__label">Score de pago</span>
+                        <div class="client-stats-kpi__value" id="client_stats_score">--</div>
+                        <div class="client-stats-kpi__meta"><span class="client-stats-badge" id="client_stats_badge" data-tone="mid">Analizando...</span></div>
+                    </article>
+                </div>
+
+                <article class="client-stats-chart">
+                    <h4>Evolución de la deuda del cliente</h4>
+                    <div class="client-stats-canvas-wrap"><canvas id="chart_cliente_deudas"></canvas></div>
+                </article>
+
+                <article class="client-stats-chart">
+                    <h4>Evolución de los pagos del cliente</h4>
+                    <div class="client-stats-canvas-wrap"><canvas id="chart_cliente_pagos"></canvas></div>
+                </article>
+            </div>
+        `;
+    }
+
+    document.body.classList.add('client-stats-open');
+
+    try {
+        await ensureChartJs();
+        destroyClientStatsCharts();
+
+        const [resDeudas, resPagos, deudaActiva] = await Promise.all([
+            fetchOperacionesClienteByTipo('deudas', currentClienteTelefono, true),
+            fetchOperacionesClienteByTipo('pagos', currentClienteTelefono, true),
+            calcularMontoTotalAdeudado(currentClienteTelefono),
+        ]);
+
+        if (resDeudas.error) throw new Error(resDeudas.error.message || 'No se pudieron cargar deudas');
+        if (resPagos.error) throw new Error(resPagos.error.message || 'No se pudieron cargar pagos');
+
+        const deudas = (resDeudas.data || []);
+        const pagos = (resPagos.data || []);
+        const serieDeuda = buildMonthlySeries(deudas);
+        const seriePago = buildMonthlySeries(pagos);
+        const indicadores = computePaymentIndicators({ pagos, deudas, deudaActiva });
+
+        const probEl = document.getElementById('client_stats_prob');
+        const scoreEl = document.getElementById('client_stats_score');
+        const badgeEl = document.getElementById('client_stats_badge');
+        if (probEl) probEl.textContent = `${indicadores.probabilidad}%`;
+        if (scoreEl) scoreEl.textContent = `${indicadores.score} / 850`;
+        if (badgeEl) {
+            badgeEl.textContent = indicadores.label;
+            badgeEl.dataset.tone = indicadores.tone;
+            badgeEl.title = `Pagado: ${currency.format(indicadores.totalPagado)} • Deuda registrada: ${currency.format(indicadores.totalDeudaRegistrada)} • Días sin pagar: ${indicadores.diasSinPagar}`;
+        }
+
+        pushLineChart('chart_cliente_deudas', serieDeuda.map((x) => x.label), serieDeuda.map((x) => x.total), 'rgba(244, 63, 94, 0.95)', 'rgba(244, 63, 94, 0.42)', 'rgba(244, 63, 94, 0.04)');
+        pushLineChart('chart_cliente_pagos', seriePago.map((x) => x.label), seriePago.map((x) => x.total), 'rgba(16, 185, 129, 0.95)', 'rgba(16, 185, 129, 0.42)', 'rgba(16, 185, 129, 0.04)');
+    } catch (err) {
+        console.error(err);
+        await showErrorToast('No se pudieron cargar las estadísticas del cliente.');
     }
 }
 
@@ -1649,7 +1963,12 @@ async function mostrarDetallesClienteModal(cliente){
                     </div>
                     <div class="actions">
                         <button id="modal_btn_whatsapp" class="btn sm alt">WhatsApp</button>
-                        <button id="modal_btn_refrescar" class="btn sm">Refrescar</button>
+                        <button id="modal_btn_refrescar" class="icon-btn btn sm" aria-label="Refrescar" title="Refrescar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                <path d="M3 3v5h5" />
+                            </svg>
+                        </button>
                         <button id="modal_btn_eliminar_todas" class="btn sm" style="background:#d33;color:#fff;border-color:transparent;">Eliminar Deudas</button>
                     </div>
                 </div>
@@ -2044,6 +2363,11 @@ window.addEventListener('resize', () => {
 const btnEditarCliente = document.getElementById('btn_editar_cliente');
 if (btnEditarCliente){
     btnEditarCliente.addEventListener('click', editarClienteActual);
+}
+
+const btnStatsCliente = document.getElementById('btn_stats_cliente');
+if (btnStatsCliente){
+    btnStatsCliente.addEventListener('click', abrirEstadisticasCliente);
 }
 
 const btnBorrarCliente = document.getElementById('btn_borrar_cliente');

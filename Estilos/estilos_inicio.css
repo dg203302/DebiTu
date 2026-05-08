@@ -443,6 +443,27 @@ header.navbar {
     overflow: hidden;
 }
 
+#kpi_adeudado_mes.kpi--stacked {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+}
+
+#kpi_adeudado_mes.kpi--stacked .kpi-actions {
+    width: 100%;
+    margin-left: 0 !important;
+    justify-content: flex-end;
+}
+
+#deuda_total {
+    min-width: 0;
+}
+
+#total_adeudado_mes {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+
 #kpi_adeudado_mes::after {
     content: '';
     position: absolute;
@@ -959,6 +980,57 @@ body.cms-sheet-open .cms-sheet-drawer {
     }
 }
 
+/* Mobile: make bottom-sheet taller and keep register button fixed */
+@media (max-width: 720px) {
+    .cms-sheet-drawer {
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        border-radius: 14px 14px 0 0;
+        max-height: calc(98vh - env(safe-area-inset-top, 0px));
+        margin: 0;
+    }
+
+    .cms-sheet-drawer .opd-body {
+        display: flex;
+        flex-direction: column;
+        padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        overflow: hidden;
+    }
+
+    /* Ensure the moved section fills available vertical space */
+    .cms-sheet-drawer #cmsSheetContent > section,
+    .cms-sheet-drawer #cmsSheetContent > .glass-panel,
+    .cms-sheet-drawer #cmsSheetContent .op-reg {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        flex: 1 1 auto;
+        overflow: auto;
+    }
+
+    /* Make the content area scrollable */
+    .cms-sheet-drawer #cmsSheetContent {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: auto;
+    }
+
+    /* Keep the submit area fixed at the bottom of the sheet */
+    .cms-sheet-drawer #cmsSheetContent .op-submit {
+        position: sticky;
+        bottom: 0;
+        background: linear-gradient(180deg, rgba(0,0,0,0), var(--glass-bg));
+        padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+        z-index: 5;
+    }
+
+    .cms-sheet-drawer #cmsSheetContent .op-submit .btn {
+        width: 100%;
+    }
+}
+
 .calc-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -1037,15 +1109,17 @@ body.cms-sheet-open .cms-sheet-drawer {
 }
 
 .type-row--cards {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
     gap: 12px;
+    align-items: stretch;
 }
 
 .type-option {
     position: relative;
     display: block;
     cursor: pointer;
+    flex: 1 1 0;
+    min-width: 0;
 }
 
 .type-option input[type="radio"] {
@@ -1462,7 +1536,9 @@ body.cms-sheet-open .cms-sheet-drawer {
     }
 
     .type-row--cards {
-        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
     }
 
     .text-gradient {

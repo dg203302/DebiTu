@@ -1,14 +1,150 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <script>
+        (function () {
+            try {
+                var t = (localStorage.getItem('CMS_THEME') || '').toString().trim().toLowerCase();
+                document.documentElement.dataset.theme = (t === 'light' || t === 'claro') ? 'light' : 'dark';
+                var a = localStorage.getItem('CMS_ANIM');
+                if (a === 'false') document.documentElement.dataset.anim = 'false';
+                var tr = localStorage.getItem('CMS_TRANS');
+                if (tr === 'false') document.documentElement.dataset.trans = 'false';
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="stylesheet" href="/Estilos/estilos_inicio.css">
     <link rel="stylesheet" href="/Estilos/estilos_estadisticas.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <title>Estadísticas | DebiTú</title>
 </head>
 <body>
-    <h1>En proceso</h1>
-    <a href="/Plantillas/Inicio.html">Volver al inicio</a>
-    <script src="/Scripts/script_estadisticas.js"></script>
+    <div class="ambient-background" aria-hidden="true">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="glass-overlay"></div>
+    </div>
+
+    <header class="navbar">
+        <div class="header-inner">
+            <div class="header-text header-text--floating">
+                <h1>Estadisticas</h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-layout stats-layout">
+        <section id="reporte_general" class="glass-panel stats-report">
+            <div class="stats-report__header">
+                <div>
+                    <p class="kpi-label">Reporte general</p>
+                    <h2 class="text-gradient stats-report__title">Resumen global de clientes</h2>
+                </div>
+                <div class="stats-status" id="stats_status">Cargando datos...</div>
+            </div>
+
+            <div class="stats-metrics" id="stats_metrics">
+                <article class="stats-metric-card">
+                    <span class="stats-metric-card__label">Usuarios</span>
+                    <strong class="stats-metric-card__value" id="stats_total_usuarios">0</strong>
+                </article>
+                <article class="stats-metric-card">
+                    <span class="stats-metric-card__label">Deuda total</span>
+                    <strong class="stats-metric-card__value" id="stats_total_deuda">$0</strong>
+                </article>
+                <article class="stats-metric-card">
+                    <span class="stats-metric-card__label">Pagos totales</span>
+                    <strong class="stats-metric-card__value" id="stats_total_pagos">$0</strong>
+                </article>
+            </div>
+
+            <div class="stats-grid">
+                <article class="chart-card glass-panel">
+                    <div class="chart-card__head">
+                        <div>
+                            <p class="kpi-label">Tendencia</p>
+                            <h3>Evolución de deudas a lo largo del tiempo</h3>
+                        </div>
+                        <span class="chart-card__badge">Todos los usuarios</span>
+                    </div>
+                    <div class="chart-wrap">
+                        <canvas id="chart_deudas_tiempo" aria-label="Gráfico de evolución de deudas" role="img"></canvas>
+                    </div>
+                </article>
+
+                <article class="chart-card glass-panel">
+                    <div class="chart-card__head">
+                        <div>
+                            <p class="kpi-label">Tendencia</p>
+                            <h3>Evolución de pagos a lo largo del tiempo</h3>
+                        </div>
+                        <span class="chart-card__badge">Todos los usuarios</span>
+                    </div>
+                    <div class="chart-wrap">
+                        <canvas id="chart_pagos_tiempo" aria-label="Gráfico de evolución de pagos" role="img"></canvas>
+                    </div>
+                </article>
+
+                <article class="chart-card chart-card--wide glass-panel">
+                    <div class="chart-card__head">
+                        <div>
+                            <p class="kpi-label">Distribución</p>
+                            <h3>Deuda total por usuario</h3>
+                        </div>
+                        <span class="chart-card__badge">Ordenado de mayor a menor</span>
+                    </div>
+                    <div class="chart-wrap chart-wrap--bars">
+                        <canvas id="chart_deuda_por_usuario" aria-label="Gráfico de barras de deuda por usuario" role="img"></canvas>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bottom-nav" aria-label="Navegación">
+        <a class="icon-btn" href="/Plantillas/administracion_clientes.html" aria-label="Clientes" title="Clientes">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+        </a>
+
+        <a class="icon-btn" href="/Plantillas/Inicio.html" aria-label="Inicio" title="Inicio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+                <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            </svg>
+        </a>
+
+        <a class="icon-btn active" href="/Plantillas/Estadisticas.html" aria-label="Estadísticas" title="Estadísticas" aria-current="page">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="6" y1="20" x2="6" y2="14" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="18" y1="20" x2="18" y2="10" />
+            </svg>
+        </a>
+
+        <a class="icon-btn" href="/Plantillas/Configuracion.html" aria-label="Configuración" title="Configuración">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09A1.65 1.65 0 0 0 19.4 15z" />
+            </svg>
+        </a>
+
+        <button type="button" class="icon-btn danger" onclick="location.href='/index.html'" aria-label="Cerrar sesión" title="Cerrar sesión">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+        </button>
+    </footer>
+    <script type="module" src="/Scripts/script_estadisticas.js"></script>
 </body>
 </html>

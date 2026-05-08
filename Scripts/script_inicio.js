@@ -693,7 +693,6 @@ async function cargarPagosRecientes(){
         showErrorToast(error.message);
         return [];
     }
-    console.log(data);
     return data || [];
 }
 
@@ -707,7 +706,6 @@ async function cargarDeudasRecientes(){
         showErrorToast(error.message);
         return [];
     }
-    console.log(data);
     return data || [];
 }
 
@@ -1060,7 +1058,7 @@ async function cargarMontoAdeudadoMensual(){
       showErrorToast(error.message);
       return 0;
     }
-    console.log(data);
+
     const totalMensual = (data || []).reduce((acc, row) => acc + (Number(row.Deuda_Activa) || 0), 0);
     const indicadorMonto = document.getElementById('total_adeudado_mes');
     const formatter = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
@@ -1068,8 +1066,28 @@ async function cargarMontoAdeudadoMensual(){
     // Guardar valor numérico sin formato para lógica de color
     indicadorMonto.dataset.valor = String(totalMensual);
     actualizarColor(indicadorMonto);
-    return;
+        requestAnimationFrame(ajustarKpiAdeudadoLayout);
+        return;
 }
+
+    function ajustarKpiAdeudadoLayout(){
+        const card = document.getElementById('kpi_adeudado_mes');
+        const amountWrap = document.getElementById('deuda_total');
+        const amount = document.getElementById('total_adeudado_mes');
+        const actions = card ? card.querySelector('.kpi-actions') : null;
+        if (!card || !amountWrap || !amount || !actions) return;
+
+        const cardWidth = card.clientWidth || 0;
+        const actionsWidth = actions.offsetWidth || 0;
+        const amountWidth = Math.max(amount.scrollWidth || 0, amountWrap.scrollWidth || 0);
+        const gapEstimate = 24;
+        const shouldStack = amountWidth + actionsWidth + gapEstimate > cardWidth;
+
+        card.classList.toggle('kpi--stacked', shouldStack);
+    }
+
+    window.addEventListener('resize', () => requestAnimationFrame(ajustarKpiAdeudadoLayout));
+    window.addEventListener('load', () => requestAnimationFrame(ajustarKpiAdeudadoLayout));
 function actualizarColor(indicador){
     const valorStr = (indicador && indicador.dataset && indicador.dataset.valor) ? indicador.dataset.valor : indicador.textContent;
     const valor = parseFloat(valorStr);

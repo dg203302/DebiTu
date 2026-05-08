@@ -19,11 +19,21 @@ body.cms-sheet-open .cms-sheet-backdrop{ opacity: 1; pointer-events: auto; }
 body.cms-sheet-open .cms-sheet-drawer{ transform: translateY(0); }
 .opd-header{ padding: 0 16px; }
 .opd-body{ padding: 12px 16px; overflow: auto; }
+.cms-sheet-drawer #cmsSheetContent{ overflow: auto; }
 .cms-sheet-actions{ margin-top: 14px; display:flex; gap:12px; justify-content:flex-end; flex-wrap:wrap; }
 .sheet-handle{ display:flex; align-items:center; justify-content:center; padding:12px 12px 8px 12px; cursor: grab; -webkit-user-select: none; user-select: none; pointer-events: auto; touch-action: none; }
 .sheet-handle:active{ cursor: grabbing; }
 .sheet-handle-bar{ width:56px; height:6px; border-radius:999px; background: rgba(255,255,255,0.09); box-shadow: inset 0 1px 0 rgba(255,255,255,0.03); }
 @media (max-width:480px){ .cms-sheet-actions{ justify-content: stretch; } .cms-sheet-actions > button{ flex: 1; } }
+/* Mobile overrides to ensure taller sheet and sticky submit */
+@media (max-width:720px){
+    .cms-sheet-drawer{ bottom: 0; left: 0; right: 0; width: 100%; border-radius: 14px 14px 0 0; max-height: calc(98vh - env(safe-area-inset-top, 0px)); margin: 0; }
+    .cms-sheet-drawer .opd-body{ display: flex; flex-direction: column; padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); overflow: hidden; }
+    .cms-sheet-drawer #cmsSheetContent > section, .cms-sheet-drawer #cmsSheetContent > .glass-panel, .cms-sheet-drawer #cmsSheetContent .op-reg{ display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; overflow: auto; }
+    .cms-sheet-drawer #cmsSheetContent{ flex: 1 1 auto; min-height: 0; overflow: auto; }
+    .cms-sheet-drawer #cmsSheetContent .op-submit{ position: sticky; bottom: 0; background: linear-gradient(180deg, rgba(0,0,0,0), var(--glass-bg)); padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 5; }
+    .cms-sheet-drawer #cmsSheetContent .op-submit .btn{ width: 100%; }
+}
     `;
     document.head.appendChild(style);
 }
