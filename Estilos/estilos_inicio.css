@@ -96,6 +96,10 @@ body {
     height: 100%;
 }
 
+html {
+    overflow-x: clip;
+}
+
 body {
     font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: var(--bg-color);
@@ -103,6 +107,7 @@ body {
     -webkit-font-smoothing: antialiased;
     transition: background-color 0.4s ease, color 0.4s ease;
     overflow-x: hidden;
+    max-width: 100vw;
 }
 
 /* ── Scrollbar ── */
@@ -275,6 +280,8 @@ header.navbar {
     margin: 0 auto;
     display: grid;
     gap: 24px;
+    min-width: 0;
+    width: min(var(--container-max-w), calc(100vw - 64px));
 }
 
 /* ── Bottom Dock (igual a Administración Clientes) ── */
@@ -297,6 +304,38 @@ header.navbar {
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     box-shadow: var(--glass-shadow);
+}
+
+.dashboard-layout > *,
+.glass-panel,
+#kpi_adeudado_mes,
+#btnes_nav,
+#Operacion-ingreso,
+#operaciones_rec,
+.op-reg,
+.input-wrapper,
+.calc-shell,
+.calc-body,
+.type-row--cards {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.glass-panel,
+#Operacion-ingreso,
+#operaciones_rec,
+.nav-card__text,
+.panel-title,
+.kpi-label,
+.kpi-subtitle,
+.op-lead__title,
+.op-lead__subtitle,
+.opd-title h3,
+.opd-title p,
+.modern-input,
+.type-option__content {
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .bottom-nav .icon-btn,
@@ -982,6 +1021,10 @@ body.cms-sheet-open .cms-sheet-drawer {
 
 /* Mobile: make bottom-sheet taller and keep register button fixed */
 @media (max-width: 720px) {
+    body {
+        overflow-x: clip;
+    }
+
     .cms-sheet-drawer {
         bottom: 0;
         left: 0;
@@ -1028,6 +1071,56 @@ body.cms-sheet-open .cms-sheet-drawer {
 
     .cms-sheet-drawer #cmsSheetContent .op-submit .btn {
         width: 100%;
+    }
+
+    .dashboard-layout {
+        width: calc(100vw - 20px);
+        padding-left: 10px;
+        padding-right: 10px;
+        overflow-x: clip;
+    }
+
+    .bottom-nav {
+        width: calc(100vw - 16px);
+        max-width: 520px;
+    }
+
+    .glass-panel {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .type-row--cards {
+        flex-direction: column;
+    }
+
+    .type-option,
+    .type-option__content,
+    .input-wrapper,
+    .modern-input,
+    .calc-shell,
+    .calc-grid,
+    .reg-actions {
+        width: 100%;
+    }
+
+    .reg-actions {
+        flex-wrap: wrap;
+    }
+
+    .reg-actions > button {
+        flex: 1 1 160px;
+    }
+
+    .calc-grid {
+        gap: 8px;
+    }
+
+    .calc-btn,
+    .calc-op,
+    #op_calc_eq {
+        min-height: 48px;
+        font-size: 1.1rem;
     }
 }
 

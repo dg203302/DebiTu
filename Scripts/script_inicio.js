@@ -12,6 +12,27 @@ let isExpanded = false; // controls whether list shows all items or limited
 let operacionIngresoInit = false;
 // Bottom-sheet functionality moved to Scripts/cmsSheet.js
 
+function restoreOperacionIngresoFromSheet(){
+    const section = document.getElementById('Operacion-ingreso');
+    if (!section) return;
+
+    try {
+        if (section._originalParent) {
+            section._originalParent.insertBefore(section, section._originalNext);
+        }
+    } catch (e) {}
+
+    section.hidden = true;
+
+    const btn = document.getElementById('btn_realiz_op');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+
+    if (section._originalStyle) {
+        Object.assign(section.style, section._originalStyle);
+        delete section._originalStyle;
+    }
+}
+
 // --- Multi-tenant helper (ID_Negocio) ---
 // Regla:
 // - localStorage.UserID === 'N/A'  => filtrar/guardar ID_Negocio = NULL
@@ -80,6 +101,11 @@ window.realizarOperacion = function(e){
     const section = document.getElementById('Operacion-ingreso');
     if (!section) return;
 
+    if (section._operationSheet && !document.body.classList.contains('cms-sheet-open')) {
+        restoreOperacionIngresoFromSheet();
+        section._operationSheet = null;
+    }
+
     // Guardar referencia al padre original para restaurar al cerrar
     if (!section._originalParent) {
         section._originalParent = section.parentNode;
@@ -98,6 +124,7 @@ window.realizarOperacion = function(e){
 
     // Abrir el sheet y mover la sección dentro
     const s = openCmsSheet({ title: 'Registrar Operación', subtitle: '', contentHtml: '' });
+    section._operationSheet = s;
     // limpiar contenido y mover el nodo
     content.innerHTML = '';
     content.appendChild(section);
@@ -120,14 +147,11 @@ window.realizarOperacion = function(e){
     // Al cerrar el sheet, restaurar la sección a su posición original y ocultarla
     s.closed.then(() => {
         try {
-            if (section._originalParent) {
-                section._originalParent.insertBefore(section, section._originalNext);
-            }
-            section.hidden = true;
-            if (btn) btn.setAttribute('aria-expanded', 'false');
+            restoreOperacionIngresoFromSheet();
         } catch (err) {
             console.warn('Error al restaurar sección Operacion-ingreso', err);
         }
+        section._operationSheet = null;
     });
 }
 

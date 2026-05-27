@@ -15,6 +15,49 @@ let clientStatsCharts = [];
 
 let clientePanelSheet = null;
 
+function restoreClientePanelFromSheet(){
+    const section = document.getElementById('detallesCliente');
+    if (!section) return;
+
+    try {
+        if (section._originalParent) {
+            section._originalParent.insertBefore(section, section._originalNext);
+        }
+    } catch (e) {}
+
+    section.hidden = true;
+
+    const btnClose = section.querySelector('#btn_cerrar_detalles');
+    const hdr = section.querySelector('#headerDetalles');
+    if (btnClose) btnClose.style.display = '';
+    if (hdr) hdr.style.display = '';
+
+    try {
+        const b = document.getElementById('btn_editar_cliente');
+        if (b && b._originalParent) {
+            b._originalParent.insertBefore(b, b._originalNext);
+            b.classList.remove('inline-edit-button');
+            delete b._originalParent;
+            delete b._originalNext;
+        }
+    } catch (_) {}
+
+    try {
+        const bStats = document.getElementById('btn_stats_cliente');
+        if (bStats && bStats._originalParent) {
+            bStats._originalParent.insertBefore(bStats, bStats._originalNext);
+            bStats.classList.remove('inline-edit-button');
+            delete bStats._originalParent;
+            delete bStats._originalNext;
+        }
+    } catch (_) {}
+
+    if (section._originalStyle) {
+        Object.assign(section.style, section._originalStyle);
+        delete section._originalStyle;
+    }
+}
+
 function isTouchDevice(){
     try{
         return ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints && navigator.msMaxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer:coarse)').matches);
@@ -25,6 +68,11 @@ function setResponsiveDetailsOpen(open){
     // En pantallas pequeñas mostramos el panel de cliente dentro del bottom-sheet compartido.
     if (window.innerWidth <= 1080) {
         if (open) {
+            if (clientePanelSheet && !document.body.classList.contains('cms-sheet-open')) {
+                restoreClientePanelFromSheet();
+                clientePanelSheet = null;
+            }
+
             document.body.classList.add('mobile-details-open');
             const section = document.getElementById('detallesCliente');
             if (!section) return;
@@ -112,35 +160,7 @@ function setResponsiveDetailsOpen(open){
 
                 s.closed.then(() => {
                     try {
-                        // Restaurar al DOM original
-                        if (section._originalParent) section._originalParent.insertBefore(section, section._originalNext);
-                        // Restaurar visibilidad/estilos
-                        section.hidden = true;
-                        if (btnClose) btnClose.style.display = '';
-                        if (hdr) hdr.style.display = '';
-                        // Restaurar el botón editar a su padre original
-                        try {
-                            const b = document.getElementById('btn_editar_cliente');
-                            if (b && b._originalParent) {
-                                b._originalParent.insertBefore(b, b._originalNext);
-                                b.classList.remove('inline-edit-button');
-                                delete b._originalParent;
-                                delete b._originalNext;
-                            }
-                        } catch (_) {}
-                        try {
-                            const bStats = document.getElementById('btn_stats_cliente');
-                            if (bStats && bStats._originalParent) {
-                                bStats._originalParent.insertBefore(bStats, bStats._originalNext);
-                                bStats.classList.remove('inline-edit-button');
-                                delete bStats._originalParent;
-                                delete bStats._originalNext;
-                            }
-                        } catch (_) {}
-                        if (section._originalStyle) {
-                            Object.assign(section.style, section._originalStyle);
-                            delete section._originalStyle;
-                        }
+                        restoreClientePanelFromSheet();
                     } catch (err) {
                         console.warn('Error al restaurar detallesCliente', err);
                     }
@@ -151,12 +171,26 @@ function setResponsiveDetailsOpen(open){
 
         } else {
             document.body.classList.remove('mobile-details-open');
-            if (clientePanelSheet){ try{ clientePanelSheet.close('close'); }catch(e){ clientePanelSheet = null; } }
+            if (clientePanelSheet){
+                const sheet = clientePanelSheet;
+                clientePanelSheet = null;
+                restoreClientePanelFromSheet();
+                try{ sheet.close('close'); }catch(e){}
+            } else {
+                restoreClientePanelFromSheet();
+            }
         }
     } else {
         // En desktop mantenemos el comportamiento previo
         document.body.classList.remove('mobile-details-open');
-        if (clientePanelSheet){ try{ clientePanelSheet.close('close'); }catch(e){} }
+        if (clientePanelSheet){
+            const sheet = clientePanelSheet;
+            clientePanelSheet = null;
+            restoreClientePanelFromSheet();
+            try{ sheet.close('close'); }catch(e){}
+        } else {
+            restoreClientePanelFromSheet();
+        }
     }
 }
 
