@@ -177,6 +177,13 @@ function prepararOperacionIngreso(){
 
     const calcShell = document.getElementById('op_calc_shell');
 
+    async function closeOperacionSheetIfOpen(){
+        const sheet = section._operationSheet;
+        if (!sheet) return;
+        try{ sheet.close('submit'); }catch(_){ }
+        try{ await sheet.closed; }catch(_){ }
+    }
+
     if (!input || !matches || !catInput || !totalAmount || !totalAmountValue || !amount || !chkPago || !chkDeuda || !btnRegistrar || !calc || !eq || !clear || !back) {
         console.warn('No se pudo inicializar Operacion-ingreso: faltan elementos del formulario.');
         return;
@@ -649,6 +656,8 @@ function prepararOperacionIngreso(){
                 await showErrorToast('Error al registrar: ' + (error.message || error));
                 return;
             }
+
+            await closeOperacionSheetIfOpen();
 
             // Actualizar Deuda_Activa según tipo
             if (phoneValue) {

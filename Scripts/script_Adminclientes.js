@@ -89,6 +89,7 @@ function setResponsiveDetailsOpen(open){
             try{
                 const s = openCmsSheet({ title: 'Panel de Cliente', subtitle: currentClienteNombre || '', contentHtml: '' });
                 clientePanelSheet = s;
+                const localSheet = s;
                 s.els.content.innerHTML = '';
                 s.els.content.appendChild(section);
                 section.hidden = false;
@@ -159,6 +160,7 @@ function setResponsiveDetailsOpen(open){
                 }
 
                 s.closed.then(() => {
+                    if (clientePanelSheet !== localSheet) return;
                     try {
                         restoreClientePanelFromSheet();
                     } catch (err) {
@@ -173,7 +175,6 @@ function setResponsiveDetailsOpen(open){
             document.body.classList.remove('mobile-details-open');
             if (clientePanelSheet){
                 const sheet = clientePanelSheet;
-                clientePanelSheet = null;
                 restoreClientePanelFromSheet();
                 try{ sheet.close('close'); }catch(e){}
             } else {
@@ -185,7 +186,6 @@ function setResponsiveDetailsOpen(open){
         document.body.classList.remove('mobile-details-open');
         if (clientePanelSheet){
             const sheet = clientePanelSheet;
-            clientePanelSheet = null;
             restoreClientePanelFromSheet();
             try{ sheet.close('close'); }catch(e){}
         } else {
