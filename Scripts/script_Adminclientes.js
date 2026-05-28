@@ -209,9 +209,8 @@ function syncDesktopNoClientSelected(){
 
 function syncEditButtonVisibility(){
     const hasSelection = !!currentClienteTelefono;
-    const isMobile = window.innerWidth <= 767;
     const btnEditar = document.getElementById('btn_editar_cliente');
-    if (btnEditar) btnEditar.style.display = (hasSelection && !isMobile) ? '' : 'none';
+    if (btnEditar) btnEditar.style.display = hasSelection ? '' : 'none';
     const btnStats = document.getElementById('btn_stats_cliente');
     if (btnStats) btnStats.style.display = hasSelection ? '' : 'none';
     const btnCerrar = document.getElementById('btn_cerrar_detalles');
@@ -1055,60 +1054,21 @@ function closePromptSheet(){
 }
 
 async function agregarCliente(){
-    const isMobile = window.innerWidth <= 1080 || isTouchDevice();
-    let nombre = '';
-    let telefono = '';
-
-    if (isMobile) {
-        if ('contacts' in navigator) {
-            try {
-                const props = ['name', 'tel'];
-                const contacts = await navigator.contacts.select(props, { multiple: false });
-                if (!contacts || contacts.length === 0) {
-                    return; // cancelado por el usuario
-                }
-                const contact = contacts[0];
-                nombre = contact.name && contact.name.length > 0 ? contact.name[0] : '';
-                telefono = contact.tel && contact.tel.length > 0 ? contact.tel[0] : '';
-
-                if (!nombre || !telefono) {
-                    showErrorToast('El contacto seleccionado no tiene nombre o teléfono válido.');
-                    return;
-                }
-            } catch (err) {
-                console.error('Error al acceder a los contactos', err);
-                await showinfo('Error al abrir contactos', err.message || 'El dispositivo denegó el permiso.');
-                // Fallback en caso de error de la API (ej. no autorizado)
-                const formValues = await openAddClientSheet();
-                if (!formValues) return;
-                nombre = formValues.nombre;
-                telefono = formValues.telefono;
-            }
-        } else {
-            await showinfo('Función no soportada', 'Tu navegador o dispositivo actual (ej. iOS/iPhone) no soporta acceder directamente a los contactos. Se abrirá la carga manual.');
-            const formValues = await openAddClientSheet();
-            if (!formValues) return;
-            nombre = formValues.nombre;
-            telefono = formValues.telefono;
-        }
-    } else {
-        const formValues = await openAddClientSheet();
-        if (!formValues) return;
-        nombre = formValues.nombre;
-        telefono = formValues.telefono;
-    }
-
-    if (nombre && telefono) {
+    const formValues = await openAddClientSheet();
+    if (formValues) {
         const idNegocio = getIdNegocioForWrite();
         if (idNegocio === undefined){
             await showErrorToast('No se encontró el ID de usuario (UserID). Iniciá sesión nuevamente.');
             return;
         }
         try {
-            telefono = normalizePhone(telefono);
+            const payload = {
+                nombre: formValues.nombre,
+                telefono: formValues.telefono,
+            };
             const {error} = await supabase
                 .from('Clientes')
-                .insert({ Nombre: nombre, Telefono: telefono, ID_Negocio: idNegocio });
+                .insert({ Nombre: payload.nombre, Telefono: payload.telefono, ID_Negocio: idNegocio });
             if (error){
                 showErrorToast('Error al agregar el cliente: ' + error.message);
                 return;
