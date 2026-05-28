@@ -209,8 +209,9 @@ function syncDesktopNoClientSelected(){
 
 function syncEditButtonVisibility(){
     const hasSelection = !!currentClienteTelefono;
+    const isMobile = window.innerWidth <= 767;
     const btnEditar = document.getElementById('btn_editar_cliente');
-    if (btnEditar) btnEditar.style.display = hasSelection ? '' : 'none';
+    if (btnEditar) btnEditar.style.display = (hasSelection && !isMobile) ? '' : 'none';
     const btnStats = document.getElementById('btn_stats_cliente');
     if (btnStats) btnStats.style.display = hasSelection ? '' : 'none';
     const btnCerrar = document.getElementById('btn_cerrar_detalles');
@@ -1054,49 +1055,52 @@ function closePromptSheet(){
 }
 
 async function agregarCliente(){
-    let formValues = null;
     const isMobile = window.innerWidth <= 767;
-    
+    let nombre = '';
+    let telefono = '';
+
     if (isMobile && 'contacts' in navigator && 'ContactsManager' in window) {
         try {
             const props = ['name', 'tel'];
             const opts = { multiple: false };
             const contacts = await navigator.contacts.select(props, opts);
-            if (contacts && contacts.length > 0) {
-                const contact = contacts[0];
-                const nombre = (contact.name && contact.name.length > 0) ? contact.name[0] : '';
-                const telefonoRaw = (contact.tel && contact.tel.length > 0) ? contact.tel[0] : '';
-                const telefono = normalizePhone(telefonoRaw);
-                if (!nombre || !telefono) {
-                    await showErrorToast('El contacto no tiene nombre o teléfono válido.');
-                    return;
-                }
-                formValues = { nombre, telefono };
-            } else {
+            if (!contacts || contacts.length === 0) {
+                return; // cancelado por el usuario
+            }
+            const contact = contacts[0];
+            nombre = contact.name && contact.name.length > 0 ? contact.name[0] : '';
+            telefono = contact.tel && contact.tel.length > 0 ? contact.tel[0] : '';
+
+            if (!nombre || !telefono) {
+                showErrorToast('El contacto seleccionado no tiene nombre o teléfono válido.');
                 return;
             }
-        } catch (ex) {
-            console.error('Contact Picker API falló', ex);
-            formValues = await openAddClientSheet();
+        } catch (err) {
+            console.error('Error al acceder a los contactos', err);
+            // Fallback en caso de error de la API (ej. no autorizado)
+            const formValues = await openAddClientSheet();
+            if (!formValues) return;
+            nombre = formValues.nombre;
+            telefono = formValues.telefono;
         }
     } else {
-        formValues = await openAddClientSheet();
+        const formValues = await openAddClientSheet();
+        if (!formValues) return;
+        nombre = formValues.nombre;
+        telefono = formValues.telefono;
     }
 
-    if (formValues) {
+    if (nombre && telefono) {
         const idNegocio = getIdNegocioForWrite();
         if (idNegocio === undefined){
             await showErrorToast('No se encontró el ID de usuario (UserID). Iniciá sesión nuevamente.');
             return;
         }
         try {
-            const payload = {
-                nombre: formValues.nombre,
-                telefono: formValues.telefono,
-            };
+            telefono = normalizePhone(telefono);
             const {error} = await supabase
                 .from('Clientes')
-                .insert({ Nombre: payload.nombre, Telefono: payload.telefono, ID_Negocio: idNegocio });
+                .insert({ Nombre: nombre, Telefono: telefono, ID_Negocio: idNegocio });
             if (error){
                 showErrorToast('Error al agregar el cliente: ' + error.message);
                 return;
