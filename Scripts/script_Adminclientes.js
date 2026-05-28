@@ -1055,29 +1055,37 @@ function closePromptSheet(){
 }
 
 async function agregarCliente(){
-    const isMobile = window.innerWidth <= 767;
+    const isMobile = window.innerWidth <= 1080 || isTouchDevice();
     let nombre = '';
     let telefono = '';
 
-    if (isMobile && 'contacts' in navigator && 'ContactsManager' in window) {
-        try {
-            const props = ['name', 'tel'];
-            const opts = { multiple: false };
-            const contacts = await navigator.contacts.select(props, opts);
-            if (!contacts || contacts.length === 0) {
-                return; // cancelado por el usuario
-            }
-            const contact = contacts[0];
-            nombre = contact.name && contact.name.length > 0 ? contact.name[0] : '';
-            telefono = contact.tel && contact.tel.length > 0 ? contact.tel[0] : '';
+    if (isMobile) {
+        if ('contacts' in navigator) {
+            try {
+                const props = ['name', 'tel'];
+                const contacts = await navigator.contacts.select(props, { multiple: false });
+                if (!contacts || contacts.length === 0) {
+                    return; // cancelado por el usuario
+                }
+                const contact = contacts[0];
+                nombre = contact.name && contact.name.length > 0 ? contact.name[0] : '';
+                telefono = contact.tel && contact.tel.length > 0 ? contact.tel[0] : '';
 
-            if (!nombre || !telefono) {
-                showErrorToast('El contacto seleccionado no tiene nombre o teléfono válido.');
-                return;
+                if (!nombre || !telefono) {
+                    showErrorToast('El contacto seleccionado no tiene nombre o teléfono válido.');
+                    return;
+                }
+            } catch (err) {
+                console.error('Error al acceder a los contactos', err);
+                await showinfo('Error al abrir contactos', err.message || 'El dispositivo denegó el permiso.');
+                // Fallback en caso de error de la API (ej. no autorizado)
+                const formValues = await openAddClientSheet();
+                if (!formValues) return;
+                nombre = formValues.nombre;
+                telefono = formValues.telefono;
             }
-        } catch (err) {
-            console.error('Error al acceder a los contactos', err);
-            // Fallback en caso de error de la API (ej. no autorizado)
+        } else {
+            await showinfo('Función no soportada', 'Tu navegador o dispositivo actual (ej. iOS/iPhone) no soporta acceder directamente a los contactos. Se abrirá la carga manual.');
             const formValues = await openAddClientSheet();
             if (!formValues) return;
             nombre = formValues.nombre;
