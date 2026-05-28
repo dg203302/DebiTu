@@ -1054,7 +1054,35 @@ function closePromptSheet(){
 }
 
 async function agregarCliente(){
-    const formValues = await openAddClientSheet();
+    let formValues = null;
+    const isMobile = window.innerWidth <= 767;
+    
+    if (isMobile && 'contacts' in navigator && 'ContactsManager' in window) {
+        try {
+            const props = ['name', 'tel'];
+            const opts = { multiple: false };
+            const contacts = await navigator.contacts.select(props, opts);
+            if (contacts && contacts.length > 0) {
+                const contact = contacts[0];
+                const nombre = (contact.name && contact.name.length > 0) ? contact.name[0] : '';
+                const telefonoRaw = (contact.tel && contact.tel.length > 0) ? contact.tel[0] : '';
+                const telefono = normalizePhone(telefonoRaw);
+                if (!nombre || !telefono) {
+                    await showErrorToast('El contacto no tiene nombre o teléfono válido.');
+                    return;
+                }
+                formValues = { nombre, telefono };
+            } else {
+                return;
+            }
+        } catch (ex) {
+            console.error('Contact Picker API falló', ex);
+            formValues = await openAddClientSheet();
+        }
+    } else {
+        formValues = await openAddClientSheet();
+    }
+
     if (formValues) {
         const idNegocio = getIdNegocioForWrite();
         if (idNegocio === undefined){
