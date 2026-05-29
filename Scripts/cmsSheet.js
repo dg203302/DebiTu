@@ -102,6 +102,10 @@ function showCmsSheetElements(){
     const els = ensureCmsSheet();
     els.backdrop.style.display = 'block';
     els.drawer.style.display = 'grid';
+    // Limpiar estilos inline atascados de drag anterior
+    els.drawer.style.transform = '';
+    els.drawer.style.transition = '';
+    els.backdrop.style.opacity = '';
     // force reflow
     els.drawer.offsetHeight;
     try{ attachSheetDragHandler(els.drawer, els.drawer.querySelector('.sheet-handle'), closeCmsSheet); attachSheetDragHandler(els.drawer, els.drawer.querySelector('.opd-header'), closeCmsSheet); }catch(e){}
@@ -111,9 +115,11 @@ function showCmsSheetElements(){
 function hideCmsSheetElementsAfterTransition(localId){
     const els = ensureCmsSheet();
     const drawer = els.drawer;
+    let finished = false;
     const onEnd = (e) => {
-        if (e.target !== drawer) return;
-        if (e.propertyName !== 'transform') return;
+        if (e && e.target !== drawer) return;
+        if (e && e.propertyName && e.propertyName !== 'transform') return;
+        if (finished) return; finished = true;
         drawer.removeEventListener('transitionend', onEnd);
         if (cmsSheetId !== localId) return;
         if (document.body.classList.contains('cms-sheet-open')) return;
@@ -121,6 +127,8 @@ function hideCmsSheetElementsAfterTransition(localId){
         els.backdrop.style.display = 'none';
     };
     drawer.addEventListener('transitionend', onEnd);
+    // Fallback de seguridad
+    setTimeout(() => { if (!finished) onEnd({target: drawer, propertyName: 'transform'}); }, 350);
 }
 
 function closeCmsSheet(reason, immediate){
@@ -157,6 +165,13 @@ function setCmsSheetActions(actions){
 function openCmsSheet(opts){
     cmsSheetId++;
     const localId = cmsSheetId;
+    
+    // Forzar limpieza del estado previo para evitar bloqueos
+    document.body.classList.remove('cms-sheet-open');
+    if (cmsSheetEls && cmsSheetEls.drawer) {
+        cmsSheetEls.drawer.offsetHeight; // force reflow
+    }
+
     const els = showCmsSheetElements();
     const title = String(opts?.title ?? 'Mensaje');
     const subtitle = String(opts?.subtitle ?? '');
@@ -167,7 +182,12 @@ function openCmsSheet(opts){
     if (els.subtitle) els.subtitle.textContent = subtitle;
     if (els.content) els.content.innerHTML = contentHtml;
     setCmsSheetActions(actions);
-    document.body.classList.add('cms-sheet-open');
+    
+    // Abrir de forma segura tras resetear
+    requestAnimationFrame(() => {
+        document.body.classList.add('cms-sheet-open');
+    });
+
     if (cmsSheetAutoCloseTimer){ clearTimeout(cmsSheetAutoCloseTimer); cmsSheetAutoCloseTimer = null; }
     const closed = new Promise((resolve) => { cmsSheetResolve = resolve; });
     if (Number.isFinite(autoCloseMs) && autoCloseMs > 0){ cmsSheetAutoCloseTimer = setTimeout(() => closeCmsSheet('auto'), autoCloseMs); }
@@ -207,7 +227,25 @@ function attachSheetDragHandler(drawer, handle, closeFn){
     }
     function onPointerMove(e){ if (!dragging) return; const clientY = (typeof e.clientY === 'number') ? e.clientY : (e.touches && e.touches[0] && e.touches[0].clientY) || (e.changedTouches && e.changedTouches[0] && e.changedTouches[0].clientY) || currentY; if (typeof e.pointerId === 'number' && pointerId != null && e.pointerId !== pointerId) return; currentY = clientY; const delta = Math.max(0, currentY - startY); drawer.style.transform = `translateY(${delta}px)`; const backdropId = (drawer.id === 'cmsSheetDrawer') ? 'cmsSheetBackdrop' : 'opdBackdrop'; const backdrop = document.getElementById(backdropId); if (backdrop){ const h = drawer.getBoundingClientRect().height || window.innerHeight; const ratio = Math.max(0, Math.min(1, 1 - (delta / (h * 0.8)))); backdrop.style.opacity = String(0.55 * ratio); } }
     function endDrag(e){ if (!dragging) return; if (e && typeof e.pointerId === 'number' && pointerId != null && e.pointerId !== pointerId) return; dragging = false; try{ if (e && typeof e.pointerId === 'number') handle.releasePointerCapture(e.pointerId); }catch(_){ } pointerId = null; const endClientY = (e && (typeof e.clientY === 'number')) ? e.clientY : (e && e.changedTouches && e.changedTouches[0] && e.changedTouches[0].clientY) || currentY; const delta = Math.max(0, endClientY - startY); drawer.style.willChange = ''; const h = drawer.getBoundingClientRect().height || window.innerHeight; const threshold = Math.min(160, Math.max(80, h * 0.25)); const backdropId = (drawer.id === 'cmsSheetDrawer') ? 'cmsSheetBackdrop' : 'opdBackdrop'; const backdrop = document.getElementById(backdropId);
-        if (delta > threshold){ const finalY = Math.max(h + 24, window.innerHeight); drawer.style.transition = 'transform 0.26s ease'; requestAnimationFrame(() => { drawer.style.transform = `translateY(${finalY}px)`; }); const onEnd = function(ev){ if (ev && ev.propertyName && ev.propertyName !== 'transform') return; drawer.removeEventListener('transitionend', onEnd); try{ if (typeof closeFn === 'function') closeFn('drag', true); }catch(e){ console.error(e); } }; drawer.addEventListener('transitionend', onEnd); } else { drawer.style.transition = 'transform 0.26s ease'; requestAnimationFrame(() => { drawer.style.transform = ''; }); if (backdrop) backdrop.style.opacity = ''; }
+        if (delta > threshold){ 
+            const finalY = Math.max(h + 24, window.innerHeight); 
+            drawer.style.transition = 'transform 0.26s ease'; 
+            requestAnimationFrame(() => { drawer.style.transform = `translateY(${finalY}px)`; }); 
+            let finished = false;
+            const onEnd = function(ev){ 
+                if (ev && ev.propertyName && ev.propertyName !== 'transform') return; 
+                if (finished) return; finished = true;
+                drawer.removeEventListener('transitionend', onEnd); 
+                try{ if (typeof closeFn === 'function') closeFn('drag', true); }catch(e){ console.error(e); } 
+            }; 
+            drawer.addEventListener('transitionend', onEnd); 
+            // Fallback de seguridad por si no se dispara el transitionend en movil
+            setTimeout(() => { if (!finished) onEnd({propertyName: 'transform'}); }, 350);
+        } else { 
+            drawer.style.transition = 'transform 0.26s ease'; 
+            requestAnimationFrame(() => { drawer.style.transform = ''; }); 
+            if (backdrop) backdrop.style.opacity = ''; 
+        }
         document.body.classList.remove('sheet-dragging');
     }
     handle.style.touchAction = 'none';
