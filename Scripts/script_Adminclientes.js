@@ -12,7 +12,6 @@ let isExpandedCliente = false; // controla ver 4 vs todos
 let currentClientesFilter = 'all'; // 'all' | 'withDebt' | 'withoutDebt'
 let isEditingCliente = false;
 let clientStatsCharts = [];
-let addClientSheetSession = null;
 
 let clientePanelSheet = null;
 
@@ -525,73 +524,8 @@ async function ajustarDeudaActivaCliente(telefono, delta){
     }
 }
 
-function getContactPickerSupport(){
-    let isSecure = false;
-    try{
-        if (typeof window !== 'undefined' && 'isSecureContext' in window){
-            isSecure = !!window.isSecureContext;
-        }
-        if (!isSecure && typeof window !== 'undefined' && window.location){
-            const host = window.location.hostname;
-            isSecure = window.location.protocol === 'https:' || host === 'localhost' || host === '127.0.0.1';
-        }
-    }catch(e){
-        isSecure = false;
-    }
-
-    const hasApi = !!(navigator && navigator.contacts && typeof navigator.contacts.select === 'function');
-    if (!isSecure){
-        return { supported: false, reason: 'La importacion de contactos requiere HTTPS o localhost.' };
-    }
-    if (!hasApi){
-        return { supported: false, reason: 'El navegador no soporta el selector de contactos.' };
-    }
-    return { supported: true, reason: '' };
-}
-
-function isContactPickerSupported(){
-    try{
-        return getContactPickerSupport().supported;
-    }catch(e){
-        return false;
-    }
-}
-
-async function pickContactFromDevice(){
-    const support = getContactPickerSupport();
-    if (!support.supported) return { unsupported: true, reason: support.reason };
-    try{
-        const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: false });
-        const contact = Array.isArray(contacts) ? contacts[0] : null;
-        if (!contact) return null;
-        const getValue = (value) => {
-            if (!value) return '';
-            if (typeof value === 'string') return value;
-            if (typeof value.value === 'string') return value.value;
-            return '';
-        };
-        const name = Array.isArray(contact.name)
-            ? contact.name.map(getValue).find(Boolean)
-            : getValue(contact.name);
-        const tel = Array.isArray(contact.tel)
-            ? contact.tel.map(getValue).find(Boolean)
-            : getValue(contact.tel);
-        return {
-            name: name ? String(name).trim() : '',
-            tel: tel ? String(tel).trim() : ''
-        };
-    }catch(err){
-        if (err && err.name === 'AbortError') return null;
-        throw err;
-    }
-}
-
 // Abrir sheet de "Agregar cliente" usando el módulo compartido cmsSheet
 async function openAddClientSheet(){
-    if (addClientSheetSession && typeof addClientSheetSession.close === 'function'){
-        try{ addClientSheetSession.close('reopen'); }catch(e){}
-        addClientSheetSession = null;
-    }
     const container = document.createElement('div');
     container.className = 'cms-addclient';
     container.innerHTML = `
@@ -610,7 +544,6 @@ async function openAddClientSheet(){
             <p class="add-client-validation" role="alert" aria-live="polite" hidden></p>
 
             <div class="action-group edit-actions">
-                <button class="btn btn-outline subtle" type="button" data-import>Importar contacto</button>
                 <button class="btn btn-primary" type="button" data-submit>Registrar</button>
             </div>
         </div>
@@ -618,7 +551,6 @@ async function openAddClientSheet(){
 
     // Abrir drawer compartido y pegar el contenido
     const s = openCmsSheet({ title: 'Registrar cliente', subtitle: '', contentHtml: '' });
-    addClientSheetSession = s;
     s.els.content.innerHTML = '';
     s.els.content.appendChild(container);
 
@@ -626,7 +558,6 @@ async function openAddClientSheet(){
     const telefonoInput = container.querySelector('#addClientTelefono');
     const validation = container.querySelector('.add-client-validation');
     const btnSubmit = container.querySelector('[data-submit]');
-    const btnImport = container.querySelector('[data-import]');
     const btnClose = container.querySelector('[data-close]');
 
     function showValidation(message){
@@ -638,34 +569,9 @@ async function openAddClientSheet(){
 
     return new Promise((resolve) => {
         let finished = false;
-        const onImport = async () => {
-            showValidation('');
-            try{
-                const picked = await pickContactFromDevice();
-                if (!picked) return;
-                if (picked.unsupported){
-                    showErrorToast(picked.reason || 'La importacion de contactos no esta disponible en este dispositivo o navegador.');
-                    return;
-                }
-                const name = (picked.name || '').trim();
-                const tel = (picked.tel || '').trim();
-                if (!name && !tel){
-                    showValidation('El contacto seleccionado no tiene nombre ni teléfono.');
-                    return;
-                }
-                if (name) nombreInput.value = name;
-                if (tel) telefonoInput.value = tel;
-                if (!name && nombreInput) nombreInput.focus();
-                else if (!tel && telefonoInput) telefonoInput.focus();
-            }catch(err){
-                console.error('Importar contacto error', err);
-                showErrorToast('No se pudo importar el contacto.');
-            }
-        };
         function cleanup(){
             if (finished) return; finished = true;
-            if (addClientSheetSession === s) addClientSheetSession = null;
-            try{ btnSubmit?.removeEventListener('click', onSubmit); btnClose?.removeEventListener('click', onCancel); btnImport?.removeEventListener('click', onImport); }catch(e){}
+            try{ btnSubmit?.removeEventListener('click', onSubmit); btnClose?.removeEventListener('click', onCancel); }catch(e){}
             try{ container.remove(); }catch(e){}
         }
 
@@ -685,7 +591,6 @@ async function openAddClientSheet(){
 
         btnSubmit?.addEventListener('click', onSubmit);
         btnClose?.addEventListener('click', onCancel);
-        btnImport?.addEventListener('click', onImport);
 
         container.addEventListener('keydown', (e) => {
             if (e.key === 'Enter'){
@@ -695,9 +600,7 @@ async function openAddClientSheet(){
         });
 
         s.closed.then(() => { if (!finished){ finished = true; cleanup(); resolve(null); } });
-        if (!isTouchDevice()){
-            requestAnimationFrame(() => nombreInput?.focus());
-        }
+        requestAnimationFrame(() => nombreInput?.focus());
     });
 }
 
