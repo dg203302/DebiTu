@@ -12,6 +12,7 @@ let isExpandedCliente = false; // controla ver 4 vs todos
 let currentClientesFilter = 'all'; // 'all' | 'withDebt' | 'withoutDebt'
 let isEditingCliente = false;
 let clientStatsCharts = [];
+let addClientSheetSession = null;
 
 let clientePanelSheet = null;
 
@@ -524,22 +525,57 @@ async function ajustarDeudaActivaCliente(telefono, delta){
     }
 }
 
+function getContactPickerSupport(){
+    let isSecure = false;
+    try{
+        if (typeof window !== 'undefined' && 'isSecureContext' in window){
+            isSecure = !!window.isSecureContext;
+        }
+        if (!isSecure && typeof window !== 'undefined' && window.location){
+            const host = window.location.hostname;
+            isSecure = window.location.protocol === 'https:' || host === 'localhost' || host === '127.0.0.1';
+        }
+    }catch(e){
+        isSecure = false;
+    }
+
+    const hasApi = !!(navigator && navigator.contacts && typeof navigator.contacts.select === 'function');
+    if (!isSecure){
+        return { supported: false, reason: 'La importacion de contactos requiere HTTPS o localhost.' };
+    }
+    if (!hasApi){
+        return { supported: false, reason: 'El navegador no soporta el selector de contactos.' };
+    }
+    return { supported: true, reason: '' };
+}
+
 function isContactPickerSupported(){
     try{
-        return !!(navigator && navigator.contacts && typeof navigator.contacts.select === 'function');
+        return getContactPickerSupport().supported;
     }catch(e){
         return false;
     }
 }
 
 async function pickContactFromDevice(){
-    if (!isContactPickerSupported()) return { unsupported: true };
+    const support = getContactPickerSupport();
+    if (!support.supported) return { unsupported: true, reason: support.reason };
     try{
         const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: false });
         const contact = Array.isArray(contacts) ? contacts[0] : null;
         if (!contact) return null;
-        const name = Array.isArray(contact.name) ? contact.name.find(Boolean) : contact.name;
-        const tel = Array.isArray(contact.tel) ? contact.tel.find(Boolean) : contact.tel;
+        const getValue = (value) => {
+            if (!value) return '';
+            if (typeof value === 'string') return value;
+            if (typeof value.value === 'string') return value.value;
+            return '';
+        };
+        const name = Array.isArray(contact.name)
+            ? contact.name.map(getValue).find(Boolean)
+            : getValue(contact.name);
+        const tel = Array.isArray(contact.tel)
+            ? contact.tel.map(getValue).find(Boolean)
+            : getValue(contact.tel);
         return {
             name: name ? String(name).trim() : '',
             tel: tel ? String(tel).trim() : ''
@@ -552,6 +588,10 @@ async function pickContactFromDevice(){
 
 // Abrir sheet de "Agregar cliente" usando el módulo compartido cmsSheet
 async function openAddClientSheet(){
+    if (addClientSheetSession && typeof addClientSheetSession.close === 'function'){
+        try{ addClientSheetSession.close('reopen'); }catch(e){}
+        addClientSheetSession = null;
+    }
     const container = document.createElement('div');
     container.className = 'cms-addclient';
     container.innerHTML = `
@@ -578,6 +618,7 @@ async function openAddClientSheet(){
 
     // Abrir drawer compartido y pegar el contenido
     const s = openCmsSheet({ title: 'Registrar cliente', subtitle: '', contentHtml: '' });
+    addClientSheetSession = s;
     s.els.content.innerHTML = '';
     s.els.content.appendChild(container);
 
@@ -603,7 +644,7 @@ async function openAddClientSheet(){
                 const picked = await pickContactFromDevice();
                 if (!picked) return;
                 if (picked.unsupported){
-                    showErrorToast('La importación de contactos no está disponible en este dispositivo o navegador.');
+                    showErrorToast(picked.reason || 'La importacion de contactos no esta disponible en este dispositivo o navegador.');
                     return;
                 }
                 const name = (picked.name || '').trim();
@@ -623,6 +664,7 @@ async function openAddClientSheet(){
         };
         function cleanup(){
             if (finished) return; finished = true;
+            if (addClientSheetSession === s) addClientSheetSession = null;
             try{ btnSubmit?.removeEventListener('click', onSubmit); btnClose?.removeEventListener('click', onCancel); btnImport?.removeEventListener('click', onImport); }catch(e){}
             try{ container.remove(); }catch(e){}
         }
@@ -645,11 +687,6 @@ async function openAddClientSheet(){
         btnClose?.addEventListener('click', onCancel);
         btnImport?.addEventListener('click', onImport);
 
-        if (btnImport && !isContactPickerSupported()){
-            btnImport.disabled = true;
-            btnImport.title = 'No disponible en este dispositivo';
-        }
-
         container.addEventListener('keydown', (e) => {
             if (e.key === 'Enter'){
                 const tag = (e.target?.tagName || '').toLowerCase();
@@ -658,7 +695,9 @@ async function openAddClientSheet(){
         });
 
         s.closed.then(() => { if (!finished){ finished = true; cleanup(); resolve(null); } });
-        requestAnimationFrame(() => nombreInput?.focus());
+        if (!isTouchDevice()){
+            requestAnimationFrame(() => nombreInput?.focus());
+        }
     });
 }
 
