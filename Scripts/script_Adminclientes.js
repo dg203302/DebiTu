@@ -607,16 +607,7 @@ async function openAddClientSheet(){
                 return;
             }
             try {
-                const availableProps = await navigator.contacts.getProperties();
-                const props = [];
-                if (availableProps.includes('name')) props.push('name');
-                if (availableProps.includes('tel')) props.push('tel');
-                
-                if (props.length === 0) {
-                    await showErrorToast('El navegador no permite leer nombres o teléfonos.');
-                    return;
-                }
-
+                const props = ['name', 'tel'];
                 const opts = { multiple: false };
                 const contacts = await navigator.contacts.select(props, opts);
                 if (contacts && contacts.length > 0) {
