@@ -524,6 +524,32 @@ async function ajustarDeudaActivaCliente(telefono, delta){
     }
 }
 
+function isContactPickerSupported(){
+    try{
+        return !!(navigator && navigator.contacts && typeof navigator.contacts.select === 'function');
+    }catch(e){
+        return false;
+    }
+}
+
+async function pickContactFromDevice(){
+    if (!isContactPickerSupported()) return { unsupported: true };
+    try{
+        const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: false });
+        const contact = Array.isArray(contacts) ? contacts[0] : null;
+        if (!contact) return null;
+        const name = Array.isArray(contact.name) ? contact.name.find(Boolean) : contact.name;
+        const tel = Array.isArray(contact.tel) ? contact.tel.find(Boolean) : contact.tel;
+        return {
+            name: name ? String(name).trim() : '',
+            tel: tel ? String(tel).trim() : ''
+        };
+    }catch(err){
+        if (err && err.name === 'AbortError') return null;
+        throw err;
+    }
+}
+
 // Abrir sheet de "Agregar cliente" usando el módulo compartido cmsSheet
 async function openAddClientSheet(){
     const container = document.createElement('div');
@@ -544,6 +570,7 @@ async function openAddClientSheet(){
             <p class="add-client-validation" role="alert" aria-live="polite" hidden></p>
 
             <div class="action-group edit-actions">
+                <button class="btn btn-outline subtle" type="button" data-import>Importar contacto</button>
                 <button class="btn btn-primary" type="button" data-submit>Registrar</button>
             </div>
         </div>
@@ -558,6 +585,7 @@ async function openAddClientSheet(){
     const telefonoInput = container.querySelector('#addClientTelefono');
     const validation = container.querySelector('.add-client-validation');
     const btnSubmit = container.querySelector('[data-submit]');
+    const btnImport = container.querySelector('[data-import]');
     const btnClose = container.querySelector('[data-close]');
 
     function showValidation(message){
@@ -569,9 +597,33 @@ async function openAddClientSheet(){
 
     return new Promise((resolve) => {
         let finished = false;
+        const onImport = async () => {
+            showValidation('');
+            try{
+                const picked = await pickContactFromDevice();
+                if (!picked) return;
+                if (picked.unsupported){
+                    showErrorToast('La importación de contactos no está disponible en este dispositivo o navegador.');
+                    return;
+                }
+                const name = (picked.name || '').trim();
+                const tel = (picked.tel || '').trim();
+                if (!name && !tel){
+                    showValidation('El contacto seleccionado no tiene nombre ni teléfono.');
+                    return;
+                }
+                if (name) nombreInput.value = name;
+                if (tel) telefonoInput.value = tel;
+                if (!name && nombreInput) nombreInput.focus();
+                else if (!tel && telefonoInput) telefonoInput.focus();
+            }catch(err){
+                console.error('Importar contacto error', err);
+                showErrorToast('No se pudo importar el contacto.');
+            }
+        };
         function cleanup(){
             if (finished) return; finished = true;
-            try{ btnSubmit?.removeEventListener('click', onSubmit); btnClose?.removeEventListener('click', onCancel); }catch(e){}
+            try{ btnSubmit?.removeEventListener('click', onSubmit); btnClose?.removeEventListener('click', onCancel); btnImport?.removeEventListener('click', onImport); }catch(e){}
             try{ container.remove(); }catch(e){}
         }
 
@@ -591,6 +643,12 @@ async function openAddClientSheet(){
 
         btnSubmit?.addEventListener('click', onSubmit);
         btnClose?.addEventListener('click', onCancel);
+        btnImport?.addEventListener('click', onImport);
+
+        if (btnImport && !isContactPickerSupported()){
+            btnImport.disabled = true;
+            btnImport.title = 'No disponible en este dispositivo';
+        }
 
         container.addEventListener('keydown', (e) => {
             if (e.key === 'Enter'){
