@@ -529,11 +529,20 @@ async function openAddClientSheet(){
     const container = document.createElement('div');
     container.className = 'cms-addclient';
     container.innerHTML = `
-
         <div class="edit-grid" role="form" aria-label="Formulario registrar cliente">
             <div class="edit-field">
                 <span class="edit-label">Nombre completo</span>
-                <input id="addClientNombre" type="text" placeholder="Ej: Juan Pérez" autocomplete="name" />
+                <div style="display: flex; gap: 8px;">
+                    <input id="addClientNombre" type="text" placeholder="Ej: Juan Pérez" autocomplete="name" style="flex: 1;" />
+                    <button class="icon-btn" type="button" id="btnImportContact" aria-label="Importar de contactos" title="Importar de contactos" style="background: var(--glass-bg, rgba(255,255,255,0.06)); border: 1px solid var(--glass-border, rgba(255,255,255,0.06)); border-radius: 8px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <line x1="19" y1="8" x2="19" y2="14"></line>
+                            <line x1="22" y1="11" x2="16" y2="11"></line>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <div class="edit-field">
@@ -544,6 +553,7 @@ async function openAddClientSheet(){
             <p class="add-client-validation" role="alert" aria-live="polite" hidden></p>
 
             <div class="action-group edit-actions">
+                <button class="btn btn-outline subtle" type="button" data-close>Cancelar</button>
                 <button class="btn btn-primary" type="button" data-submit>Registrar</button>
             </div>
         </div>
@@ -559,6 +569,7 @@ async function openAddClientSheet(){
     const validation = container.querySelector('.add-client-validation');
     const btnSubmit = container.querySelector('[data-submit]');
     const btnClose = container.querySelector('[data-close]');
+    const btnImport = container.querySelector('#btnImportContact');
 
     function showValidation(message){
         if (!validation) return;
@@ -570,8 +581,9 @@ async function openAddClientSheet(){
     return new Promise((resolve) => {
         let finished = false;
         function cleanup(){
-            if (finished) return; finished = true;
-            try{ btnSubmit?.removeEventListener('click', onSubmit); btnClose?.removeEventListener('click', onCancel); }catch(e){}
+            if (finished) return; 
+            finished = true;
+            try{ btnSubmit?.removeEventListener('click', onSubmit); btnClose?.removeEventListener('click', onCancel); btnImport?.removeEventListener('click', onImport); }catch(e){}
             try{ container.remove(); }catch(e){}
         }
 
@@ -589,8 +601,34 @@ async function openAddClientSheet(){
 
         const onCancel = () => { cleanup(); try{ s.close('cancel'); }catch(e){} resolve(null); };
 
+        const onImport = async () => {
+            if (!('contacts' in navigator && 'ContactsManager' in window)) {
+                await showErrorToast('La API de contactos no está soportada en este navegador.');
+                return;
+            }
+            try {
+                const props = ['name', 'tel'];
+                const opts = { multiple: false };
+                const contacts = await navigator.contacts.select(props, opts);
+                if (contacts && contacts.length > 0) {
+                    const contact = contacts[0];
+                    if (contact.name && contact.name.length > 0) {
+                        nombreInput.value = contact.name[0];
+                    }
+                    if (contact.tel && contact.tel.length > 0) {
+                        telefonoInput.value = contact.tel[0];
+                    }
+                    showValidation('');
+                }
+            } catch (err) {
+                console.error('Error importing contact:', err);
+                // User may have denied permission or cancelled
+            }
+        };
+
         btnSubmit?.addEventListener('click', onSubmit);
         btnClose?.addEventListener('click', onCancel);
+        btnImport?.addEventListener('click', onImport);
 
         container.addEventListener('keydown', (e) => {
             if (e.key === 'Enter'){
@@ -599,8 +637,7 @@ async function openAddClientSheet(){
             }
         });
 
-        s.closed.then(() => { if (!finished){ finished = true; cleanup(); resolve(null); } });
-        requestAnimationFrame(() => nombreInput?.focus());
+        s.closed.then(() => { if (!finished){ cleanup(); resolve(null); } });
     });
 }
 
