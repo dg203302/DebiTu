@@ -1,5 +1,5 @@
-import {showError,showErrorToast,showSuccess,showSuccessToast,showinfo, loadSweetAlert2} from './sweetalert2.js'
-import {loadSupabase} from './supabase.js';
+import { showError, showErrorToast, showSuccess, showSuccessToast, showinfo, loadSweetAlert2 } from './sweetalert2.js'
+import { loadSupabase } from './supabase.js';
 import { openCmsSheet } from './cmsSheet.js';
 const Swal = await loadSweetAlert2();
 const supabase = await loadSupabase();
@@ -15,7 +15,7 @@ let clientStatsCharts = [];
 
 let clientePanelSheet = null;
 
-function restoreClientePanelFromSheet(){
+function restoreClientePanelFromSheet() {
     const section = document.getElementById('detallesCliente');
     if (!section) return;
 
@@ -23,7 +23,7 @@ function restoreClientePanelFromSheet(){
         if (section._originalParent) {
             section._originalParent.insertBefore(section, section._originalNext);
         }
-    } catch (e) {}
+    } catch (e) { }
 
     section.hidden = true;
 
@@ -40,7 +40,7 @@ function restoreClientePanelFromSheet(){
             delete b._originalParent;
             delete b._originalNext;
         }
-    } catch (_) {}
+    } catch (_) { }
 
     try {
         const bStats = document.getElementById('btn_stats_cliente');
@@ -50,7 +50,7 @@ function restoreClientePanelFromSheet(){
             delete bStats._originalParent;
             delete bStats._originalNext;
         }
-    } catch (_) {}
+    } catch (_) { }
 
     if (section._originalStyle) {
         Object.assign(section.style, section._originalStyle);
@@ -58,13 +58,13 @@ function restoreClientePanelFromSheet(){
     }
 }
 
-function isTouchDevice(){
-    try{
+function isTouchDevice() {
+    try {
         return ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints && navigator.msMaxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer:coarse)').matches);
-    }catch(e){ return false; }
+    } catch (e) { return false; }
 }
 
-function setResponsiveDetailsOpen(open){
+function setResponsiveDetailsOpen(open) {
     // En pantallas pequeñas mostramos el panel de cliente dentro del bottom-sheet compartido.
     if (window.innerWidth <= 1080) {
         if (open) {
@@ -86,8 +86,8 @@ function setResponsiveDetailsOpen(open){
             const content = document.getElementById('cmsSheetContent');
             if (content && content.contains(section) && document.body.classList.contains('cms-sheet-open')) return;
 
-            try{
-                const s = openCmsSheet({ title: 'Panel de Cliente', subtitle: currentClienteNombre || '', contentHtml: '' });
+            try {
+                const s = openCmsSheet({ title: 'Panel de Cliente', contentHtml: '' });
                 clientePanelSheet = s;
                 const localSheet = s;
                 s.els.content.innerHTML = '';
@@ -169,14 +169,14 @@ function setResponsiveDetailsOpen(open){
                     clientePanelSheet = null;
                     document.body.classList.remove('mobile-details-open');
                 });
-            }catch(e){ console.error('No se pudo abrir cms sheet para panel de cliente', e); }
+            } catch (e) { console.error('No se pudo abrir cms sheet para panel de cliente', e); }
 
         } else {
             document.body.classList.remove('mobile-details-open');
-            if (clientePanelSheet){
+            if (clientePanelSheet) {
                 const sheet = clientePanelSheet;
                 restoreClientePanelFromSheet();
-                try{ sheet.close('close'); }catch(e){}
+                try { sheet.close('close'); } catch (e) { }
             } else {
                 restoreClientePanelFromSheet();
             }
@@ -184,17 +184,17 @@ function setResponsiveDetailsOpen(open){
     } else {
         // En desktop mantenemos el comportamiento previo
         document.body.classList.remove('mobile-details-open');
-        if (clientePanelSheet){
+        if (clientePanelSheet) {
             const sheet = clientePanelSheet;
             restoreClientePanelFromSheet();
-            try{ sheet.close('close'); }catch(e){}
+            try { sheet.close('close'); } catch (e) { }
         } else {
             restoreClientePanelFromSheet();
         }
     }
 }
 
-function setDesktopNoClientSelected(noSelected){
+function setDesktopNoClientSelected(noSelected) {
     // Solo aplica a escritorio; en móvil/tablet el comportamiento es distinto.
     if (window.innerWidth > 1080) {
         document.body.classList.toggle('desktop-no-client-selected', !!noSelected);
@@ -203,11 +203,11 @@ function setDesktopNoClientSelected(noSelected){
     }
 }
 
-function syncDesktopNoClientSelected(){
+function syncDesktopNoClientSelected() {
     setDesktopNoClientSelected(!currentClienteTelefono);
 }
 
-function syncEditButtonVisibility(){
+function syncEditButtonVisibility() {
     const hasSelection = !!currentClienteTelefono;
     const btnEditar = document.getElementById('btn_editar_cliente');
     if (btnEditar) btnEditar.style.display = hasSelection ? '' : 'none';
@@ -217,7 +217,7 @@ function syncEditButtonVisibility(){
     if (btnCerrar) btnCerrar.style.display = hasSelection ? '' : 'none';
 }
 
-function setClienteEditMode(on){
+function setClienteEditMode(on) {
     isEditingCliente = !!on;
     const panel = document.getElementById('editarClientePanel');
     const datos = document.getElementById('datosCliente');
@@ -227,7 +227,7 @@ function setClienteEditMode(on){
     if (ops) ops.style.display = isEditingCliente ? 'none' : '';
 }
 
-function parseMontoToNumber(input){
+function parseMontoToNumber(input) {
     if (input === undefined || input === null) return 0;
     const raw = String(input).trim();
     if (!raw) return 0;
@@ -241,8 +241,8 @@ function parseMontoToNumber(input){
     return Number.isFinite(n) ? n : NaN;
 }
 
-async function abrirEdicionCliente(){
-    if (!currentClienteTelefono){
+async function abrirEdicionCliente() {
+    if (!currentClienteTelefono) {
         await showErrorToast('No hay cliente seleccionado.');
         return;
     }
@@ -250,7 +250,7 @@ async function abrirEdicionCliente(){
     const nombreInput = document.getElementById('edit_nombre_inline');
     const telefonoInput = document.getElementById('edit_telefono_inline');
     const deudaInput = document.getElementById('edit_deuda_inline');
-    if (!nombreInput || !telefonoInput || !deudaInput){
+    if (!nombreInput || !telefonoInput || !deudaInput) {
         await showErrorToast('No se encontró el formulario de edición.');
         return;
     }
@@ -264,15 +264,15 @@ async function abrirEdicionCliente(){
 
     setClienteEditMode(true);
     syncEditButtonVisibility();
-    requestAnimationFrame(() => { try{ if (!isTouchDevice()) nombreInput.focus(); }catch(_){} });
+    requestAnimationFrame(() => { try { if (!isTouchDevice()) nombreInput.focus(); } catch (_) { } });
 }
 
-function cancelarEdicionCliente(){
+function cancelarEdicionCliente() {
     setClienteEditMode(false);
 }
 
-async function guardarEdicionCliente(){
-    if (!currentClienteTelefono){
+async function guardarEdicionCliente() {
+    if (!currentClienteTelefono) {
         await showErrorToast('No hay cliente seleccionado.');
         return;
     }
@@ -280,7 +280,7 @@ async function guardarEdicionCliente(){
     const nombreInput = document.getElementById('edit_nombre_inline');
     const telefonoInput = document.getElementById('edit_telefono_inline');
     const deudaInput = document.getElementById('edit_deuda_inline');
-    if (!nombreInput || !telefonoInput || !deudaInput){
+    if (!nombreInput || !telefonoInput || !deudaInput) {
         await showErrorToast('No se encontró el formulario de edición.');
         return;
     }
@@ -292,17 +292,17 @@ async function guardarEdicionCliente(){
     const newTelefono = normalizePhone((telefonoInput.value || '').trim());
     const deudaParsed = parseMontoToNumber(deudaInput.value);
 
-    if (!newNombre){
+    if (!newNombre) {
         await showErrorToast('Ingrese el nombre del cliente.');
         nombreInput.focus();
         return;
     }
-    if (!newTelefono){
+    if (!newTelefono) {
         await showErrorToast('Ingrese el teléfono del cliente (solo números).');
         telefonoInput.focus();
         return;
     }
-    if (!Number.isFinite(deudaParsed) || deudaParsed < 0){
+    if (!Number.isFinite(deudaParsed) || deudaParsed < 0) {
         await showErrorToast('La deuda activa debe ser un número válido (>= 0).');
         deudaInput.focus();
         return;
@@ -315,12 +315,12 @@ async function guardarEdicionCliente(){
     const oldDeuda = await calcularMontoTotalAdeudado(oldTelefono);
     const changedDeuda = Number(deudaParsed) !== Number(oldDeuda || 0);
 
-    if (!changedNombre && !changedTelefono && !changedDeuda){
+    if (!changedNombre && !changedTelefono && !changedDeuda) {
         await showinfo('Sin cambios', 'No se modificó ningún dato.');
         return;
     }
 
-    if (changedTelefono){
+    if (changedTelefono) {
         const okConfirm = await openConfirmSheet({
             title: 'Confirmar cambio de teléfono',
             subtitle: 'Esto afectará los registros asociados.',
@@ -338,12 +338,12 @@ async function guardarEdicionCliente(){
             .eq('Telefono', oldTelefono);
         upd = applyIdNegocioFilter(upd);
         const { error: errCliente } = await upd;
-        if (errCliente){
+        if (errCliente) {
             await showErrorToast('No se pudo actualizar el cliente: ' + errCliente.message);
             return;
         }
 
-        if (changedTelefono){
+        if (changedTelefono) {
             let updDeudas = supabase
                 .from('Deudas')
                 .update({ Telefono_cliente: newTelefono })
@@ -358,7 +358,7 @@ async function guardarEdicionCliente(){
             updPagos = applyIdNegocioFilter(updPagos);
             const { error: errPagos } = await updPagos;
 
-            if (errDeudas || errPagos){
+            if (errDeudas || errPagos) {
                 // Best-effort rollback del cliente
                 let rb = supabase
                     .from('Clientes')
@@ -395,17 +395,17 @@ async function guardarEdicionCliente(){
         requestAnimationFrame(() => autoSelectClientByPhone(newTelefono));
 
         setClienteEditMode(false);
-    } catch (err){
+    } catch (err) {
         console.error('Guardar edición cliente error', err);
         await showErrorToast('Error al editar el cliente');
     }
 }
 
-function renderClientesEnContenedor(clientes){
+function renderClientesEnContenedor(clientes) {
     const contenedorLista = document.getElementById('contenedorListaClientes');
     if (!contenedorLista) return;
     contenedorLista.innerHTML = '';
-    if (!clientes || clientes.length === 0){
+    if (!clientes || clientes.length === 0) {
         contenedorLista.innerHTML = '<p>No hay clientes registrados.</p>';
         return;
     }
@@ -413,19 +413,19 @@ function renderClientesEnContenedor(clientes){
 }
 
 // Helpers compartidos
-function escapeHtml(str){
+function escapeHtml(str) {
     if (str === undefined || str === null) return '';
-    return String(str).replace(/[&<>\"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    return String(str).replace(/[&<>\"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }
-function formatDate(value){
+function formatDate(value) {
     if (!value) return '';
     const d = new Date(value);
-    if (!isNaN(d)){
+    if (!isNaN(d)) {
         try { return d.toLocaleString('es-AR', { dateStyle: 'medium', timeStyle: 'short' }); }
         catch { return d.toString(); }
     }
     const n = Number(value);
-    if (!Number.isNaN(n)){
+    if (!Number.isNaN(n)) {
         const d2 = new Date(n);
         if (!isNaN(d2)) return d2.toLocaleString('es-AR', { dateStyle: 'medium', timeStyle: 'short' });
     }
@@ -433,13 +433,13 @@ function formatDate(value){
 }
 
 // Normaliza teléfonos: deja solo dígitos y, si hay más de 10, conserva los últimos 10 (formato local)
-function normalizePhone(phone){
+function normalizePhone(phone) {
     const digits = (phone || '').toString().replace(/\D+/g, '');
     if (digits.length > 10) return digits.slice(-10);
     return digits;
 }
 
-function getAvatarLetters(nombre){
+function getAvatarLetters(nombre) {
     const raw = (nombre || '').toString().trim();
     if (!raw) return 'CP';
     const compact = raw.replace(/\s+/g, '');
@@ -447,15 +447,15 @@ function getAvatarLetters(nombre){
     return two ? two.toUpperCase() : 'CP';
 }
 
-function autoSelectClientByPhone(phone){
+function autoSelectClientByPhone(phone) {
     const target = normalizePhone(phone);
     if (!target) return false;
     const items = Array.from(document.querySelectorAll('#contenedorListaClientes .client-item'))
         .filter((el) => !el.classList.contains('skeleton'));
-    for (const el of items){
+    for (const el of items) {
         const meta = el.querySelector('.meta');
         const digits = normalizePhone(meta ? meta.textContent : '');
-        if (digits && digits === target){
+        if (digits && digits === target) {
             el.click();
             return true;
         }
@@ -463,7 +463,7 @@ function autoSelectClientByPhone(phone){
     return false;
 }
 
-async function editarClienteActual(){
+async function editarClienteActual() {
     await abrirEdicionCliente();
 }
 
@@ -471,28 +471,28 @@ async function editarClienteActual(){
 // Regla:
 // - localStorage.UserID === 'N/A'  => filtrar/guardar ID_Negocio = NULL
 // - caso normal                   => filtrar/guardar ID_Negocio = <UserID>
-function getLocalUserId(){
+function getLocalUserId() {
     const raw = localStorage.getItem('UserID');
     if (raw === undefined || raw === null) return null;
     const v = String(raw).trim();
     return v ? v : null;
 }
 
-function getIdNegocioForWrite(){
+function getIdNegocioForWrite() {
     const userId = getLocalUserId();
     if (!userId) return undefined; // sesión ausente
     if (userId === 'N/A') return null; // caso especial
     return userId;
 }
 
-function applyIdNegocioFilter(query){
+function applyIdNegocioFilter(query) {
     const userId = getLocalUserId();
     if (userId === 'N/A') return query.is('ID_Negocio', null);
     if (!userId) return query.eq('ID_Negocio', '__MISSING_USERID__');
     return query.eq('ID_Negocio', userId);
 }
 
-function Regresar(){
+function Regresar() {
     window.location.href = "/Plantillas/Inicio.html";
 }
 window.Regresar = Regresar;
@@ -500,10 +500,10 @@ window.Regresar = Regresar;
 let confirmSheetState = null;
 let promptSheetState = null;
 
-async function ajustarDeudaActivaCliente(telefono, delta){
+async function ajustarDeudaActivaCliente(telefono, delta) {
     const tel = normalizePhone(telefono);
     if (!tel) return false;
-    try{
+    try {
         const actual = await calcularMontoTotalAdeudado(tel);
         const next = Math.max(0, (Number(actual) || 0) + (Number(delta) || 0));
         let upd = supabase
@@ -512,12 +512,12 @@ async function ajustarDeudaActivaCliente(telefono, delta){
             .eq('Telefono', tel);
         upd = applyIdNegocioFilter(upd);
         const { error } = await upd;
-        if (error){
+        if (error) {
             await showErrorToast('No se pudo actualizar la Deuda Activa: ' + error.message);
             return false;
         }
         return true;
-    }catch(e){
+    } catch (e) {
         console.error('ajustarDeudaActivaCliente error', e);
         await showErrorToast('Error actualizando la Deuda Activa');
         return false;
@@ -525,7 +525,7 @@ async function ajustarDeudaActivaCliente(telefono, delta){
 }
 
 // Abrir sheet de "Agregar cliente" usando el módulo compartido cmsSheet
-async function openAddClientSheet(){
+async function openAddClientSheet() {
     const container = document.createElement('div');
     container.className = 'cms-addclient';
     container.innerHTML = `
@@ -572,10 +572,10 @@ async function openAddClientSheet(){
     const btnSubmit = container.querySelector('[data-submit]');
     const btnClose = container.querySelector('[data-close]');
 
-    function showValidation(message){
+    function showValidation(message) {
         if (!validation) return;
         const msg = (message || '').toString().trim();
-        if (!msg){ validation.hidden = true; validation.textContent = ''; return; }
+        if (!msg) { validation.hidden = true; validation.textContent = ''; return; }
         validation.textContent = msg; validation.hidden = false;
     }
 
@@ -605,42 +605,42 @@ async function openAddClientSheet(){
 
     return new Promise((resolve) => {
         let finished = false;
-        function cleanup(){
-            if (finished) return; 
+        function cleanup() {
+            if (finished) return;
             finished = true;
-            try{ btnSubmit?.removeEventListener('click', onSubmit); btnClose?.removeEventListener('click', onCancel); }catch(e){}
-            try{ container.remove(); }catch(e){}
+            try { btnSubmit?.removeEventListener('click', onSubmit); btnClose?.removeEventListener('click', onCancel); } catch (e) { }
+            try { container.remove(); } catch (e) { }
         }
 
         const onSubmit = () => {
             const nombre = (nombreInput?.value || '').trim();
             const telefonoRaw = (telefonoInput?.value || '').trim();
             const telefono = normalizePhone(telefonoRaw);
-            if (!nombre){ showValidation('Ingrese el nombre del cliente.'); nombreInput?.focus(); return; }
-            if (!telefono){ showValidation('Ingrese el teléfono del cliente (solo números).'); telefonoInput?.focus(); return; }
+            if (!nombre) { showValidation('Ingrese el nombre del cliente.'); nombreInput?.focus(); return; }
+            if (!telefono) { showValidation('Ingrese el teléfono del cliente (solo números).'); telefonoInput?.focus(); return; }
             showValidation('');
             cleanup();
-            try{ s.close('submit'); }catch(e){}
+            try { s.close('submit'); } catch (e) { }
             resolve({ nombre, telefono });
         };
 
-        const onCancel = () => { cleanup(); try{ s.close('cancel'); }catch(e){} resolve(null); };
+        const onCancel = () => { cleanup(); try { s.close('cancel'); } catch (e) { } resolve(null); };
 
         btnSubmit?.addEventListener('click', onSubmit);
         btnClose?.addEventListener('click', onCancel);
 
         container.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter'){
+            if (e.key === 'Enter') {
                 const tag = (e.target?.tagName || '').toLowerCase();
-                if (tag === 'input'){ e.preventDefault(); onSubmit(); }
+                if (tag === 'input') { e.preventDefault(); onSubmit(); }
             }
         });
 
-        s.closed.then(() => { if (!finished){ cleanup(); resolve(null); } });
+        s.closed.then(() => { if (!finished) { cleanup(); resolve(null); } });
     });
 }
 
-function ensureConfirmSheet(){
+function ensureConfirmSheet() {
     if (confirmSheetState?.sheet && confirmSheetState?.backdrop) return confirmSheetState;
 
     const backdrop = document.createElement('div');
@@ -707,13 +707,13 @@ function ensureConfirmSheet(){
         cleanup: null
     };
 
-    function requestClose(result){
-        if (typeof confirmSheetState?.cleanup === 'function'){
-            try{ confirmSheetState.cleanup(); }catch{ /* ignore */ }
+    function requestClose(result) {
+        if (typeof confirmSheetState?.cleanup === 'function') {
+            try { confirmSheetState.cleanup(); } catch { /* ignore */ }
         }
         confirmSheetState.cleanup = null;
         const r = confirmSheetState?.resolve;
-        if (typeof r === 'function'){
+        if (typeof r === 'function') {
             confirmSheetState.resolve = null;
             r(result);
         }
@@ -726,12 +726,12 @@ function ensureConfirmSheet(){
     btnConfirm?.addEventListener('click', () => requestClose(true));
 
     sheet.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape'){
+        if (e.key === 'Escape') {
             e.preventDefault();
             requestClose(false);
             return;
         }
-        if (e.key === 'Enter'){
+        if (e.key === 'Enter') {
             e.preventDefault();
             requestClose(true);
         }
@@ -739,7 +739,7 @@ function ensureConfirmSheet(){
 
     document.addEventListener('keydown', (e) => {
         if (!document.body.classList.contains('confirm-sheet-open')) return;
-        if (e.key === 'Escape'){
+        if (e.key === 'Escape') {
             e.preventDefault();
             requestClose(false);
         }
@@ -748,7 +748,7 @@ function ensureConfirmSheet(){
     return confirmSheetState;
 }
 
-function openConfirmSheet({ title, subtitle, messageHtml, confirmText, cancelText } = {}){
+function openConfirmSheet({ title, subtitle, messageHtml, confirmText, cancelText } = {}) {
     const state = ensureConfirmSheet();
     if (!state) return Promise.resolve(false);
 
@@ -780,7 +780,7 @@ function openConfirmSheet({ title, subtitle, messageHtml, confirmText, cancelTex
     });
 }
 
-function openConfirmSheetWithOption({ title, subtitle, messageHtml, confirmText, cancelText, optionLabel, optionDefault } = {}){
+function openConfirmSheetWithOption({ title, subtitle, messageHtml, confirmText, cancelText, optionLabel, optionDefault } = {}) {
     const state = ensureConfirmSheet();
     if (!state) return Promise.resolve({ confirmed: false, option: false });
 
@@ -797,7 +797,7 @@ function openConfirmSheetWithOption({ title, subtitle, messageHtml, confirmText,
     const checkedDefault = !!optionDefault;
     state.payload = { option: checkedDefault };
 
-    if (state.extraEl){
+    if (state.extraEl) {
         state.extraEl.innerHTML = `
             <label class="confirm-sheet__option">
                 <input type="checkbox" ${checkedDefault ? 'checked' : ''} />
@@ -828,7 +828,7 @@ function openConfirmSheetWithOption({ title, subtitle, messageHtml, confirmText,
     });
 }
 
-function closeConfirmSheet(){
+function closeConfirmSheet() {
     const state = confirmSheetState;
     if (!state?.sheet || !state?.backdrop) return;
 
@@ -864,7 +864,7 @@ function closeConfirmSheet(){
     }, 420);
 }
 
-function ensurePromptSheet(){
+function ensurePromptSheet() {
     if (promptSheetState?.sheet && promptSheetState?.backdrop) return promptSheetState;
 
     const backdrop = document.createElement('div');
@@ -940,10 +940,10 @@ function ensurePromptSheet(){
         validate: null
     };
 
-    function showValidation(message){
+    function showValidation(message) {
         if (!validation) return;
         const msg = (message || '').toString().trim();
-        if (!msg){
+        if (!msg) {
             validation.hidden = true;
             validation.textContent = '';
             return;
@@ -952,20 +952,20 @@ function ensurePromptSheet(){
         validation.hidden = false;
     }
 
-    function requestClose(result){
+    function requestClose(result) {
         const r = promptSheetState?.resolve;
-        if (typeof r === 'function'){
+        if (typeof r === 'function') {
             promptSheetState.resolve = null;
             r(result);
         }
         closePromptSheet();
     }
 
-    function submit(){
+    function submit() {
         const raw = (inputEl?.value || '').toString();
         const validator = promptSheetState?.validate;
         const errorMsg = (typeof validator === 'function') ? validator(raw) : null;
-        if (typeof errorMsg === 'string' && errorMsg.trim()){
+        if (typeof errorMsg === 'string' && errorMsg.trim()) {
             showValidation(errorMsg);
             inputEl?.focus();
             return;
@@ -980,14 +980,14 @@ function ensurePromptSheet(){
     btnConfirm?.addEventListener('click', submit);
 
     sheet.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape'){
+        if (e.key === 'Escape') {
             e.preventDefault();
             requestClose(null);
             return;
         }
-        if (e.key === 'Enter'){
+        if (e.key === 'Enter') {
             const tag = (e.target?.tagName || '').toLowerCase();
-            if (tag === 'input'){
+            if (tag === 'input') {
                 e.preventDefault();
                 submit();
             }
@@ -996,7 +996,7 @@ function ensurePromptSheet(){
 
     document.addEventListener('keydown', (e) => {
         if (!document.body.classList.contains('prompt-sheet-open')) return;
-        if (e.key === 'Escape'){
+        if (e.key === 'Escape') {
             e.preventDefault();
             requestClose(null);
         }
@@ -1005,7 +1005,7 @@ function ensurePromptSheet(){
     return promptSheetState;
 }
 
-function openPromptSheet({ title, subtitle, label, hint, value, placeholder, inputMode, confirmText, cancelText, validate } = {}){
+function openPromptSheet({ title, subtitle, label, hint, value, placeholder, inputMode, confirmText, cancelText, validate } = {}) {
     const state = ensurePromptSheet();
     if (!state) return Promise.resolve(null);
 
@@ -1017,17 +1017,17 @@ function openPromptSheet({ title, subtitle, label, hint, value, placeholder, inp
     if (state.titleEl) state.titleEl.textContent = (title || 'Editar').toString();
     if (state.subtitleEl) state.subtitleEl.textContent = (subtitle || 'Ingresá un valor.').toString();
     if (state.labelEl) state.labelEl.textContent = (label || 'Valor').toString();
-    if (state.hintEl){
+    if (state.hintEl) {
         const h = (hint || '').toString().trim();
         state.hintEl.textContent = h;
         state.hintEl.hidden = !h;
     }
-    if (state.inputEl){
+    if (state.inputEl) {
         state.inputEl.value = (value ?? '').toString();
         state.inputEl.placeholder = (placeholder || '').toString();
         if (inputMode) state.inputEl.inputMode = String(inputMode);
     }
-    if (state.validation){
+    if (state.validation) {
         state.validation.hidden = true;
         state.validation.textContent = '';
     }
@@ -1053,7 +1053,7 @@ function openPromptSheet({ title, subtitle, label, hint, value, placeholder, inp
     });
 }
 
-function closePromptSheet(){
+function closePromptSheet() {
     const state = promptSheetState;
     if (!state?.sheet || !state?.backdrop) return;
 
@@ -1089,11 +1089,11 @@ function closePromptSheet(){
     }, 420);
 }
 
-async function agregarCliente(){
+async function agregarCliente() {
     const formValues = await openAddClientSheet();
     if (formValues) {
         const idNegocio = getIdNegocioForWrite();
-        if (idNegocio === undefined){
+        if (idNegocio === undefined) {
             await showErrorToast('No se encontró el ID de usuario (UserID). Iniciá sesión nuevamente.');
             return;
         }
@@ -1102,16 +1102,16 @@ async function agregarCliente(){
                 nombre: formValues.nombre,
                 telefono: formValues.telefono,
             };
-            const {error} = await supabase
+            const { error } = await supabase
                 .from('Clientes')
                 .insert({ Nombre: payload.nombre, Telefono: payload.telefono, ID_Negocio: idNegocio });
-            if (error){
+            if (error) {
                 showErrorToast('Error al agregar el cliente: ' + error.message);
                 return;
             }
             showSuccessToast('Cliente agregado');
             window.location.reload();
-        } catch (err){
+        } catch (err) {
             console.error('Agregar cliente error', err);
             showErrorToast('Error al agregar el cliente');
         }
@@ -1119,44 +1119,44 @@ async function agregarCliente(){
 }
 window.agregarCliente = agregarCliente;
 
-async function verTodosClientes(){
+async function verTodosClientes() {
     const data = await fetchAllClientes();
     if (!data) return;
     renderClientesEnContenedor(filtrarClientes(data, currentClientesFilter));
 }
 window.verTodosClientes = verTodosClientes;
 
-async function fetchAllClientes(){
-    const {data, error} = await applyIdNegocioFilter(
+async function fetchAllClientes() {
+    const { data, error } = await applyIdNegocioFilter(
         supabase
             .from('Clientes')
             .select('*')
     );
-    if (error){
+    if (error) {
         showErrorToast('Error al obtener los clientes: ' + error.message);
         return null;
     }
     return data || [];
 }
 
-function getDeudaActivaFromCliente(cliente){
+function getDeudaActivaFromCliente(cliente) {
     const v = cliente?.Deuda_Activa ?? cliente?.deuda_activa ?? cliente?.deudaActiva ?? 0;
     const n = Number(v);
     return Number.isFinite(n) ? n : 0;
 }
 
-function filtrarClientes(clientes, filter){
+function filtrarClientes(clientes, filter) {
     if (!Array.isArray(clientes)) return [];
-    if (filter === 'withDebt'){
+    if (filter === 'withDebt') {
         return clientes.filter((c) => getDeudaActivaFromCliente(c) > 0);
     }
-    if (filter === 'withoutDebt'){
+    if (filter === 'withoutDebt') {
         return clientes.filter((c) => getDeudaActivaFromCliente(c) <= 0);
     }
     return clientes;
 }
 
-async function aplicarFiltroClientes(filter){
+async function aplicarFiltroClientes(filter) {
     currentClientesFilter = filter || 'all';
 
     // UX simple: al filtrar se parte del universo completo (sin búsqueda)
@@ -1175,11 +1175,11 @@ async function aplicarFiltroClientes(filter){
     cerrarDetallesCliente();
 }
 
-function initFiltrosClientes(){
+function initFiltrosClientes() {
     const wrap = document.querySelector('.filters-wrap');
     if (!wrap) return;
     const chips = Array.from(wrap.querySelectorAll('.chip'));
-    for (const chip of chips){
+    for (const chip of chips) {
         const label = (chip.textContent || '').toString().trim().toLowerCase();
         let filter = 'all';
         if (label.includes('con') && label.includes('deuda')) filter = 'withDebt';
@@ -1198,14 +1198,14 @@ function initFiltrosClientes(){
         btn.classList.toggle('is-active', btn.dataset.filter === currentClientesFilter);
     });
 }
-function cerrarListaClientes(){
+function cerrarListaClientes() {
     const input = document.getElementById('buscarClienteInput');
     if (input) input.value = '';
     verTodosClientes();
 }
 window.cerrarListaClientes = cerrarListaClientes;
 
-function insertarClienteEnLista(cliente, contenedor){
+function insertarClienteEnLista(cliente, contenedor) {
     const nombre = cliente.Nombre ?? cliente.nombre ?? '';
     const telefono = normalizePhone(cliente.Telefono ?? cliente.telefono ?? '');
 
@@ -1256,15 +1256,15 @@ function insertarClienteEnLista(cliente, contenedor){
     contenedor.appendChild(card);
 }
 
-async function borrarClienteActual(){
-    if (!currentClienteTelefono){
+async function borrarClienteActual() {
+    if (!currentClienteTelefono) {
         await showErrorToast('No hay cliente seleccionado.');
         return;
     }
     const selectedCard = document.querySelector('.client-item[aria-selected="true"]');
     await borrarCliente(currentClienteTelefono, currentClienteNombre || '', selectedCard);
 }
-async function borrarCliente(telefono, nombre, cardEl){
+async function borrarCliente(telefono, nombre, cardEl) {
     const tel = normalizePhone(telefono);
 
     const ok = await openConfirmSheet({
@@ -1282,7 +1282,7 @@ async function borrarCliente(telefono, nombre, cardEl){
         .eq('Telefono', tel);
     del = applyIdNegocioFilter(del);
     const { error } = await del;
-    if (error){
+    if (error) {
         await showErrorToast('Error al borrar cliente: ' + error.message);
         return;
     }
@@ -1301,13 +1301,13 @@ async function borrarCliente(telefono, nombre, cardEl){
     showSuccessToast('Cliente borrado correctamente');
     window.location.reload();
 }
-async function calcularMontoTotalPagado(telefono){
+async function calcularMontoTotalPagado(telefono) {
     let q = supabase
         .from('Pagos')
         .select('Monto')
         .eq('Telefono_cliente', telefono);
     q = applyIdNegocioFilter(q);
-    const {data, error} = await q;
+    const { data, error } = await q;
     if (error) {
         showErrorToast('Error al obtener los pagos: ' + error.message);
         return 0;
@@ -1315,7 +1315,7 @@ async function calcularMontoTotalPagado(telefono){
     return (data || []).reduce((total, pago) => total + (Number(pago.Monto) || 0), 0);
 }
 
-async function calcularMontoTotalAdeudado(telefono){
+async function calcularMontoTotalAdeudado(telefono) {
     let q = supabase
         .from('Clientes')
         .select('Deuda_Activa')
@@ -1331,7 +1331,7 @@ async function calcularMontoTotalAdeudado(telefono){
 }
 
 // -------- Operaciones del cliente seleccionado (tabs, lista, expandir, detalle) --------
-function prepararTabsOperacionesCliente(){
+function prepararTabsOperacionesCliente() {
     const btnDeudas = document.getElementById('btn_ver_deudas_cliente');
     const btnPagos = document.getElementById('btn_ver_pagos_cliente');
     if (!btnDeudas || !btnPagos) return;
@@ -1350,7 +1350,7 @@ function prepararTabsOperacionesCliente(){
 
     // Preparar/crear botón Expandir/Contraer si no existe
     const opsSection = document.getElementById('operacionesCliente');
-    if (opsSection && !document.getElementById('btn_expandir_cliente')){
+    if (opsSection && !document.getElementById('btn_expandir_cliente')) {
         const btn = document.createElement('button');
         btn.id = 'btn_expandir_cliente';
         btn.textContent = 'Expandir';
@@ -1370,11 +1370,11 @@ function prepararTabsOperacionesCliente(){
     setActiveTabCliente(currentClienteOpView);
 }
 
-function setActiveTabCliente(tipo){
+function setActiveTabCliente(tipo) {
     currentClienteOpView = tipo;
     const btnDeudas = document.getElementById('btn_ver_deudas_cliente');
     const btnPagos = document.getElementById('btn_ver_pagos_cliente');
-    if (btnDeudas && btnPagos){
+    if (btnDeudas && btnPagos) {
         btnDeudas.classList.toggle('active', tipo === 'deudas');
         btnDeudas.setAttribute('aria-selected', String(tipo === 'deudas'));
         btnPagos.classList.toggle('active', tipo === 'pagos');
@@ -1382,26 +1382,26 @@ function setActiveTabCliente(tipo){
     }
 }
 
-async function mostrarOperacionesCliente(tipo){
+async function mostrarOperacionesCliente(tipo) {
     const cont = document.getElementById('lista_operaciones_cliente');
     if (!cont || !currentClienteTelefono) return;
     cont.textContent = 'Cargando...';
-    try{
+    try {
         const { data, error } = await fetchOperacionesClienteByTipo(tipo, currentClienteTelefono, false);
-        if (error){
+        if (error) {
             showErrorToast(error.message);
             cont.textContent = 'Error al cargar.';
             return;
         }
         renderListaOperacionesCliente(cont, data || [], tipo);
-    }catch(err){
+    } catch (err) {
         console.error(err);
         showErrorToast('No se pudieron cargar las operaciones');
         cont.textContent = 'Error al cargar.';
     }
 }
 
-async function fetchOperacionesClienteByTipo(tipo, telefono, asc = true){
+async function fetchOperacionesClienteByTipo(tipo, telefono, asc = true) {
     const tabla = (tipo === 'deudas') ? 'Deudas' : 'Pagos';
     let q = supabase
         .from(tabla)
@@ -1411,28 +1411,28 @@ async function fetchOperacionesClienteByTipo(tipo, telefono, asc = true){
     return await q.order('Creado', { ascending: !!asc });
 }
 
-function normalizeMontoOperacion(item){
+function normalizeMontoOperacion(item) {
     const montoRaw = item?.Monto ?? item?.monto ?? item?.Amount ?? item?.amount ?? 0;
     const monto = Number(montoRaw);
     return Number.isFinite(monto) ? monto : 0;
 }
 
-function normalizeFechaOperacion(item){
+function normalizeFechaOperacion(item) {
     const raw = item?.Creado ?? item?.creado ?? item?.fecha ?? item?.created_at ?? null;
     if (!raw) return null;
     const date = new Date(raw);
     return Number.isNaN(date.getTime()) ? null : date;
 }
 
-function monthKey(date){
+function monthKey(date) {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 }
 
-function monthLabel(date){
+function monthLabel(date) {
     return date.toLocaleDateString('es-AR', { month: 'short', year: 'numeric' });
 }
 
-function buildMonthlySeries(items){
+function buildMonthlySeries(items) {
     const bucket = new Map();
     for (const item of (items || [])) {
         const date = normalizeFechaOperacion(item);
@@ -1445,11 +1445,11 @@ function buildMonthlySeries(items){
     return Array.from(bucket.values()).sort((a, b) => a.date - b.date);
 }
 
-function clamp(value, min, max){
+function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
 }
 
-function computePaymentIndicators({ pagos, deudas, deudaActiva }){
+function computePaymentIndicators({ pagos, deudas, deudaActiva }) {
     const totalPagado = (pagos || []).reduce((acc, item) => acc + normalizeMontoOperacion(item), 0);
     const totalDeudaRegistrada = (deudas || []).reduce((acc, item) => acc + normalizeMontoOperacion(item), 0);
     const cobertura = totalDeudaRegistrada > 0 ? clamp(totalPagado / totalDeudaRegistrada, 0, 1.4) : (totalPagado > 0 ? 1 : 0);
@@ -1479,14 +1479,14 @@ function computePaymentIndicators({ pagos, deudas, deudaActiva }){
     return { score, probabilidad, tone, label, totalPagado, totalDeudaRegistrada, diasSinPagar };
 }
 
-function destroyClientStatsCharts(){
+function destroyClientStatsCharts() {
     for (const chart of clientStatsCharts) {
-        try { chart?.destroy(); } catch (_) {}
+        try { chart?.destroy(); } catch (_) { }
     }
     clientStatsCharts = [];
 }
 
-async function ensureChartJs(){
+async function ensureChartJs() {
     if (window.Chart) return window.Chart;
     await new Promise((resolve, reject) => {
         const existing = document.querySelector('script[data-lib="chartjs"]');
@@ -1507,7 +1507,7 @@ async function ensureChartJs(){
     return window.Chart;
 }
 
-function pushLineChart(canvasId, labels, values, color, fillA, fillB){
+function pushLineChart(canvasId, labels, values, color, fillA, fillB) {
     const canvas = document.getElementById(canvasId);
     if (!canvas || !window.Chart) return;
     const ctx = canvas.getContext('2d');
@@ -1557,7 +1557,7 @@ function pushLineChart(canvasId, labels, values, color, fillA, fillB){
 
 let clientStatsDrawerEls = null;
 
-function ensureClientStatsDrawer(){
+function ensureClientStatsDrawer() {
     if (clientStatsDrawerEls) return clientStatsDrawerEls;
 
     let backdrop = document.getElementById('clientStatsBackdrop');
@@ -1612,12 +1612,12 @@ function ensureClientStatsDrawer(){
     return clientStatsDrawerEls;
 }
 
-function closeClientStatsDrawer(){
+function closeClientStatsDrawer() {
     document.body.classList.remove('client-stats-open');
     destroyClientStatsCharts();
 }
 
-async function abrirEstadisticasCliente(){
+async function abrirEstadisticasCliente() {
     if (!currentClienteTelefono) {
         await showErrorToast('Selecciona un cliente primero.');
         return;
@@ -1696,16 +1696,16 @@ async function abrirEstadisticasCliente(){
     }
 }
 
-function renderListaOperacionesCliente(container, items, tipo){
+function renderListaOperacionesCliente(container, items, tipo) {
     container.innerHTML = '';
-    if (!items || items.length === 0){
+    if (!items || items.length === 0) {
         const empty = document.createElement('div');
         empty.textContent = 'No hay registros.';
         container.appendChild(empty);
         return;
     }
     const formatter = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
-    const visibleItems = isExpandedCliente ? items.slice(0,50) : items.slice(0,3);
+    const visibleItems = isExpandedCliente ? items.slice(0, 50) : items.slice(0, 3);
     visibleItems.forEach(item => {
         const fechaRaw = item.Creado || item.creado || item.fecha || item.created_at || '';
         const fecha = formatDate(fechaRaw);
@@ -1716,7 +1716,7 @@ function renderListaOperacionesCliente(container, items, tipo){
         card.innerHTML = `
             <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
                 <div>
-                    <div style="font-weight:600; color:${tipo==='deudas' ? 'var(--danger)' : 'var(--success)'}">${tipo==='deudas' ? 'Deuda' : 'Pago'}</div>
+                    <div style="font-weight:600; color:${tipo === 'deudas' ? 'var(--danger)' : 'var(--success)'}">${tipo === 'deudas' ? 'Deuda' : 'Pago'}</div>
                     <div class="muted" style="font-size:0.85rem;">${escapeHtml(String(fecha))}</div>
                 </div>
                 <div style="font-weight:700;">${formatter.format(monto)}</div>
@@ -1725,7 +1725,7 @@ function renderListaOperacionesCliente(container, items, tipo){
         card.addEventListener('click', () => showOperacionDetalleCliente(item, tipo));
         container.appendChild(card);
     });
-    if (!isExpandedCliente && items.length > 3){
+    if (!isExpandedCliente && items.length > 3) {
         const more = document.createElement('div');
         more.className = 'more-indicator';
         more.textContent = `Mostrar ${items.length - 3} registros más`;
@@ -1734,7 +1734,7 @@ function renderListaOperacionesCliente(container, items, tipo){
     }
 }
 
-function expandirTablaCliente(){
+function expandirTablaCliente() {
     isExpandedCliente = !isExpandedCliente;
     const btn = document.getElementById('btn_expandir_cliente');
     if (btn) btn.textContent = isExpandedCliente ? 'Contraer' : 'Expandir';
@@ -1744,25 +1744,25 @@ function expandirTablaCliente(){
     mostrarOperacionesCliente(currentClienteOpView);
 }
 
-async function showOperacionDetalleCliente(item, tipo){
+async function showOperacionDetalleCliente(item, tipo) {
     openOperacionDetalleDrawer(item, tipo);
 }
 
 // --- Drawer: detalle de deuda/pago (sin SweetAlert) ---
 let opDrawerEls = null;
 
-function ensureOperacionDetalleDrawer(){
+function ensureOperacionDetalleDrawer() {
     if (opDrawerEls) return opDrawerEls;
 
     let backdrop = document.getElementById('opDetailBackdrop');
     let drawer = document.getElementById('opDetailDrawer');
-    if (!backdrop){
+    if (!backdrop) {
         backdrop = document.createElement('div');
         backdrop.id = 'opDetailBackdrop';
         backdrop.className = 'op-detail-backdrop';
         document.body.appendChild(backdrop);
     }
-    if (!drawer){
+    if (!drawer) {
         drawer = document.createElement('div');
         drawer.id = 'opDetailDrawer';
         drawer.className = 'op-detail-drawer';
@@ -1814,14 +1814,14 @@ function ensureOperacionDetalleDrawer(){
     return opDrawerEls;
 }
 
-function closeOperacionDetalleDrawer(){
+function closeOperacionDetalleDrawer() {
     document.body.classList.remove('op-detail-open');
     const els = ensureOperacionDetalleDrawer();
     els.currentItem = null;
     els.currentTipo = null;
 }
 
-function renderOpDetailRow(label, value, opts = {}){
+function renderOpDetailRow(label, value, opts = {}) {
     const amount = !!opts.amount;
     const safeValue = (value === null || value === undefined || value === '') ? '—' : String(value);
     return `
@@ -1832,7 +1832,7 @@ function renderOpDetailRow(label, value, opts = {}){
     `;
 }
 
-function openOperacionDetalleDrawer(item, tipo){
+function openOperacionDetalleDrawer(item, tipo) {
     const els = ensureOperacionDetalleDrawer();
     els.currentItem = item;
     els.currentTipo = tipo;
@@ -1855,10 +1855,10 @@ function openOperacionDetalleDrawer(item, tipo){
 
     // Mostrar solo campos no sensibles/no IDs (embellecido y sin ids)
     const ignoredKeys = new Set([
-        'Monto','monto','Amount','amount',
-        'Creado','creado','fecha','created_at',
-        'Telefono_cliente','Cliente','cliente','client',
-        'ID_Negocio','id_negocio','idNegocio'
+        'Monto', 'monto', 'Amount', 'amount',
+        'Creado', 'creado', 'fecha', 'created_at',
+        'Telefono_cliente', 'Cliente', 'cliente', 'client',
+        'ID_Negocio', 'id_negocio', 'idNegocio'
     ]);
     const idLike = (k) => /^id(_|$)/i.test(String(k)) || /_id$/i.test(String(k));
     Object.keys(item || {}).forEach((k) => {
@@ -1875,7 +1875,7 @@ function openOperacionDetalleDrawer(item, tipo){
 
     if (els.grid) els.grid.innerHTML = rows.join('');
 
-    if (els.deleteBtn){
+    if (els.deleteBtn) {
         els.deleteBtn.textContent = 'Eliminar registro';
         els.deleteBtn.onclick = async () => {
             await confirmarYEliminarOperacionDesdeDrawer();
@@ -1885,24 +1885,24 @@ function openOperacionDetalleDrawer(item, tipo){
     document.body.classList.add('op-detail-open');
 }
 
-async function eliminarOperacionIndiv(item, tipo, telefono){
-    try{
+async function eliminarOperacionIndiv(item, tipo, telefono) {
+    try {
         const table = (tipo === 'deudas') ? 'Deudas' : 'Pagos';
         const candidates = (tipo === 'deudas')
-            ? ['id_deuda','idDeuda','id','ID','Id']
-            : ['id_pago','idPago','id','ID','Id'];
+            ? ['id_deuda', 'idDeuda', 'id', 'ID', 'Id']
+            : ['id_pago', 'idPago', 'id', 'ID', 'Id'];
 
         let usedKey = null;
         let idVal = null;
-        for (const k of candidates){
-            if (item && item[k] !== undefined && item[k] !== null){ usedKey = k; idVal = item[k]; break; }
+        for (const k of candidates) {
+            if (item && item[k] !== undefined && item[k] !== null) { usedKey = k; idVal = item[k]; break; }
         }
 
         let del = supabase.from(table).delete();
-        if (usedKey){
+        if (usedKey) {
             del = del.eq(usedKey, idVal);
         } else {
-            const matchObj = { };
+            const matchObj = {};
             if (telefono) matchObj['Telefono_cliente'] = telefono;
             const monto = (item?.Monto ?? item?.monto);
             if (monto !== undefined) matchObj['Monto'] = Number(monto) || 0;
@@ -1912,24 +1912,24 @@ async function eliminarOperacionIndiv(item, tipo, telefono){
         }
         del = applyIdNegocioFilter(del);
         const { error } = await del;
-        if (error){ await showErrorToast('No se pudo eliminar el registro: ' + error.message); return false; }
+        if (error) { await showErrorToast('No se pudo eliminar el registro: ' + error.message); return false; }
         return true;
-    }catch(err){
+    } catch (err) {
         console.error('Eliminar operacion indiv error', err);
         await showErrorToast('Error eliminando el registro');
         return false;
     }
 }
 
-async function confirmarYEliminarOperacionDesdeDrawer(){
+async function confirmarYEliminarOperacionDesdeDrawer() {
     const els = ensureOperacionDetalleDrawer();
     const item = els.currentItem;
     const tipo = els.currentTipo;
-    if (!item || !tipo){
+    if (!item || !tipo) {
         await showErrorToast('No hay operación seleccionada.');
         return;
     }
-    if (!currentClienteTelefono){
+    if (!currentClienteTelefono) {
         await showErrorToast('No hay cliente seleccionado.');
         return;
     }
@@ -1940,7 +1940,7 @@ async function confirmarYEliminarOperacionDesdeDrawer(){
     const titulo = (tipo === 'deudas') ? 'Eliminar deuda' : 'Eliminar pago';
 
     let shouldAdjustDeuda = false;
-    if (tipo === 'deudas'){
+    if (tipo === 'deudas') {
         const res = await openConfirmSheetWithOption({
             title: titulo,
             subtitle: 'Este registro es solo archivo.',
@@ -1966,25 +1966,25 @@ async function confirmarYEliminarOperacionDesdeDrawer(){
     const ok = await eliminarOperacionIndiv(item, tipo, currentClienteTelefono);
     if (!ok) return;
 
-    if (tipo === 'deudas' && shouldAdjustDeuda){
+    if (tipo === 'deudas' && shouldAdjustDeuda) {
         await ajustarDeudaActivaCliente(currentClienteTelefono, -monto);
         // Recargar la interfaz de clientes para reflejar la nueva Deuda_Activa
-        try{
+        try {
             window.location.reload();
-        }catch(e){
+        } catch (e) {
             console.warn('No se pudo recargar la lista de clientes:', e);
         }
     }
 
     // refrescar panel
-    try{
+    try {
         const formatter2 = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
         const totalPagado = await calcularMontoTotalPagado(currentClienteTelefono);
         const elPagado = document.getElementById('montototalPagado');
         if (elPagado) elPagado.innerHTML = formatter2.format(totalPagado);
         // deuda activa viene de Clientes; no se toca
         await mostrarOperacionesCliente(currentClienteOpView);
-    }catch(e){
+    } catch (e) {
         console.warn('Refresco post-eliminar falló', e);
     }
 
@@ -1993,7 +1993,7 @@ async function confirmarYEliminarOperacionDesdeDrawer(){
 }
 
 // Mostrar detalles del cliente en un modal que replica la UI/funcionalidad del div de detalles
-async function mostrarDetallesClienteModal(cliente){
+async function mostrarDetallesClienteModal(cliente) {
     if (!cliente) return;
     const nombre = cliente.Nombre ?? cliente.nombre ?? '';
     const telefono = normalizePhone(cliente.Telefono ?? cliente.telefono ?? '');
@@ -2063,8 +2063,8 @@ async function mostrarDetallesClienteModal(cliente){
     const formatter = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
     let modalView = 'deudas';
 
-    async function updateTotals(){
-        try{
+    async function updateTotals() {
+        try {
             let q = supabase
                 .from('Clientes')
                 .select('Deuda_Activa')
@@ -2077,7 +2077,7 @@ async function mostrarDetallesClienteModal(cliente){
                 cliente.Deuda_Activa = adeudado;
             }
             if (elTotalAdeudado) elTotalAdeudado.textContent = formatter.format(adeudado);
-        }catch(err){
+        } catch (err) {
             console.error('updateTotals error', err);
         }
     }
@@ -2098,7 +2098,7 @@ async function mostrarDetallesClienteModal(cliente){
             cancelText: 'Cancelar',
             validate: (val) => {
                 if (val === null || val === undefined || String(val).trim() === '') return 'Ingresa un monto';
-                const normalizado = String(val).replace(/[^0-9,\.]/g,'').replace(',', '.');
+                const normalizado = String(val).replace(/[^0-9,\.]/g, '').replace(',', '.');
                 const num = parseFloat(normalizado);
                 if (Number.isNaN(num) || num < 0) return 'Monto inválido';
                 if (num > 1_000_000_000) return 'Monto demasiado grande';
@@ -2106,7 +2106,7 @@ async function mostrarDetallesClienteModal(cliente){
             }
         });
         if (nuevoStr === null) return; // cancelado
-        const normalizado = String(nuevoStr).replace(/[^0-9,\.]/g,'').replace(',', '.');
+        const normalizado = String(nuevoStr).replace(/[^0-9,\.]/g, '').replace(',', '.');
         const nuevo = parseFloat(normalizado);
         if (isNaN(nuevo)) return;
         try {
@@ -2116,14 +2116,14 @@ async function mostrarDetallesClienteModal(cliente){
                 .eq('Telefono', telefono);
             upd = applyIdNegocioFilter(upd);
             const { error: updErr } = await upd;
-            if (updErr){
+            if (updErr) {
                 await showErrorToast('Error al actualizar deuda: ' + updErr.message);
                 return;
             }
             cliente.Deuda_Activa = nuevo;
             if (elTotalAdeudado) elTotalAdeudado.textContent = formatter.format(nuevo);
             await showSuccessToast('Deuda actualizada');
-        }catch(err){
+        } catch (err) {
             console.error('Error actualizando deuda activa', err);
             await showErrorToast('Error inesperado al actualizar');
         }
@@ -2134,7 +2134,7 @@ async function mostrarDetallesClienteModal(cliente){
         elTotalAdeudado.title = 'Click para editar Deuda Activa';
     }
 
-    async function loadOps(view){
+    async function loadOps(view) {
         if (!listaCont) return;
         listaCont.textContent = 'Cargando...';
         try {
@@ -2144,18 +2144,18 @@ async function mostrarDetallesClienteModal(cliente){
                 .eq('Telefono_cliente', telefono);
             q = applyIdNegocioFilter(q);
             const { data, error } = await q.order('Creado', { ascending: false });
-            if (error){
+            if (error) {
                 listaCont.textContent = 'Error al cargar.';
                 return;
             }
             const items = data || [];
             listaCont.innerHTML = '';
             const formatterLocal = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
-            if (items.length === 0){
+            if (items.length === 0) {
                 listaCont.textContent = 'No hay registros.';
                 return;
             }
-            items.slice(0,200).forEach(item => { // hard cap para no congelar UI
+            items.slice(0, 200).forEach(item => { // hard cap para no congelar UI
                 const fecha = formatDate(item.Creado || item.fecha || item.creado || '');
                 const monto = Number(item.Monto ?? item.monto ?? 0) || 0;
                 const card = document.createElement('div');
@@ -2163,16 +2163,16 @@ async function mostrarDetallesClienteModal(cliente){
                 card.tabIndex = 0;
                 card.innerHTML = `<div class="op-row">
                     <div>
-                        <div class="op-kind ${view==='deudas' ? 'neg' : 'pos'}">${view==='deudas' ? 'Deuda' : 'Pago'}</div>
+                        <div class="op-kind ${view === 'deudas' ? 'neg' : 'pos'}">${view === 'deudas' ? 'Deuda' : 'Pago'}</div>
                         <div class="op-date">${escapeHtml(String(fecha))}</div>
                     </div>
                     <div class="op-monto">${formatterLocal.format(monto)}</div>
                 </div>`;
                 card.addEventListener('click', () => showOperacionDetalleCliente(item, view));
-                card.addEventListener('keypress', (e)=>{ if(e.key==='Enter') showOperacionDetalleCliente(item, view); });
+                card.addEventListener('keypress', (e) => { if (e.key === 'Enter') showOperacionDetalleCliente(item, view); });
 
                 // Acciones individuales (solo para deudas): eliminar y WhatsApp
-                if (view === 'deudas'){
+                if (view === 'deudas') {
                     const actions = document.createElement('div');
                     actions.className = 'op-actions';
                     actions.style.cssText = 'display:flex; gap:8px; justify-content:flex-end; margin-top:6px;';
@@ -2194,8 +2194,8 @@ async function mostrarDetallesClienteModal(cliente){
                         });
                         if (!res.confirmed) return;
                         const ok = await eliminarDeudaIndiv(item, telefono);
-                        if (ok){
-                            if (res.option){
+                        if (ok) {
+                            if (res.option) {
                                 await ajustarDeudaActivaCliente(telefono, -monto);
                             }
                             await updateTotals();
@@ -2220,28 +2220,26 @@ async function mostrarDetallesClienteModal(cliente){
                 }
                 listaCont.appendChild(card);
             });
-            if (items.length > 200){
+            if (items.length > 200) {
                 const more = document.createElement('div');
                 more.className = 'more-indicator';
                 more.textContent = `Mostrando 200 de ${items.length} registros (filtra para ver menos)`;
                 listaCont.appendChild(more);
             }
-        } catch(err){
+        } catch (err) {
             console.error(err);
             listaCont.textContent = 'Error al cargar.';
         }
     }
 
-    function setActiveTabs(){
-        btnDeudas?.classList.toggle('active', modalView==='deudas');
-        btnPagos?.classList.toggle('active', modalView==='pagos');
+    function setActiveTabs() {
+        btnDeudas?.classList.toggle('active', modalView === 'deudas');
+        btnPagos?.classList.toggle('active', modalView === 'pagos');
     }
 
     // Eventos
     btnWhats?.addEventListener('click', () => {
-        const mensaje = `Hola ${currentClienteNombre}, tu deuda total es de ${elTotalAdeudado ? elTotalAdeudado.textContent : ''}.`;
-        const url = `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`;
-        window.open(url, '_blank');
+        openWhatsAppMenu();
     });
     btnRefrescar?.addEventListener('click', async () => { await updateTotals(); await loadOps(modalView); });
     btnDeudas?.addEventListener('click', async () => { modalView = 'deudas'; setActiveTabs(); await loadOps(modalView); });
@@ -2252,31 +2250,31 @@ async function mostrarDetallesClienteModal(cliente){
         let totalMonto = 0;
         let count = 0;
         let countKnown = false;
-        try{
+        try {
             let q = supabase
                 .from('Deudas')
                 .select('Monto')
                 .eq('Telefono_cliente', telefono);
             q = applyIdNegocioFilter(q);
             const { data, error } = await q;
-            if (!error){
+            if (!error) {
                 const arr = data || [];
                 count = arr.length;
                 totalMonto = arr.reduce((acc, d) => acc + (Number(d?.Monto) || 0), 0);
                 countKnown = true;
             }
-        }catch(e){
+        } catch (e) {
             // best-effort; si falla, igual permitimos borrar
             console.warn('No se pudo calcular el total de deudas para ajustar Deuda Activa', e);
         }
 
-        if (countKnown && count === 0){
+        if (countKnown && count === 0) {
             await showinfo('Sin deudas', 'No hay deudas para eliminar.');
             return;
         }
 
         let shouldAdjust = false;
-        if (countKnown){
+        if (countKnown) {
             const formatter = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
             const res = await openConfirmSheetWithOption({
                 title: 'Eliminar todas las deudas',
@@ -2301,8 +2299,8 @@ async function mostrarDetallesClienteModal(cliente){
         }
 
         const ok = await eliminarDeudasCliente(telefono);
-        if (ok){
-            if (shouldAdjust){
+        if (ok) {
+            if (shouldAdjust) {
                 await ajustarDeudaActivaCliente(telefono, -totalMonto);
             }
             await updateTotals();
@@ -2311,10 +2309,10 @@ async function mostrarDetallesClienteModal(cliente){
         }
     });
     btnClose?.addEventListener('click', closeModalCliente);
-    overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeModalCliente(); });
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModalCliente(); });
     document.addEventListener('keydown', escListenerOnce);
 
-    async function init(){
+    async function init() {
         setActiveTabs();
         await updateTotals();
         await loadOps(modalView);
@@ -2322,21 +2320,21 @@ async function mostrarDetallesClienteModal(cliente){
     init();
 }
 
-function escListenerOnce(e){
-    if (e.key === 'Escape'){
+function escListenerOnce(e) {
+    if (e.key === 'Escape') {
         closeModalCliente();
     }
 }
 
-function closeModalCliente(){
+function closeModalCliente() {
     const overlay = document.getElementById('clienteModalOverlay');
-    if (overlay){
+    if (overlay) {
         overlay.remove();
     }
     document.removeEventListener('keydown', escListenerOnce);
 }
 
-function ensureClienteModalStyles(){
+function ensureClienteModalStyles() {
     if (document.getElementById('clienteModalStyles')) return;
     const style = document.createElement('style');
     style.id = 'clienteModalStyles';
@@ -2379,7 +2377,7 @@ function ensureClienteModalStyles(){
 
 
 // Refrescar operaciones y totales del cliente visible
-async function refrescarOperacionesCliente(){
+async function refrescarOperacionesCliente() {
     if (!currentClienteTelefono) return;
     await mostrarOperacionesCliente(currentClienteOpView);
     const formatter = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
@@ -2392,10 +2390,10 @@ async function refrescarOperacionesCliente(){
 }
 
 // Cerrar contenedor de detalles del cliente
-function cerrarDetallesCliente(){
+function cerrarDetallesCliente() {
     // Si estamos editando, el botón de cerrar debe cerrar SOLO la edición
     // (volver a la vista de detalle) sin perder el cliente seleccionado.
-    if (isEditingCliente){
+    if (isEditingCliente) {
         setClienteEditMode(false);
         return;
     }
@@ -2431,33 +2429,33 @@ window.addEventListener('resize', () => {
 
 // Wire UI actions
 const btnEditarCliente = document.getElementById('btn_editar_cliente');
-if (btnEditarCliente){
+if (btnEditarCliente) {
     btnEditarCliente.addEventListener('click', editarClienteActual);
 }
 
 const btnStatsCliente = document.getElementById('btn_stats_cliente');
-if (btnStatsCliente){
+if (btnStatsCliente) {
     btnStatsCliente.addEventListener('click', abrirEstadisticasCliente);
 }
 
 const btnBorrarCliente = document.getElementById('btn_borrar_cliente');
-if (btnBorrarCliente){
+if (btnBorrarCliente) {
     btnBorrarCliente.addEventListener('click', borrarClienteActual);
 }
 
 const btnGuardarCliente = document.getElementById('btn_guardar_cliente');
-if (btnGuardarCliente){
+if (btnGuardarCliente) {
     btnGuardarCliente.addEventListener('click', guardarEdicionCliente);
 }
 
 const btnCancelarEdicion = document.getElementById('btn_cancelar_edicion');
-if (btnCancelarEdicion){
+if (btnCancelarEdicion) {
     btnCancelarEdicion.addEventListener('click', cancelarEdicionCliente);
 }
 
 document.getElementById('buscarClienteInput').addEventListener('input', async (e) => {
     const query = (e.target.value || '').trim();
-    if (query.length === 0){
+    if (query.length === 0) {
         await verTodosClientes();
         return;
     }
@@ -2482,7 +2480,7 @@ document.getElementById('buscarClienteInput').addEventListener('input', async (e
         .limit(50);
     q = applyIdNegocioFilter(q);
     const { data, error } = await q;
-    if (error){
+    if (error) {
         showErrorToast('Error al obtener los clientes: ' + error.message);
         return;
     }
@@ -2529,41 +2527,225 @@ document.getElementById('buscarClienteInput').addEventListener('input', async (e
     }
 })();
 
-function enviarDeudaTotal(){
+// WhatsApp Menu Functions
+function openWhatsAppMenu() {
     if (!currentClienteTelefono || !currentClienteNombre) {
-        showErrorToast('No hay cliente seleccionado.');
+        showErrorToast('Selecciona un cliente primero.');
         return;
     }
-    const deudaTot = calcularMontoTotalAdeudado(currentClienteTelefono);
-    deudaTot.then((monto) => {
-        if (monto <= 0) {
-            showErrorToast('El cliente no tiene deudas pendientes.');
+    const modal = document.getElementById('modalWhatsApp');
+    if (modal) {
+        if (modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+        }
+
+        const openIt = () => {
+            modal.style.display = 'flex';
+            selectWaMessageType('resumen');
+            selectWaDateRange('all');
+            document.getElementById('waCustomDates').style.display = 'none';
+            document.getElementById('waDateStart').value = '';
+            document.getElementById('waDateEnd').value = '';
+        };
+
+        if (document.startViewTransition) {
+            document.startViewTransition(() => openIt());
+        } else {
+            openIt();
+        }
+    }
+}
+window.openWhatsAppMenu = openWhatsAppMenu;
+
+function closeWhatsAppMenu() {
+    const modal = document.getElementById('modalWhatsApp');
+    if (modal) {
+        if (document.startViewTransition) {
+            document.startViewTransition(() => { modal.style.display = 'none'; });
+        } else {
+            modal.style.display = 'none';
+        }
+    }
+}
+window.closeWhatsAppMenu = closeWhatsAppMenu;
+
+function toggleWaCustomDates() {
+    const range = document.getElementById('waDateRange').value;
+    const customDiv = document.getElementById('waCustomDates');
+    if (range === 'custom') {
+        customDiv.style.display = 'flex';
+    } else {
+        customDiv.style.display = 'none';
+    }
+}
+window.toggleWaCustomDates = toggleWaCustomDates;
+
+function selectWaMessageType(type) {
+    document.getElementById('waMessageType').value = type;
+    const container = document.getElementById('waMessageTypeContainer');
+    if (container) {
+        container.querySelectorAll('button').forEach(btn => {
+            if (btn.getAttribute('onclick').includes(`'${type}'`)) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
+    // Ocultar selector de fechas si es Deuda Actual (resumen)
+    const dateGroup = document.getElementById('waDateRangeGroup');
+    if (dateGroup) {
+        dateGroup.style.display = type === 'resumen' ? 'none' : 'block';
+    }
+}
+window.selectWaMessageType = selectWaMessageType;
+
+function selectWaDateRange(range) {
+    document.getElementById('waDateRange').value = range;
+    const container = document.getElementById('waDateRangeContainer');
+    if (container) {
+        container.querySelectorAll('button').forEach(btn => {
+            if (btn.getAttribute('onclick').includes(`'${range}'`)) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+    toggleWaCustomDates();
+}
+window.selectWaDateRange = selectWaDateRange;
+
+async function sendWhatsAppMessage() {
+    if (!currentClienteTelefono || !currentClienteNombre) {
+        showErrorToast('No hay cliente seleccionado.');
+        closeWhatsAppMenu();
+        return;
+    }
+
+    const msgType = document.getElementById('waMessageType').value;
+    const dateRange = document.getElementById('waDateRange').value;
+    let startDate = null;
+    let endDate = null;
+
+    const now = new Date();
+
+    if (dateRange === 'mes_actual') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    } else if (dateRange === 'mes_anterior') {
+        startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        endDate = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+    } else if (dateRange === 'custom') {
+        const d1 = document.getElementById('waDateStart').value;
+        const d2 = document.getElementById('waDateEnd').value;
+        if (d1 && d2) {
+            startDate = new Date(d1 + 'T00:00:00');
+            endDate = new Date(d2 + 'T23:59:59');
+            if (startDate > endDate) {
+                showErrorToast('La fecha de inicio debe ser menor o igual a la de fin.');
+                return;
+            }
+        } else {
+            showErrorToast('Selecciona ambas fechas.');
             return;
         }
-        const numero = normalizePhone(currentClienteTelefono);
-        const mensaje = `Hola ${currentClienteNombre}, tu deuda total es de ${monto}.`;
-        const mensajeCodificado = encodeURIComponent(mensaje);
-        const urlWhatsApp = `https://wa.me/${numero}?text=${mensajeCodificado}`;
-        window.open(urlWhatsApp, '_blank'); 
-    });
+    }
+
+    const formatDate = (date) => date ? date.toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
+    const formatCurrency = (val) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(val);
+
+    // Fetch data asynchronously
+    let deudasCliente = [];
+    let pagosCliente = [];
+    try {
+        const dRes = await fetchOperacionesClienteByTipo('deudas', currentClienteTelefono, false);
+        const pRes = await fetchOperacionesClienteByTipo('pagos', currentClienteTelefono, false);
+        if (dRes && dRes.data) deudasCliente = dRes.data;
+        if (pRes && pRes.data) pagosCliente = pRes.data;
+    } catch (err) {
+        console.error("Error al obtener operaciones para WhatsApp:", err);
+    }
+
+    let filteredDeudas = deudasCliente;
+    let filteredPagos = pagosCliente;
+
+    if (startDate && endDate) {
+        filteredDeudas = deudasCliente.filter(d => {
+            const fd = new Date(d.Creado || d.created_at || d.fecha);
+            return fd >= startDate && fd <= endDate;
+        });
+        filteredPagos = pagosCliente.filter(p => {
+            const fd = new Date(p.Creado || p.created_at || p.fecha);
+            return fd >= startDate && fd <= endDate;
+        });
+    }
+
+    let mensaje = `Hola ${currentClienteNombre}, te compartimos el estado de cuenta.\n\n`;
+
+    if (msgType !== 'resumen' && startDate && endDate) {
+        mensaje += `Periodo: ${formatDate(startDate)} al ${formatDate(endDate)}\n\n`;
+    }
+
+    if (msgType === 'resumen') {
+        const activeDebt = await calcularMontoTotalAdeudado(currentClienteTelefono);
+        mensaje += `Estado de Deuda Actual\n`;
+        mensaje += `Total Adeudado: ${formatCurrency(activeDebt)}\n`;
+    } else if (msgType === 'deudas') {
+        mensaje += `Registros de Deudas\n`;
+        if (filteredDeudas.length === 0) {
+            mensaje += `No hay deudas registradas en este periodo.\n`;
+        } else {
+            let total = 0;
+            filteredDeudas.sort((a, b) => new Date(a.Creado || a.created_at) - new Date(b.Creado || b.created_at)).forEach(d => {
+                const monto = Number(d.Monto || d.monto) || 0;
+                total += monto;
+                mensaje += `- ${formatDate(new Date(d.Creado || d.created_at))}: ${formatCurrency(monto)}\n`;
+            });
+            mensaje += `\nTotal de cargos: ${formatCurrency(total)}\n`;
+        }
+    } else if (msgType === 'pagos') {
+        mensaje += `Registros de Pagos\n`;
+        if (filteredPagos.length === 0) {
+            mensaje += `No hay pagos registrados en este periodo.\n`;
+        } else {
+            let total = 0;
+            filteredPagos.sort((a, b) => new Date(a.Creado || a.created_at) - new Date(b.Creado || b.created_at)).forEach(p => {
+                const monto = Number(p.Monto || p.monto) || 0;
+                total += monto;
+                mensaje += `- ${formatDate(new Date(p.Creado || p.created_at))}: ${formatCurrency(monto)}\n`;
+            });
+            mensaje += `\nTotal pagado: ${formatCurrency(total)}\n`;
+        }
+    }
+
+    mensaje += `\nGracias por confiar en nosotros.`;
+
+    const numero = normalizePhone(currentClienteTelefono);
+    const mensajeCodificado = encodeURIComponent(mensaje);
+    const urlWhatsApp = `https://wa.me/${numero}?text=${mensajeCodificado}`;
+    window.open(urlWhatsApp, '_blank');
+
+    closeWhatsAppMenu();
 }
-window.enviarDeudaTotal = enviarDeudaTotal
+window.sendWhatsAppMessage = sendWhatsAppMessage;
 
 // Eliminar una deuda individual
-async function eliminarDeudaIndiv(item, telefono){
-    try{
+async function eliminarDeudaIndiv(item, telefono) {
+    try {
         // Detectar llave primaria probable
-        const idKeys = ['id_deuda','idDeuda','id','ID','Id'];
+        const idKeys = ['id_deuda', 'idDeuda', 'id', 'ID', 'Id'];
         let usedKey = null; let idVal = null;
-        for (const k of idKeys){
-            if (item && item[k] !== undefined && item[k] !== null){ usedKey = k; idVal = item[k]; break; }
+        for (const k of idKeys) {
+            if (item && item[k] !== undefined && item[k] !== null) { usedKey = k; idVal = item[k]; break; }
         }
         let del = supabase.from('Deudas').delete();
-        if (usedKey){
+        if (usedKey) {
             del = del.eq(usedKey, idVal);
         } else {
             // Fallback: usar coincidencia por teléfono + monto + fecha si existen
-            const matchObj = { };
+            const matchObj = {};
             if (telefono) matchObj['Telefono_cliente'] = telefono;
             const monto = (item.Monto ?? item.monto);
             if (monto !== undefined) matchObj['Monto'] = Number(monto) || 0;
@@ -2573,9 +2755,9 @@ async function eliminarDeudaIndiv(item, telefono){
         }
         del = applyIdNegocioFilter(del);
         const { error } = await del;
-        if (error){ await showErrorToast('No se pudo eliminar la deuda: ' + error.message); return false; }
+        if (error) { await showErrorToast('No se pudo eliminar la deuda: ' + error.message); return false; }
         return true;
-    }catch(err){
+    } catch (err) {
         console.error('Eliminar deuda indiv error', err);
         await showErrorToast('Error eliminando la deuda');
         return false;
@@ -2583,25 +2765,25 @@ async function eliminarDeudaIndiv(item, telefono){
 }
 
 // Eliminar todas las deudas del cliente (sin borrar al cliente)
-async function eliminarDeudasCliente(telefono){
-    try{
+async function eliminarDeudasCliente(telefono) {
+    try {
         const tel = normalizePhone(telefono || currentClienteTelefono || '');
-        if (!tel){ await showErrorToast('Teléfono inválido'); return false; }
+        if (!tel) { await showErrorToast('Teléfono inválido'); return false; }
         let del = supabase
             .from('Deudas')
             .delete()
             .eq('Telefono_cliente', tel);
         del = applyIdNegocioFilter(del);
         const { error } = await del;
-        if (error){ await showErrorToast('No se pudieron eliminar las deudas: ' + error.message); return false; }
+        if (error) { await showErrorToast('No se pudieron eliminar las deudas: ' + error.message); return false; }
         return true;
-    }catch(err){
+    } catch (err) {
         console.error('Eliminar todas deudas error', err);
         await showErrorToast('Error eliminando deudas');
         return false;
     }
 }
-window.cerrarSesion=function() {
+window.cerrarSesion = function () {
     localStorage.clear();
     window.location.href = "/index.html";
 }

@@ -27,13 +27,14 @@ function ensureSupabase() {
     return supabase_promise;
 }
 export async function loadSupabase() {
+    if (window.__supabaseClient__) return window.__supabaseClient__;
     const supabaseClientModule = await ensureSupabase();
 
     const supabaseUrl = 'https://mypinjltofzmlscantol.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15cGluamx0b2Z6bWxzY2FudG9sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTg5MzIsImV4cCI6MjA3Nzc3NDkzMn0.uCuim1q0Id86pBR0BIj2IwBcQyd4TznT5G6n727kVtw';
 
     const client = supabaseClientModule.createClient(supabaseUrl, supabaseKey); 
-    
+    window.__supabaseClient__ = client;
     return client;
 }
 export async function loadSupaBseWithAuth() {

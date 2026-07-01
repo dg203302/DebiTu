@@ -91,6 +91,13 @@
 	margin: 6px 0 0;
 }
 
+.stats-report__actions {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 8px;
+}
+
 .stats-status {
 	min-width: 160px;
 	padding: 10px 14px;
@@ -100,6 +107,29 @@
 	color: var(--text-secondary);
 	font-size: 0.85rem;
 	text-align: center;
+}
+
+@media (max-width: 480px) {
+    .stats-report__header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .stats-report__actions {
+        width: 100%;
+        align-items: center;
+        margin-top: 10px;
+    }
+    
+    .stats-report__actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .stats-status {
+        width: 100%;
+    }
 }
 
 .stats-metrics {
