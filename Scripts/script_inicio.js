@@ -1,18 +1,18 @@
-import {loadSupabase} from './supabase.js'
-import { ensureCmsSheet, openCmsSheet, closeCmsSheet, attachSheetDragHandler, showErrorToast, showSuccessToast, showInfoSheet, confirmSheet } from './cmsSheet.js';
+import { loadSupabase } from './supabase.js'
+import { ensureCmsSheet, openCmsSheet, closeCmsSheet, showErrorToast, showSuccessToast, showInfoSheet, confirmSheet } from './cmsSheet.js';
 
-function isTouchDevice(){
-    try{
+function isTouchDevice() {
+    try {
         return ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints && navigator.msMaxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer:coarse)').matches);
-    }catch(e){ return false; }
+    } catch (e) { return false; }
 }
-const client= await loadSupabase();
+const client = await loadSupabase();
 let currentOpView = 'deudas'; // 'deudas' | 'pagos'
 let isExpanded = false; // controls whether list shows all items or limited
 let operacionIngresoInit = false;
 // Bottom-sheet functionality moved to Scripts/cmsSheet.js
 
-function restoreOperacionIngresoFromSheet(){
+function restoreOperacionIngresoFromSheet() {
     const section = document.getElementById('Operacion-ingreso');
     if (!section) return;
 
@@ -20,7 +20,7 @@ function restoreOperacionIngresoFromSheet(){
         if (section._originalParent) {
             section._originalParent.insertBefore(section, section._originalNext);
         }
-    } catch (e) {}
+    } catch (e) { }
 
     section.hidden = true;
 
@@ -37,46 +37,50 @@ function restoreOperacionIngresoFromSheet(){
 // Regla:
 // - localStorage.UserID === 'N/A'  => filtrar/guardar ID_Negocio = NULL
 // - caso normal                   => filtrar/guardar ID_Negocio = <UserID>
-function getLocalUserId(){
+function getLocalUserId() {
     const raw = localStorage.getItem('UserID');
     if (raw === undefined || raw === null) return null;
     const v = String(raw).trim();
     return v ? v : null;
 }
 
-function getIdNegocioForWrite(){
+function getIdNegocioForWrite() {
     const userId = getLocalUserId();
     if (!userId) return undefined; // sesión ausente
     if (userId === 'N/A') return null; // caso especial
     return userId;
 }
 
-function applyIdNegocioFilter(query){
+function applyIdNegocioFilter(query) {
     const userId = getLocalUserId();
     if (userId === 'N/A') return query.is('ID_Negocio', null);
     if (!userId) return query.eq('ID_Negocio', '__MISSING_USERID__');
     return query.eq('ID_Negocio', userId);
 }
 
-window.onload = async function() {
-    /*if (!localStorage.getItem('UserID')) {
-        window.location.href = '/index.html';
-    }*/
-    const titulo = document.getElementById("header_titulo");
-    if (titulo) titulo.textContent = textoB();
-    const pfp = document.getElementById("pfp");
-    if (pfp) pfp.src = localStorage.getItem("UserPhoto") || '';
-    await cargarMontoAdeudadoMensual();
-    prepararOperacionIngreso();
-    prepararTabsOperaciones();
-    await mostrarOperaciones('deudas');
-};
-window.cerrarSesion=function() {
+(async () => {
+    try {
+        const titulo = document.getElementById("header_titulo");
+        if (titulo) titulo.textContent = textoB();
+        const pfp = document.getElementById("pfp");
+        if (pfp) pfp.src = localStorage.getItem("UserPhoto") || '';
+        await cargarMontoAdeudadoMensual();
+        prepararOperacionIngreso();
+        prepararTabsOperaciones();
+        await mostrarOperaciones('deudas');
+    } catch (err) {
+        console.error('Error al inicializar Inicio:', err);
+    } finally {
+        const loader = document.getElementById('global-loader');
+        if (loader) loader.classList.add('hidden');
+    }
+})();
+window.cerrarSesion = function () {
     localStorage.clear();
     window.location.href = "/index.html";
 }
 // Toggle expand/collapse of operations list. Bound to the Expandir button in HTML.
-window.expandirTabla = function(){
+window.expandirTabla = function () {
     isExpanded = !isExpanded;
     // update button label (keep icon)
     const btn = document.getElementById('btn_expandir_ops') || document.querySelector('button[onclick="expandirTabla()"]');
@@ -96,7 +100,7 @@ window.expandirTabla = function(){
 
 // Función invocada desde el enlace "Realizar Operación" en el HTML.
 // Ahora solo oculta/muestra la sección embebida #Operacion-ingreso.
-window.realizarOperacion = function(e){
+window.realizarOperacion = function (e) {
     if (e && typeof e.preventDefault === 'function') e.preventDefault();
     const section = document.getElementById('Operacion-ingreso');
     if (!section) return;
@@ -117,7 +121,7 @@ window.realizarOperacion = function(e){
     const content = els.content;
 
     // Si la sección ya está dentro del sheet, cerrar
-    if (content.contains(section) && document.body.classList.contains('cms-sheet-open')){
+    if (content.contains(section) && document.body.classList.contains('cms-sheet-open')) {
         closeCmsSheet('close');
         return;
     }
@@ -129,10 +133,10 @@ window.realizarOperacion = function(e){
     content.innerHTML = '';
     content.appendChild(section);
     // Al mostrarse dentro del sheet, cerrar por defecto la calculadora (details)
-    try{
+    try {
         const calcShell = section.querySelector && section.querySelector('#op_calc_shell');
         if (calcShell && typeof calcShell.open !== 'undefined') calcShell.open = false;
-    }catch(_){ }
+    } catch (_) { }
     section.hidden = false;
 
     // Actualizar botón visual (aria-expanded)
@@ -142,7 +146,7 @@ window.realizarOperacion = function(e){
     // Inicializar comportamientos del formulario
     prepararOperacionIngreso();
     const input = document.getElementById('op_clientSearch');
-    if (input) setTimeout(() => { try{ if (!isTouchDevice()) input.focus(); }catch(_){} }, 0);
+    if (input) setTimeout(() => { try { if (!isTouchDevice()) input.focus(); } catch (_) { } }, 0);
 
     // Al cerrar el sheet, restaurar la sección a su posición original y ocultarla
     s.closed.then(() => {
@@ -155,7 +159,7 @@ window.realizarOperacion = function(e){
     });
 }
 
-function prepararOperacionIngreso(){
+function prepararOperacionIngreso() {
     if (operacionIngresoInit) return;
     const section = document.getElementById('Operacion-ingreso');
     if (!section) return;
@@ -177,11 +181,11 @@ function prepararOperacionIngreso(){
 
     const calcShell = document.getElementById('op_calc_shell');
 
-    async function closeOperacionSheetIfOpen(){
+    async function closeOperacionSheetIfOpen() {
         const sheet = section._operationSheet;
         if (!sheet) return;
-        try{ sheet.close('submit'); }catch(_){ }
-        try{ await sheet.closed; }catch(_){ }
+        try { sheet.close('submit'); } catch (_) { }
+        try { await sheet.closed; } catch (_) { }
     }
 
     if (!input || !matches || !catInput || !totalAmount || !totalAmountValue || !amount || !chkPago || !chkDeuda || !btnRegistrar || !calc || !eq || !clear || !back) {
@@ -194,11 +198,11 @@ function prepararOperacionIngreso(){
     // --- Búsqueda de clientes ---
     let debounceTimer = null;
 
-    async function loadMatches(term){
+    async function loadMatches(term) {
         matches.innerHTML = '';
         matches.selectedClient = null;
         if (!term) return;
-        try{
+        try {
             const orQuery = `Nombre.ilike.%${term}%,Telefono.ilike.%${term}%`;
             let q = client
                 .from('Clientes')
@@ -229,7 +233,7 @@ function prepararOperacionIngreso(){
                 });
                 matches.appendChild(div);
             });
-        }catch(err){
+        } catch (err) {
             console.error('Busqueda clientes error', err);
             matches.innerHTML = '<div class="muted">Error de búsqueda</div>';
         }
@@ -249,19 +253,19 @@ function prepararOperacionIngreso(){
     let showingResult = false; // si el display muestra "... = ..."
     let syncingFromCode = false;
 
-    function parseNumberInput(s){
+    function parseNumberInput(s) {
         const v = String(s ?? '').trim().replace(/\s+/g, '').replace(/,/g, '.');
         const n = parseFloat(v);
         return Number.isFinite(n) ? n : NaN;
     }
 
-    function toDisplayExpr(normalized){
+    function toDisplayExpr(normalized) {
         return String(normalized)
             .replace(/\*/g, '×')
             .replace(/\//g, '÷');
     }
 
-    function fromDisplayExpr(display){
+    function fromDisplayExpr(display) {
         return String(display)
             .replace(/×/g, '*')
             .replace(/÷/g, '/')
@@ -269,15 +273,15 @@ function prepararOperacionIngreso(){
             .replace(/\s+/g, '');
     }
 
-    function isOperatorChar(ch){
+    function isOperatorChar(ch) {
         return ch === '+' || ch === '-' || ch === '*' || ch === '/';
     }
 
-    function roundMoney(n){
+    function roundMoney(n) {
         return parseFloat(Number(n).toFixed(2));
     }
 
-    function formatMoney(n){
+    function formatMoney(n) {
         if (!Number.isFinite(n)) return 'Error';
         const s = roundMoney(n).toFixed(2);
         if (s.endsWith('.00')) return s.slice(0, -3);
@@ -285,32 +289,32 @@ function prepararOperacionIngreso(){
         return s;
     }
 
-    function formatAmountForInput(n){
+    function formatAmountForInput(n) {
         if (!Number.isFinite(n)) return '0.00';
         return roundMoney(n).toFixed(2);
     }
 
-    function setDisplay(displayText){
+    function setDisplay(displayText) {
         syncingFromCode = true;
         amount.value = displayText;
         amount.placeholder = '';
         syncingFromCode = false;
     }
 
-    function setTotalAmount(n){
+    function setTotalAmount(n) {
         const safe = Number.isFinite(n) ? roundMoney(n) : 0;
         totalAmountValue.value = String(safe);
         totalAmount.value = formatAmountForInput(safe);
     }
 
-    function addToTotalAmount(delta){
+    function addToTotalAmount(delta) {
         const current = parseNumberInput(totalAmount.value);
         const base = Number.isFinite(current) ? current : parseNumberInput(totalAmountValue.value);
         const next = (Number.isFinite(base) ? base : 0) + (Number.isFinite(delta) ? delta : 0);
         setTotalAmount(next);
     }
 
-    function setExpr(nextExpr){
+    function setExpr(nextExpr) {
         expr = String(nextExpr || '0');
         if (expr === '' || expr === '-') {
             setDisplay(expr);
@@ -326,13 +330,13 @@ function prepararOperacionIngreso(){
         }
     }
 
-    function sanitizeExpressionRaw(raw){
+    function sanitizeExpressionRaw(raw) {
         const cleaned = fromDisplayExpr(raw)
             .replace(/[^0-9+\-*/.]/g, '');
         return cleaned;
     }
 
-    function tokenizeExpression(normalized){
+    function tokenizeExpression(normalized) {
         const tokens = [];
         const s = String(normalized || '');
         let i = 0;
@@ -365,7 +369,7 @@ function prepararOperacionIngreso(){
                             i++;
                         } else break;
                     }
-                    if (num === '-' || num === '-.' ) return null;
+                    if (num === '-' || num === '-.') return null;
                     tokens.push({ type: 'num', value: parseFloat(num) });
                     continue;
                 }
@@ -379,11 +383,11 @@ function prepararOperacionIngreso(){
         return tokens;
     }
 
-    function precedence(op){
+    function precedence(op) {
         return (op === '*' || op === '/') ? 2 : 1;
     }
 
-    function applyOp(op, a, b){
+    function applyOp(op, a, b) {
         if (!Number.isFinite(a) || !Number.isFinite(b)) return NaN;
         if (op === '+') return a + b;
         if (op === '-') return a - b;
@@ -392,7 +396,7 @@ function prepararOperacionIngreso(){
         return NaN;
     }
 
-    function evaluateExpression(normalized){
+    function evaluateExpression(normalized) {
         const tokens = tokenizeExpression(normalized);
         if (!tokens || tokens.length === 0) return NaN;
         if (tokens[tokens.length - 1].type === 'op') return NaN;
@@ -428,7 +432,7 @@ function prepararOperacionIngreso(){
         return Number.isFinite(r) ? r : NaN;
     }
 
-    function currentNumberHasDot(){
+    function currentNumberHasDot() {
         const s = expr;
         let i = s.length - 1;
         while (i >= 0) {
@@ -440,7 +444,7 @@ function prepararOperacionIngreso(){
         return part.includes('.');
     }
 
-    function handleDigit(d){
+    function handleDigit(d) {
         if (showingResult) {
             expr = '0';
             showingResult = false;
@@ -450,7 +454,7 @@ function prepararOperacionIngreso(){
         setExpr(expr);
     }
 
-    function handleDecimal(){
+    function handleDecimal() {
         if (showingResult) {
             expr = '0';
             showingResult = false;
@@ -467,7 +471,7 @@ function prepararOperacionIngreso(){
         setExpr(expr);
     }
 
-    function handleOperator(op){
+    function handleOperator(op) {
         if (!isOperatorChar(op)) return;
         if (showingResult) {
             showingResult = false;
@@ -498,7 +502,7 @@ function prepararOperacionIngreso(){
         setExpr(expr);
     }
 
-    async function handleEquals(){
+    async function handleEquals() {
         if (!expr || expr === '-' || isOperatorChar(expr.slice(-1))) return;
         const result = evaluateExpression(expr);
         if (!Number.isFinite(result)) {
@@ -514,14 +518,14 @@ function prepararOperacionIngreso(){
         addToTotalAmount(rounded);
     }
 
-    function clearCalculator(){
+    function clearCalculator() {
         expr = '0';
         lastResult = 0;
         showingResult = false;
         setDisplay('0');
     }
 
-    function backspace(){
+    function backspace() {
         if (showingResult) {
             showingResult = false;
             expr = String(roundMoney(lastResult));
@@ -606,7 +610,7 @@ function prepararOperacionIngreso(){
     // --- Registrar operación ---
     btnRegistrar.addEventListener('click', async () => {
         btnRegistrar.disabled = true;
-        try{
+        try {
             const tipo = chkPago.checked ? 'pago' : 'deuda';
             const name = input.value.trim();
             const categoria = catInput.value.trim();
@@ -644,7 +648,7 @@ function prepararOperacionIngreso(){
             };
 
             const idNegocio = getIdNegocioForWrite();
-            if (idNegocio === undefined){
+            if (idNegocio === undefined) {
                 await showErrorToast('No se encontró el ID de usuario (UserID). Iniciá sesión nuevamente.');
                 return;
             }
@@ -652,7 +656,7 @@ function prepararOperacionIngreso(){
 
             const table = tipo === 'deuda' ? 'Deudas' : 'Pagos';
             const { error } = await client.from(table).insert(payload);
-            if (error){
+            if (error) {
                 await showErrorToast('Error al registrar: ' + (error.message || error));
                 return;
             }
@@ -684,7 +688,7 @@ function prepararOperacionIngreso(){
                         .eq('Telefono', phoneValue);
                     upd = applyIdNegocioFilter(upd);
                     const { error: updError } = await upd;
-                    if (updError){
+                    if (updError) {
                         console.error('Error al actualizar deuda del cliente', updError);
                         // Mostrar toast sin bloquear el flujo
                         showSuccessToast('Operación registrada');
@@ -697,8 +701,8 @@ function prepararOperacionIngreso(){
                 showSuccessToast('Operación registrada correctamente');
             }
 
-            try { await recargarMontos(); } catch(e){}
-            try { await recargarTabla(); } catch(e){}
+            try { await recargarMontos(); } catch (e) { }
+            try { await recargarTabla(); } catch (e) { }
 
             // Reset básico del formulario
             input.value = '';
@@ -708,41 +712,41 @@ function prepararOperacionIngreso(){
             chkDeuda.checked = true;
             setTotalAmount(0);
             clearCalculator();
-        }catch(err){
+        } catch (err) {
             console.error(err);
             await showErrorToast('Error al registrar la operación');
-        }finally{
+        } finally {
             btnRegistrar.disabled = false;
         }
     });
 }
-async function cargarPagosRecientes(){
+async function cargarPagosRecientes() {
     const { data, error } = await applyIdNegocioFilter(
         client
             .from('Pagos')
             .select('*')
     ).order('Creado', { ascending: false });
-    if (error){
+    if (error) {
         showErrorToast(error.message);
         return [];
     }
     return data || [];
 }
 
-async function cargarDeudasRecientes(){
+async function cargarDeudasRecientes() {
     const { data, error } = await applyIdNegocioFilter(
         client
             .from('Deudas')
             .select('*')
     ).order('Creado', { ascending: false });
-    if (error){
+    if (error) {
         showErrorToast(error.message);
         return [];
     }
     return data || [];
 }
 
-function prepararTabsOperaciones(){
+function prepararTabsOperaciones() {
     const btnDeudas = document.getElementById('btn_ver_deudas');
     const btnPagos = document.getElementById('btn_ver_pagos');
     if (!btnDeudas || !btnPagos) return;
@@ -759,11 +763,11 @@ function prepararTabsOperaciones(){
     });
 }
 
-function setActiveTab(tipo){
+function setActiveTab(tipo) {
     currentOpView = tipo;
     const btnDeudas = document.getElementById('btn_ver_deudas');
     const btnPagos = document.getElementById('btn_ver_pagos');
-    if (btnDeudas && btnPagos){
+    if (btnDeudas && btnPagos) {
         btnDeudas.classList.toggle('active', tipo === 'deudas');
         btnDeudas.setAttribute('aria-selected', String(tipo === 'deudas'));
         btnPagos.classList.toggle('active', tipo === 'pagos');
@@ -772,23 +776,23 @@ function setActiveTab(tipo){
 
 }
 
-async function mostrarOperaciones(tipo){
+async function mostrarOperaciones(tipo) {
     const cont = document.getElementById('lista_operaciones');
     if (!cont) return;
     cont.textContent = 'Cargando...';
-    try{
+    try {
         const items = tipo === 'deudas' ? await cargarDeudasRecientes() : await cargarPagosRecientes();
         renderListaOperaciones(cont, items, tipo);
-    }catch(err){
+    } catch (err) {
         console.error(err);
         showErrorToast('No se pudieron cargar las operaciones');
         cont.textContent = 'Error al cargar.';
     }
 }
 
-function renderListaOperaciones(container, items, tipo){
+function renderListaOperaciones(container, items, tipo) {
     container.innerHTML = '';
-    if (!items || items.length === 0){
+    if (!items || items.length === 0) {
         const empty = document.createElement('div');
         empty.textContent = 'No hay registros.';
         container.appendChild(empty);
@@ -796,7 +800,7 @@ function renderListaOperaciones(container, items, tipo){
     }
     const formatter = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
     // If not expanded, show up to 4 items. Otherwise show up to 50 (safety cap).
-    const visibleItems = isExpanded ? items.slice(0,50) : items.slice(0,4);
+    const visibleItems = isExpanded ? items.slice(0, 50) : items.slice(0, 4);
     visibleItems.forEach(item => {
         const fechaRaw = item.Creado || item.creado || item.fecha || item.created_at || '';
         const fecha = formatDate(fechaRaw);
@@ -821,7 +825,7 @@ function renderListaOperaciones(container, items, tipo){
         container.appendChild(card);
     });
     // Persistent toggle indicator: show on both states when there are more items
-    if (items.length > 4){
+    if (items.length > 4) {
         const toggle = document.createElement('div');
         toggle.className = 'more-indicator';
         toggle.textContent = isExpanded ? 'Ocultar registros' : `Mostrar ${items.length - 4} registros más`;
@@ -833,24 +837,24 @@ function renderListaOperaciones(container, items, tipo){
     }
 }
 
-function escapeHtml(str){
-    return str.replace(/[&<>"]+/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function escapeHtml(str) {
+    return str.replace(/[&<>"]+/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }
 
-function formatDate(value){
+function formatDate(value) {
     if (!value) return '';
     // Try to parse common date formats
     const d = new Date(value);
-    if (!isNaN(d)){
-        try{
+    if (!isNaN(d)) {
+        try {
             return d.toLocaleString('es-AR', { dateStyle: 'medium', timeStyle: 'short' });
-        }catch(e){
+        } catch (e) {
             return d.toString();
         }
     }
     // If it's a numeric timestamp
     const n = Number(value);
-    if (!Number.isNaN(n)){
+    if (!Number.isNaN(n)) {
         const d2 = new Date(n);
         if (!isNaN(d2)) return d2.toLocaleString('es-AR', { dateStyle: 'medium', timeStyle: 'short' });
     }
@@ -865,11 +869,12 @@ async function showOperacionDetalle(item, tipo) {
 let opdInicioEls = null;
 let opdInicioId = 0;
 
-function ensureOperacionDetalleDrawerInicio(){
+function ensureOperacionDetalleDrawerInicio() {
+    ensureCmsSheet(); // Asegurar que los estilos compartidos (.cms-sheet-top-bar, etc) se inyecten
     if (opdInicioEls) return opdInicioEls;
 
     let backdrop = document.getElementById('opdBackdrop');
-    if (!backdrop){
+    if (!backdrop) {
         backdrop = document.createElement('div');
         backdrop.id = 'opdBackdrop';
         backdrop.className = 'opd-backdrop';
@@ -878,7 +883,7 @@ function ensureOperacionDetalleDrawerInicio(){
     }
 
     let drawer = document.getElementById('opdDrawer');
-    if (!drawer){
+    if (!drawer) {
         drawer = document.createElement('div');
         drawer.id = 'opdDrawer';
         drawer.className = 'opd-drawer';
@@ -887,7 +892,15 @@ function ensureOperacionDetalleDrawerInicio(){
         drawer.setAttribute('aria-label', 'Detalle de operación');
         drawer.style.display = 'none';
         drawer.innerHTML = `
-            <div class="sheet-handle" id="opdHandle" aria-hidden="true"><div class="sheet-handle-bar"></div></div>
+            <div class="cms-sheet-top-bar">
+                <button type="button" class="cms-sheet-close-btn" id="opdCloseTop" aria-label="Cerrar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
+                        <path d="M9 14 4 9l5-5"/>
+                        <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/>
+                    </svg>
+                    <span>Cerrar</span>
+                </button>
+            </div>
             <div class="opd-header">
                 <div class="opd-title">
                     <h3 id="opdTitle">Detalle</h3>
@@ -907,13 +920,9 @@ function ensureOperacionDetalleDrawerInicio(){
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeOperacionDetalleDrawerInicio();
     });
-
-    // Añadir handle drag-to-close (solo una vez)
-    // Adjuntar tanto al handle visual como al header (ambos pueden usarse como handle)
-    const h = drawer.querySelector('#opdHandle');
-    if (h) attachSheetDragHandler(drawer, h, closeOperacionDetalleDrawerInicio);
-    const hdr = drawer.querySelector('.opd-header');
-    if (hdr) attachSheetDragHandler(drawer, hdr, closeOperacionDetalleDrawerInicio);
+    const closeBtn = drawer.querySelector('#opdCloseTop');
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    // Drag handler eliminado, ahora el drawer debe cerrarse con un botón
 
     opdInicioEls = {
         backdrop,
@@ -925,7 +934,7 @@ function ensureOperacionDetalleDrawerInicio(){
     return opdInicioEls;
 }
 
-function showOperacionDetalleDrawerInicioElements(){
+function showOperacionDetalleDrawerInicioElements() {
     const els = ensureOperacionDetalleDrawerInicio();
     els.backdrop.style.display = 'block';
     els.drawer.style.display = 'grid';
@@ -935,7 +944,7 @@ function showOperacionDetalleDrawerInicioElements(){
     return els;
 }
 
-function hideOperacionDetalleDrawerInicioElementsAfterTransition(localId){
+function hideOperacionDetalleDrawerInicioElementsAfterTransition(localId) {
     const els = ensureOperacionDetalleDrawerInicio();
     const drawer = els.drawer;
 
@@ -954,27 +963,27 @@ function hideOperacionDetalleDrawerInicioElementsAfterTransition(localId){
     drawer.addEventListener('transitionend', onEnd);
 }
 
-function closeOperacionDetalleDrawerInicio(reason, immediate){
+function closeOperacionDetalleDrawerInicio(reason, immediate) {
     document.body.classList.remove('opd-open');
-    if (immediate){
-        try{
+    if (immediate) {
+        try {
             const els = ensureOperacionDetalleDrawerInicio();
-            if (els.drawer){
+            if (els.drawer) {
                 els.drawer.style.display = 'none';
                 els.drawer.style.transform = '';
                 els.drawer.style.transition = '';
             }
-            if (els.backdrop){
+            if (els.backdrop) {
                 els.backdrop.style.display = 'none';
                 els.backdrop.style.opacity = '';
             }
-        }catch(e){}
+        } catch (e) { }
     } else {
         hideOperacionDetalleDrawerInicioElementsAfterTransition(opdInicioId);
     }
 }
 
-function buildOpdItem(label, sub, value, valueClass){
+function buildOpdItem(label, sub, value, valueClass) {
     const safeLabel = escapeHtml(String(label ?? ''));
     const safeSub = escapeHtml(String(sub ?? ''));
     const safeValue = escapeHtml(String(value ?? ''));
@@ -989,7 +998,7 @@ function buildOpdItem(label, sub, value, valueClass){
     `;
 }
 
-async function openOperacionDetalleDrawerInicio(item, tipo){
+async function openOperacionDetalleDrawerInicio(item, tipo) {
     opdInicioId++;
     const localId = opdInicioId;
     const els = showOperacionDetalleDrawerInicioElements();
@@ -1019,8 +1028,8 @@ async function openOperacionDetalleDrawerInicio(item, tipo){
 
     // Otros campos (sin IDs)
     const ignored = new Set([
-        'monto','amount','creado','created_at','fecha','categoria','detalle','telefono_cliente','cliente','client',
-        'id','id_deuda','id_pago','id_negocio','tipo'
+        'monto', 'amount', 'creado', 'created_at', 'fecha', 'categoria', 'detalle', 'telefono_cliente', 'cliente', 'client',
+        'id', 'id_deuda', 'id_pago', 'id_negocio', 'tipo'
     ]);
 
     Object.keys(item || {}).forEach((k) => {
@@ -1032,7 +1041,7 @@ async function openOperacionDetalleDrawerInicio(item, tipo){
         if (v === null || v === undefined) return;
         let display = '';
         if (typeof v === 'object') {
-            try { display = JSON.stringify(v); } catch(e) { display = String(v); }
+            try { display = JSON.stringify(v); } catch (e) { display = String(v); }
         } else {
             display = String(v);
         }
@@ -1045,17 +1054,17 @@ async function openOperacionDetalleDrawerInicio(item, tipo){
     if (opdInicioId === localId) document.body.classList.add('opd-open');
 
     // Reemplazar el placeholder de Cliente
-    try{
+    try {
         const nombre = await obtenerNombreCliente(item.Telefono_cliente);
-        if (nombre && els.list){
+        if (nombre && els.list) {
             const items = els.list.querySelectorAll('.opd-item');
             const clienteRow = Array.from(items).find(x => (x.querySelector('h4')?.textContent || '') === 'Cliente');
-            if (clienteRow){
+            if (clienteRow) {
                 const val = clienteRow.querySelector('.opd-value');
                 if (val) val.textContent = nombre;
             }
         }
-    }catch(e){
+    } catch (e) {
         // no-op
     }
 }
@@ -1081,15 +1090,15 @@ async function recargarTabla() {
         await mostrarOperaciones(currentOpView);
     }
 }
-async function cargarMontoAdeudadoMensual(){
-        const { data, error } = await applyIdNegocioFilter(
-                client
-                        .from('Clientes')
-                        .select('Deuda_Activa')
-        );
+async function cargarMontoAdeudadoMensual() {
+    const { data, error } = await applyIdNegocioFilter(
+        client
+            .from('Clientes')
+            .select('Deuda_Activa')
+    );
     if (error) {
-      showErrorToast(error.message);
-      return 0;
+        showErrorToast(error.message);
+        return 0;
     }
 
     const totalMensual = (data || []).reduce((acc, row) => acc + (Number(row.Deuda_Activa) || 0), 0);
@@ -1099,107 +1108,108 @@ async function cargarMontoAdeudadoMensual(){
     // Guardar valor numérico sin formato para lógica de color
     indicadorMonto.dataset.valor = String(totalMensual);
     actualizarColor(indicadorMonto);
-        requestAnimationFrame(ajustarKpiAdeudadoLayout);
-        return;
+    requestAnimationFrame(ajustarKpiAdeudadoLayout);
+    return;
 }
 
-    function ajustarKpiAdeudadoLayout(){
-        const card = document.getElementById('kpi_adeudado_mes');
-        const amountWrap = document.getElementById('deuda_total');
-        const amount = document.getElementById('total_adeudado_mes');
-        const actions = card ? card.querySelector('.kpi-actions') : null;
-        if (!card || !amountWrap || !amount || !actions) return;
+function ajustarKpiAdeudadoLayout() {
+    const card = document.getElementById('kpi_adeudado_mes');
+    const amountWrap = document.getElementById('deuda_total');
+    const amount = document.getElementById('total_adeudado_mes');
+    const actions = card ? card.querySelector('.kpi-actions') : null;
+    if (!card || !amountWrap || !amount || !actions) return;
 
-        const cardWidth = card.clientWidth || 0;
-        const actionsWidth = actions.offsetWidth || 0;
-        const amountWidth = Math.max(amount.scrollWidth || 0, amountWrap.scrollWidth || 0);
-        const gapEstimate = 24;
-        const shouldStack = amountWidth + actionsWidth + gapEstimate > cardWidth;
+    const cardWidth = card.clientWidth || 0;
+    const actionsWidth = actions.offsetWidth || 0;
+    const amountWidth = Math.max(amount.scrollWidth || 0, amountWrap.scrollWidth || 0);
+    const gapEstimate = 24;
+    const shouldStack = amountWidth + actionsWidth + gapEstimate > cardWidth;
 
-        card.classList.toggle('kpi--stacked', shouldStack);
-    }
+    card.classList.toggle('kpi--stacked', shouldStack);
+}
 
-    window.addEventListener('resize', () => requestAnimationFrame(ajustarKpiAdeudadoLayout));
-    window.addEventListener('load', () => requestAnimationFrame(ajustarKpiAdeudadoLayout));
-function actualizarColor(indicador){
+window.addEventListener('resize', () => requestAnimationFrame(ajustarKpiAdeudadoLayout));
+window.addEventListener('load', () => requestAnimationFrame(ajustarKpiAdeudadoLayout));
+function actualizarColor(indicador) {
     const valorStr = (indicador && indicador.dataset && indicador.dataset.valor) ? indicador.dataset.valor : indicador.textContent;
     const valor = parseFloat(valorStr);
     if (Number.isNaN(valor)) return;
     if (valor === 0) {
         const isLight = document.documentElement?.dataset?.theme === 'light'
         indicador.style.color = isLight ? 'var(--text)' : 'white';
-    } else if (valor > 0 && valor <=100000){
+    } else if (valor > 0 && valor <= 100000) {
         indicador.style.color = 'green';
     }
-    else if (valor > 100000 && valor <= 300000){
+    else if (valor > 100000 && valor <= 300000) {
         indicador.style.color = 'orange';
     }
-    else{
+    else {
         indicador.style.color = 'red';
     }
 }
-async function recargarMontos(){
+async function recargarMontos() {
     await cargarMontoAdeudadoMensual();
 }
-window.recargarMontos=recargarMontos;
+window.recargarMontos = recargarMontos;
 window.recargarTabla = recargarTabla;
 
 const __deudaTotalEl = document.getElementById("deuda_total");
-if (__deudaTotalEl){
-__deudaTotalEl.addEventListener("click", async function() {
-    // Abrir usando el mismo drawer que el detalle de deuda/pago (opd-*)
-    opdInicioId++;
-    const localId = opdInicioId;
-    const els = showOperacionDetalleDrawerInicioElements();
+if (__deudaTotalEl) {
+    __deudaTotalEl.addEventListener("click", async function () {
+        // Abrir usando el mismo drawer que el detalle de deuda/pago (opd-*)
+        opdInicioId++;
+        const localId = opdInicioId;
+        const els = showOperacionDetalleDrawerInicioElements();
 
-    if (els.title) els.title.textContent = 'Desglose de Deuda Total Activa';
-    if (els.subtitle) els.subtitle.textContent = 'Clientes con saldo pendiente';
-    if (els.list) els.list.innerHTML = '<div class="loading-state">Cargando…</div>';
-    if (opdInicioId === localId) document.body.classList.add('opd-open');
+        if (els.title) els.title.textContent = 'Desglose de Deuda Total Activa';
+        if (els.subtitle) els.subtitle.textContent = 'Clientes con saldo pendiente';
+        if (els.list) els.list.innerHTML = '<div class="loading-state">Cargando…</div>';
+        if (opdInicioId === localId) document.body.classList.add('opd-open');
 
-    try{
-        let q = client
-            .from('Clientes')
-            .select('Nombre, Telefono, Deuda_Activa')
-            .gt('Deuda_Activa', 0)
-            .order('Deuda_Activa', { ascending: false });
-        q = applyIdNegocioFilter(q);
-        const { data, error } = await q;
 
-        if (error) {
-            if (els.list) els.list.innerHTML = `<div class="opd-list">${buildOpdItem('Error', '', String(error.message || error), 'opd-value--danger')}</div>`;
-            return;
+        try {
+            let q = client
+                .from('Clientes')
+                .select('Nombre, Telefono, Deuda_Activa')
+                .gt('Deuda_Activa', 0)
+                .order('Deuda_Activa', { ascending: false });
+            q = applyIdNegocioFilter(q);
+            const { data, error } = await q;
+
+            if (error) {
+                if (els.list) els.list.innerHTML = `<div class="opd-list">${buildOpdItem('Error', '', String(error.message || error), 'opd-value--danger')}</div>`;
+                return;
+            }
+            if (!data || data.length === 0) {
+                if (els.list) els.list.innerHTML = `<div class="opd-list">${buildOpdItem('Sin resultados', '', 'No hay clientes con deuda activa.', '')}</div>`;
+                return;
+            }
+
+            const formatter = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
+            let totalDeuda = 0;
+
+            let html = '<h4 class="opd-section-title">Clientes</h4><div class="opd-list">';
+            data.forEach((cliente) => {
+                const nombre = String(cliente?.Nombre ?? '').trim();
+                const tel = String(cliente?.Telefono ?? '').trim();
+                const deuda = Number(cliente?.Deuda_Activa) || 0;
+                totalDeuda += deuda;
+                html += buildOpdItem(nombre || 'Cliente', tel ? `Tel: ${tel}` : '', formatter.format(deuda), 'opd-value--danger');
+            });
+            html += '</div>';
+
+            html += '<h4 class="opd-section-title" style="margin-top:14px;">Total</h4>';
+            html += `<div class="opd-list">${buildOpdItem('Total Deuda Activa', 'Suma de clientes con deuda', formatter.format(totalDeuda), 'opd-value--danger')}</div>`;
+
+            if (els.list) els.list.innerHTML = html;
+        } catch (err) {
+            console.error(err);
+            if (els.list) els.list.innerHTML = `<div class="opd-list">${buildOpdItem('Error', '', 'Error al cargar el desglose.', 'opd-value--danger')}</div>`;
         }
-        if (!data || data.length === 0) {
-            if (els.list) els.list.innerHTML = `<div class="opd-list">${buildOpdItem('Sin resultados', '', 'No hay clientes con deuda activa.', '')}</div>`;
-            return;
-        }
-
-        const formatter = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
-        let totalDeuda = 0;
-
-        let html = '<h4 class="opd-section-title">Clientes</h4><div class="opd-list">';
-        data.forEach((cliente) => {
-            const nombre = String(cliente?.Nombre ?? '').trim();
-            const tel = String(cliente?.Telefono ?? '').trim();
-            const deuda = Number(cliente?.Deuda_Activa) || 0;
-            totalDeuda += deuda;
-            html += buildOpdItem(nombre || 'Cliente', tel ? `Tel: ${tel}` : '', formatter.format(deuda), 'opd-value--danger');
-        });
-        html += '</div>';
-
-        html += '<h4 class="opd-section-title" style="margin-top:14px;">Total</h4>';
-        html += `<div class="opd-list">${buildOpdItem('Total Deuda Activa', 'Suma de clientes con deuda', formatter.format(totalDeuda), 'opd-value--danger')}</div>`;
-
-        if (els.list) els.list.innerHTML = html;
-    }catch(err){
-        console.error(err);
-        if (els.list) els.list.innerHTML = `<div class="opd-list">${buildOpdItem('Error', '', 'Error al cargar el desglose.', 'opd-value--danger')}</div>`;
-    }
-});
+    });
 }
 
-function textoB(){
+function textoB() {
     const tiempo_actual = new Date();
     const nombre = localStorage.getItem("UserName") || 'Usuario';
     if (tiempo_actual.getHours() >= 5 && tiempo_actual.getHours() < 12) {
@@ -1210,3 +1220,14 @@ function textoB(){
         return `¡Buenas noches, ${nombre}!`;
     }
 }
+
+window.addEventListener('scroll', () => {
+    const headerEl = document.querySelector('.header-text');
+    if (headerEl) {
+        if (window.scrollY > 10) {
+            headerEl.classList.add('scrolled');
+        } else {
+            headerEl.classList.remove('scrolled');
+        }
+    }
+});

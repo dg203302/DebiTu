@@ -530,6 +530,18 @@ async function openAddClientSheet(){
     container.className = 'cms-addclient';
     container.innerHTML = `
         <div class="edit-grid" role="form" aria-label="Formulario registrar cliente">
+            <div id="btnImportarContactosContainer" style="display: none; margin-bottom: 12px;">
+                <button type="button" class="btn btn-outline subtle" id="btnImportarContactos" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                    Importar de Contactos
+                </button>
+            </div>
+            
             <div class="edit-field">
                 <span class="edit-label">Nombre completo</span>
                 <input id="addClientNombre" type="text" placeholder="Ej: Juan Pérez" autocomplete="name" />
@@ -565,6 +577,29 @@ async function openAddClientSheet(){
         const msg = (message || '').toString().trim();
         if (!msg){ validation.hidden = true; validation.textContent = ''; return; }
         validation.textContent = msg; validation.hidden = false;
+    }
+
+    const importContainer = container.querySelector('#btnImportarContactosContainer');
+    const btnImportarContactos = container.querySelector('#btnImportarContactos');
+
+    if ('contacts' in navigator && 'ContactsManager' in window) {
+        importContainer.style.display = 'block';
+        btnImportarContactos.addEventListener('click', async () => {
+            try {
+                const props = ['name', 'tel'];
+                const opts = { multiple: false };
+                const contacts = await navigator.contacts.select(props, opts);
+                if (contacts && contacts.length > 0) {
+                    const c = contacts[0];
+                    if (c.name && c.name.length > 0) nombreInput.value = c.name[0];
+                    if (c.tel && c.tel.length > 0) {
+                        telefonoInput.value = c.tel[0].replace(/[^0-9]/g, '');
+                    }
+                }
+            } catch (err) {
+                console.error('Error al abrir contactos', err);
+            }
+        });
     }
 
     return new Promise((resolve) => {
@@ -2479,11 +2514,19 @@ document.getElementById('buscarClienteInput').addEventListener('input', async (e
     renderClientesEnContenedor(filtered || []);
 });
 
-// Carga inicial para el layout actual (lista visible por defecto)
-verTodosClientes();
-syncDesktopNoClientSelected();
-syncEditButtonVisibility();
-initFiltrosClientes();
+(async () => {
+    try {
+        await verTodosClientes();
+        syncDesktopNoClientSelected();
+        syncEditButtonVisibility();
+        initFiltrosClientes();
+    } catch (err) {
+        console.error('Error al inicializar clientes:', err);
+    } finally {
+        const loader = document.getElementById('global-loader');
+        if (loader) loader.classList.add('hidden');
+    }
+})();
 
 function enviarDeudaTotal(){
     if (!currentClienteTelefono || !currentClienteNombre) {
@@ -2561,3 +2604,14 @@ window.cerrarSesion=function() {
     localStorage.clear();
     window.location.href = "/index.html";
 }
+
+window.addEventListener('scroll', () => {
+    const headerH1 = document.querySelector('.header-copy h1');
+    if (headerH1) {
+        if (window.scrollY > 10) {
+            headerH1.classList.add('scrolled');
+        } else {
+            headerH1.classList.remove('scrolled');
+        }
+    }
+});

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es" data-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7,31 +8,38 @@
     <script>
         (function () {
             try {
-                var t = (localStorage.getItem('CMS_THEME') || '').toString().trim().toLowerCase();
-                document.documentElement.dataset.theme = (t === 'light' || t === 'claro') ? 'light' : 'dark';
+
                 var a = localStorage.getItem('CMS_ANIM');
                 if (a === 'false') document.documentElement.dataset.anim = 'false'; var tr = localStorage.getItem('CMS_TRANS'); if (tr === 'false') document.documentElement.dataset.trans = 'false';
-            } catch (e) {}
+            } catch (e) { }
         })();
     </script>
     <link rel="stylesheet" href="/Estilos/estilos_inicio.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/Estilos/fondo_liquido.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dashboard | DebiTú</title>
 </head>
+
 <body>
-    <!-- Capas de Glassmorphism (Fondo) -->
-    <div class="ambient-background">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-        <div class="glass-overlay"></div>
+    <!-- Pantalla de carga global -->
+    <div id="global-loader" class="global-loader">
+        <div class="loader-spinner"></div>
+        <h2 class="loader-text">Cargando</h2>
+    </div>
+
+    <!-- Fondo Animado Líquido RGB -->
+    <div class="liquid-container" aria-hidden="true">
+        <div class="blob-liquid blob-liquid-1"></div>
+        <div class="blob-liquid blob-liquid-2"></div>
+        <div class="blob-liquid blob-liquid-3"></div>
     </div>
 
     <header class="navbar">
         <div class="header-inner">
             <div class="header-text">
-                <h1 id="header_titulo">Inicio</h1>
+                <h1 id="header_titulo" style="font-size: 1.5rem;">Inicio</h1>
             </div>
         </div>
     </header>
@@ -43,14 +51,19 @@
                 <h1 id="total_adeudado_mes" class="text-gradient">Cargando...</h1>
             </div>
             <div class="kpi-actions" style="display: flex; gap: 12px; align-items: center;">
-                <button type="button" class="icon-btn btn-large" onclick="recargarMontos()" aria-label="Recargar montos" title="Actualizar KPI">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <button type="button" class="icon-btn btn-large" onclick="recargarMontos()" aria-label="Recargar montos"
+                    title="Actualizar KPI">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                         <path d="M3 3v5h5" />
                     </svg>
                 </button>
-                <button type="button" id="btn_realiz_op_mob" class="icon-btn btn-large pulse-glow mobile-op-btn" onclick="realizarOperacion(event)" aria-label="Nueva Operación" title="Nueva Operación">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color: var(--accent-color);">
+                <button type="button" id="btn_realiz_op_mob" class="icon-btn btn-large pulse-glow mobile-op-btn"
+                    onclick="realizarOperacion(event)" aria-label="Nueva Operación" title="Nueva Operación">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                        style="color: var(--accent-color);">
                         <circle cx="12" cy="12" r="10" />
                         <path d="M8 12h8" />
                         <path d="M12 8v8" />
@@ -58,7 +71,7 @@
                 </button>
             </div>
         </section>
-        
+
         <section id="btnes_nav" class="nav-grid">
             <!--<a class="nav-card glass-panel interactive-panel" href="/Plantillas/administracion_clientes.html">
                 <div class="nav-icon bg-blue-gradient">
@@ -74,9 +87,13 @@
                     <span class="nav-card__subtitle">Gestión de perfiles y estados</span>
                 </div>
             </a>-->
-            <button type="button" class="nav-card nav-card--primary glass-panel interactive-panel pulse-glow desktop-op-btn" id="btn_realiz_op" onclick="realizarOperacion(event)" aria-expanded="false" aria-controls="Operacion-ingreso">
+            <button type="button"
+                class="nav-card nav-card--primary glass-panel interactive-panel pulse-glow desktop-op-btn"
+                id="btn_realiz_op" onclick="realizarOperacion(event)" aria-expanded="false"
+                aria-controls="Operacion-ingreso">
                 <div class="nav-icon bg-accent-gradient">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <circle cx="12" cy="12" r="10" />
                         <path d="M8 12h8" />
                         <path d="M12 8v8" />
@@ -110,10 +127,11 @@
                         </span>
                     </label>
                 </div>
-                
+
                 <div class="input-wrapper">
                     <label for="op_clientSearch">Buscar Cliente</label>
-                    <input id="op_clientSearch" class="modern-input" placeholder="Ingresa nombre o teléfono..." autocomplete="off" inputmode="search">
+                    <input id="op_clientSearch" class="modern-input" placeholder="Ingresa nombre o teléfono..."
+                        autocomplete="off" inputmode="search">
                     <div id="op_clientMatches" class="client-matches" aria-live="polite"></div>
                 </div>
 
@@ -124,7 +142,8 @@
 
                 <div class="input-wrapper amount-wrapper">
                     <label for="op_total_amount">Monto total a registrar ($)</label>
-                    <input id="op_total_amount" class="modern-input reg-amount" value="0" inputmode="decimal" autocomplete="off" spellcheck="false">
+                    <input id="op_total_amount" class="modern-input reg-amount" value="0" inputmode="decimal"
+                        autocomplete="off" spellcheck="false">
                     <input id="op_total_amount_value" type="hidden" value="0">
                 </div>
 
@@ -132,7 +151,8 @@
                     <summary class="calc-summary" aria-controls="op_calc_body">
                         <span class="calc-summary__title">Calculadora</span>
                         <span class="calc-summary__chev" aria-hidden="true">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="6 9 12 15 18 9" />
                             </svg>
                         </span>
@@ -141,7 +161,8 @@
                     <div id="op_calc_body" class="calc-body">
                         <div class="input-wrapper">
                             <label for="op_amount">Operación</label>
-                            <input id="op_amount" class="modern-input calc-display" value="0" inputmode="text" autocomplete="off" spellcheck="false">
+                            <input id="op_amount" class="modern-input calc-display" value="0" inputmode="text"
+                                autocomplete="off" spellcheck="false">
                         </div>
 
                         <div id="op_calc" class="calc-grid" aria-label="Calculadora">
@@ -167,7 +188,8 @@
                         </div>
 
                         <div class="reg-actions">
-                            <button type="button" id="op_calc_back" class="btn-clear secondary" title="Borrar un dígito">⌫</button>
+                            <button type="button" id="op_calc_back" class="btn-clear secondary"
+                                title="Borrar un dígito">⌫</button>
                             <button type="button" id="op_calc_clear" class="btn-clear danger">Limpiar (C)</button>
                         </div>
                     </div>
@@ -183,14 +205,18 @@
             <div class="section-title-row">
                 <h2 class="panel-title">Operaciones Recientes</h2>
                 <div class="section-actions" id="botones">
-                    <button type="button" class="icon-btn tooltip-btn" onclick="recargarTabla()" aria-label="Refrescar operaciones" title="Refrescar vista">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <button type="button" class="icon-btn tooltip-btn" onclick="recargarTabla()"
+                        aria-label="Refrescar operaciones" title="Refrescar vista">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                             <path d="M3 3v5h5" />
                         </svg>
                     </button>
-                    <button type="button" class="icon-btn btn-text" id="btn_expandir_ops" onclick="expandirTabla()" aria-expanded="false" aria-label="Expandir operaciones">
-                        <svg class="icon icon-rotate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <button type="button" class="icon-btn btn-text" id="btn_expandir_ops" onclick="expandirTabla()"
+                        aria-expanded="false" aria-label="Expandir operaciones">
+                        <svg class="icon icon-rotate" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <polyline points="7 13 12 18 17 13" />
                             <polyline points="7 6 12 11 17 6" />
                         </svg>
@@ -198,12 +224,14 @@
                     </button>
                 </div>
             </div>
-            
+
             <div class="tabs modern-tabs" role="tablist" aria-label="Filtro de operaciones">
-                <button id="btn_ver_deudas" class="tab active" type="button" role="tab" aria-selected="true">Deudas Activas</button>
-                <button id="btn_ver_pagos" class="tab" type="button" role="tab" aria-selected="false">Pagos Recibidos</button>
+                <button id="btn_ver_deudas" class="tab active" type="button" role="tab" aria-selected="true">Deudas
+                    Activas</button>
+                <button id="btn_ver_pagos" class="tab" type="button" role="tab" aria-selected="false">Pagos
+                    Recibidos</button>
             </div>
-            
+
             <div id="lista_operaciones" class="modern-list">
                 <div class="loading-state">Obteniendo historial...</div>
             </div>
@@ -213,7 +241,8 @@
 
     <footer class="bottom-nav" aria-label="Navegación">
         <a class="icon-btn" href="/Plantillas/administracion_clientes.html" aria-label="Clientes" title="Clientes">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                 <circle cx="9" cy="7" r="4" />
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -222,31 +251,36 @@
         </a>
 
         <a class="icon-btn active" href="/Plantillas/Inicio.html" aria-label="Inicio" title="Inicio">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
                 <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
-                <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <path
+                    d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
             </svg>
         </a>
 
-        <a class="icon-btn" href="/Plantillas/Estadisticas.html" aria-label="Estadísticas"
-            title="Estadísticas">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                    stroke-linejoin="round" aria-hidden="true">
-                    <line x1="6" y1="20" x2="6" y2="14" />
-                    <line x1="12" y1="20" x2="12" y2="4" />
-                    <line x1="18" y1="20" x2="18" y2="10" />
-                </svg>
+        <a class="icon-btn" href="/Plantillas/Estadisticas.html" aria-label="Estadísticas" title="Estadísticas">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
+                <line x1="6" y1="20" x2="6" y2="14" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="18" y1="20" x2="18" y2="10" />
+            </svg>
         </a>
 
         <a class="icon-btn" href="/Plantillas/Configuracion.html" aria-label="Configuración" title="Configuración">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
                 <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09A1.65 1.65 0 0 0 19.4 15z" />
+                <path
+                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09A1.65 1.65 0 0 0 19.4 15z" />
             </svg>
         </a>
 
-        <button type="button" class="icon-btn danger" onclick="cerrarSesion()" aria-label="Cerrar sesión" title="Cerrar sesión">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <button type="button" class="icon-btn danger" onclick="cerrarSesion()" aria-label="Cerrar sesión"
+            title="Cerrar sesión">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                 <polyline points="16 17 21 12 16 7" />
                 <line x1="21" y1="12" x2="9" y2="12" />
@@ -255,5 +289,7 @@
     </footer>
 
     <script src="/Scripts/script_inicio.js" type="module"></script>
+    <script src="/Scripts/spa_router.js"></script>
 </body>
+
 </html>

@@ -49,34 +49,7 @@
     --container-max-w: 1280px;
 }
 
-:root[data-theme="light"] {
-    --bg-color: #fafafa;
-    --bg-rgb: 250, 250, 250;
-    --text-primary: #09090b;
-    --text-secondary: #52525b;
 
-    /* Semantic Colors */
-    --danger: #e11d48;
-    --success: #059669;
-
-    --glass-bg: rgba(255, 255, 255, 0.75);
-    --glass-border: rgba(0, 0, 0, 0.08);
-    --glass-shadow: 0 24px 40px -8px rgba(0, 0, 0, 0.05);
-
-    --input-bg: rgba(255, 255, 255, 0.9);
-    --input-hover: #ffffff;
-    --input-border: rgba(0, 0, 0, 0.1);
-
-    --accent-color: #06b6d4;
-    --accent-glow: rgba(6, 182, 212, 0.25);
-    --gradient-primary: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
-    --gradient-danger: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);
-    --gradient-emerald: linear-gradient(135deg, #10b981 0%, #047857 100%);
-
-    --blob-1: #67e8f9;
-    --blob-2: #c4b5fd;
-    --blob-3: #93c5fd;
-}
 
 * {
     box-sizing: border-box;
@@ -157,10 +130,7 @@ body {
     animation: orbFloat 14s infinite alternate ease-in-out, orbColor 8s infinite alternate ease-in-out;
 }
 
-:root[data-theme="light"] .blob {
-    mix-blend-mode: normal;
-    opacity: 0.6;
-}
+
 
 .blob-1 {
     top: -15%;
@@ -294,7 +264,7 @@ header.navbar {
     min-height: var(--footer-h);
     width: fit-content;
     gap: 12px;
-    border: 1px solid var(--glass-border);
+    border: none;
     border-radius: 999px;
     padding: 10px 16px;
     display: flex;
@@ -1540,15 +1510,24 @@ body.cms-sheet-open .cms-sheet-drawer {
     }
 
     .header-text {
-        background: rgba(15, 15, 20, 0.25);
-        border: 1px solid var(--glass-border);
+        background: transparent;
+        border: 1px solid transparent;
         padding: 8px 24px;
         border-radius: 999px;
+        backdrop-filter: blur(0px);
+        -webkit-backdrop-filter: blur(0px);
+        box-shadow: none;
+        text-align: right;
+        pointer-events: auto;
+        transition: all 0.3s ease;
+    }
+
+    .header-text.scrolled {
+        background: rgba(15, 15, 20, 0.25);
+        border: 1px solid var(--glass-border);
         backdrop-filter: blur(24px);
         -webkit-backdrop-filter: blur(24px);
         box-shadow: var(--glass-shadow);
-        text-align: right;
-        pointer-events: auto;
     }
 
     .header-text h1 {
@@ -1688,19 +1667,5 @@ body.cms-sheet-open .cms-sheet-drawer {
     background: #141722 !important;
 }
 
-:root[data-theme="light"][data-trans="false"] .glass-panel,
-:root[data-theme="light"][data-trans="false"] .bottom-nav,
-:root[data-theme="light"][data-trans="false"] .header-text,
-:root[data-theme="light"][data-trans="false"] .header-copy h1,
-:root[data-theme="light"][data-trans="false"] .cfg-toast,
-:root[data-theme="light"][data-trans="false"] .details-panel,
-:root[data-theme="light"][data-trans="false"] .control-panel,
-:root[data-theme="light"][data-trans="false"] .add-client-sheet,
-:root[data-theme="light"][data-trans="false"] .op-detail-drawer,
-:root[data-theme="light"][data-trans="false"] .prompt-sheet,
-:root[data-theme="light"][data-trans="false"] .confirm-sheet {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: #ffffff !important;
-}
+
 

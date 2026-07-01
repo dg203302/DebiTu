@@ -27,21 +27,7 @@
 	color-scheme: dark;
 }
 
-/* Tema claro (se activa con :root[data-theme="light"]) */
-:root[data-theme="light"] {
-	--bg: #ffffff;
-	--bg-elev: #fafafa;
-	--input: #f4f4f5;
-	--text: #0b0b0c;
-	--muted: #52525b;
-	--heading: #0b0b0c;
-	--border: #e4e4e7;
-	--primary: #0b0b0c;
-	--primary-600: #1f1f23;
-	--on-primary: #ffffff;
-	--ring: rgba(0, 0, 0, 0.18);
-	color-scheme: light;
-}
+/* Tema claro (se activa con 
 
 /* Reset y base */
 * { box-sizing: border-box; }
@@ -74,8 +60,8 @@ body {
 ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
 
-:root[data-theme="light"] ::-webkit-scrollbar-thumb { background: #cbd5e1; }
-:root[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+
 
 /* Contenedor principal */
 main {
@@ -167,7 +153,7 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* Selección de texto y estados */
 ::selection { background: rgba(255,255,255,0.18); color: var(--heading); }
-:root[data-theme="light"] ::selection { background: rgba(0,0,0,0.12); }
+
 
 /* SweetAlert2: tema oscuro coherente */
 .swal2-popup {

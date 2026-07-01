@@ -8,8 +8,7 @@
     <script>
         (function () {
             try {
-                var t = (localStorage.getItem('CMS_THEME') || '').toString().trim().toLowerCase();
-                document.documentElement.dataset.theme = (t === 'light' || t === 'claro') ? 'light' : 'dark';
+
                 var a = localStorage.getItem('CMS_ANIM');
                 if (a === 'false') document.documentElement.dataset.anim = 'false'; var tr = localStorage.getItem('CMS_TRANS'); if (tr === 'false') document.documentElement.dataset.trans = 'false';
             } catch (e) { }
@@ -18,23 +17,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="/Estilos/estilos_clientes.css">
-    <title>Clientes | CMS Premium</title>
+    <link rel="stylesheet" href="/Estilos/fondo_liquido.css">
+    <title>Clientes | DebiTú</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 </head>
 
 <body>
-    <div class="ambient-background" aria-hidden="true">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-        <div class="glass-overlay"></div>
+    <!-- Pantalla de carga global -->
+    <div id="global-loader" class="global-loader">
+        <div class="loader-spinner"></div>
+        <h2 class="loader-text">Cargando</h2>
+    </div>
+
+    <div class="liquid-container" aria-hidden="true">
+        <div class="blob-liquid blob-liquid-1"></div>
+        <div class="blob-liquid blob-liquid-2"></div>
+        <div class="blob-liquid blob-liquid-3"></div>
     </div>
 
     <header class="navbar">
         <div class="header-inner">
             <div class="brand-cluster">
                 <div class="header-copy">
-                    <h1>Administración</h1>
+                    <h1 style="font-size: 1.5rem;">Administración</h1>
                 </div>
             </div>
 
@@ -91,8 +96,10 @@
             <div id="headerDetalles">
                 <h2 class="section-title">Panel de Cliente</h2>
                 <div class="action-group">
-                    <button id="btn_stats_cliente" class="icon-btn btn-outline subtle" type="button" aria-label="Estadísticas del cliente" title="Estadísticas del cliente">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <button id="btn_stats_cliente" class="icon-btn btn-outline subtle" type="button"
+                        aria-label="Estadísticas del cliente" title="Estadísticas del cliente">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <line x1="6" y1="20" x2="6" y2="14" />
                             <line x1="12" y1="20" x2="12" y2="4" />
                             <line x1="18" y1="20" x2="18" y2="10" />
@@ -194,9 +201,10 @@
                             aria-selected="false">Pagos</button>
                     </div>
                     <div class="actions">
-                        <button id="btn_refrescar_cliente" class="icon-btn btn-outline subtle"
-                            type="button" aria-label="Refrescar" title="Refrescar">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <button id="btn_refrescar_cliente" class="icon-btn btn-outline subtle" type="button"
+                            aria-label="Refrescar" title="Refrescar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M21 12a9 9 0 1 1-3.9-7.43" />
                                 <polyline points="21 3 21 9 15 9" />
                             </svg>
@@ -228,14 +236,13 @@
             </svg>
         </a>
 
-        <a class="icon-btn" href="/Plantillas/Estadisticas.html" aria-label="Estadísticas"
-            title="Estadísticas">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                    stroke-linejoin="round" aria-hidden="true">
-                    <line x1="6" y1="20" x2="6" y2="14" />
-                    <line x1="12" y1="20" x2="12" y2="4" />
-                    <line x1="18" y1="20" x2="18" y2="10" />
-                </svg>
+        <a class="icon-btn" href="/Plantillas/Estadisticas.html" aria-label="Estadísticas" title="Estadísticas">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
+                <line x1="6" y1="20" x2="6" y2="14" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="18" y1="20" x2="18" y2="10" />
+            </svg>
         </a>
 
         <a class="icon-btn" href="/Plantillas/Configuracion.html" aria-label="Configuración" title="Configuración">
@@ -283,6 +290,7 @@
         document.addEventListener('DOMContentLoaded', updateLayoutForMobile);
         updateLayoutForMobile();
     </script>
+    <script src="/Scripts/spa_router.js"></script>
 </body>
 
 </html>

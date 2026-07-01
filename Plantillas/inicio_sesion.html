@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es" data-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,50 +8,49 @@
     <script>
         (function () {
             try {
-                var t = (localStorage.getItem('CMS_THEME') || '').toString().trim().toLowerCase();
-                document.documentElement.dataset.theme = (t === 'light' || t === 'claro') ? 'light' : 'dark';
-            } catch (e) {}
+
+            } catch (e) { }
         })();
     </script>
     <link rel="stylesheet" href="/Estilos/estilos_login.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/Estilos/fondo_liquido.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Inicia Sesión | DebiTú</title>
 </head>
+
 <body>
-    <div class="mesh-background">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-        <div class="noise-overlay"></div>
+    <div class="liquid-container" aria-hidden="true">
+        <div class="blob-liquid blob-liquid-1"></div>
+        <div class="blob-liquid blob-liquid-2"></div>
+        <div class="blob-liquid blob-liquid-3"></div>
     </div>
 
-    <header class="navbar">
-        <div class="navbar__brand fade-in-up">
-            <div class="brand-logo">
-                <img src="/icons/Icon.png" alt="DebiTú" loading="eager" decoding="async">
-            </div>
-            <span class="brand-name">Debi<span class="text-highlight">Tú</span></span>
-        </div>
-    </header>
-
-    <main class="landing-container">
+    <main class="landing-container" style="margin-top: 50px;">
         <section class="value-prop">
-            <!--<div class="badge fade-in-up" style="animation-delay: 0.1s;">
-                <span class="badge-dot"></span> Nueva Experiencia 2.0
-            </div>-->
-            <h1 class="hero-title fade-in-up" style="animation-delay: 0.2s;">
-                Domina tus cobros con
-                <span class="text-gradient">precisión.</span>
-            </h1>
+            <div class="hero-brand-lockup fade-in-up" style="animation-delay: 0.2s;">
+                <div class="hero-logo-container">
+                    <img src="/icons/Icon.png" alt="DebiTú" loading="eager" decoding="async">
+                </div>
+                <h1 class="hero-title">
+                    Debi<span class="text-gradient">Tú</span>
+                </h1>
+            </div>
             <p class="hero-subtitle fade-in-up" style="animation-delay: 0.3s;">
-                La plataforma definitiva para gestionar clientes, automatizar el seguimiento de deudas y potenciar tu flujo de caja sin estrés. Todo dentro de un panel de cristal.
+                La plataforma definitiva para gestionar clientes, automatizar el seguimiento de deudas y potenciar tu
+                flujo de caja sin estrés. Todo dentro de un panel de cristal.
             </p>
-            
+
             <div class="feature-grid fade-in-up" style="animation-delay: 0.4s;">
                 <div class="feature-card interactive">
                     <div class="feature-icon glow-cyan">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
                     </div>
                     <div class="feature-text">
                         <h3>Perfiles Inteligentes</h3>
@@ -59,7 +59,9 @@
                 </div>
                 <div class="feature-card interactive">
                     <div class="feature-icon glow-purple">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
                     </div>
                     <div class="feature-text">
                         <h3>Flujo de Caja Activo</h3>
@@ -72,7 +74,7 @@
         <section class="login-wrapper fade-in-up" style="animation-delay: 0.5s;">
             <div class="login-glass-panel interactive-glass">
                 <div class="panel-glow"></div>
-                
+
                 <div class="login-header">
                     <h2>Acceso Seguro</h2>
                     <p>Tu información encriptada de extremo a extremo.</p>
@@ -81,7 +83,20 @@
                 <div class="login-actions">
                     <button class="btn-oauth google-oauth interactive" id="btn_google">
                         <div class="oauth-icon">
-                            <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                            <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                                    fill="#4285F4" />
+                                <path
+                                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                                    fill="#34A853" />
+                                <path
+                                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                                    fill="#FBBC05" />
+                                <path
+                                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                                    fill="#EA4335" />
+                            </svg>
                         </div>
                         <span>Ingresar con Google</span>
                     </button>
@@ -100,12 +115,13 @@
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                     <span>Autenticación cifrada 256-bit</span>
                 </div>-->
-            </div>
+                </div>
         </section>
     </main>
 
     <footer class="app-footer">
-        <p>&copy; <span id="anio"></span> Client Management System. Diseñado para la excelencia.</p>
+        <p>&copy; <span id="anio"></span> DebiTú. Por <a href="https://djsolutionss.lovable.app"
+                style="color: #00e8ff; font-weight: 600; text-decoration: none;">D&J Solutions</a>.</p>
     </footer>
 
     <script src="/Scripts/script_indice.js" type="module"></script>
@@ -113,4 +129,5 @@
         document.getElementById('anio').textContent = new Date().getFullYear();
     </script>
 </body>
+
 </html>

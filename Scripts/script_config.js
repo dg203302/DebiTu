@@ -1,34 +1,8 @@
 import {loadSupaBseWithAuth} from './supabase.js'
 
-// --- Tema (modo oscuro/claro) ---
-const THEME_STORAGE_KEY = 'CMS_THEME'
+// --- Tema (siempre oscuro) ---
+document.documentElement.dataset.theme = 'dark';
 
-function getStoredTheme(){
-    const raw = (localStorage.getItem(THEME_STORAGE_KEY) || '').toString().trim().toLowerCase()
-    if (raw === 'light' || raw === 'claro') return 'light'
-    return 'dark'
-}
-
-function applyTheme(theme){
-    const normalized = theme === 'light' ? 'light' : 'dark'
-    document.documentElement.dataset.theme = normalized
-
-    const btn = document.getElementById('modo-oscuro-btn')
-    if (btn){
-        btn.setAttribute('aria-checked', String(normalized === 'dark'))
-    }
-}
-
-function toggleTheme(){
-    const current = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'
-    const next = current === 'dark' ? 'light' : 'dark'
-    localStorage.setItem(THEME_STORAGE_KEY, next)
-    applyTheme(next)
-    return next
-}
-
-// Aplicar tema lo antes posible (evita flash si el usuario eligió claro)
-applyTheme(getStoredTheme())
 
 const client= await loadSupaBseWithAuth();
 
@@ -414,23 +388,30 @@ async function eliminarCuenta(){
     }
 }
 
-window.onload = function() {
-    const anioEl = document.getElementById('anio')
-    if (anioEl) anioEl.textContent = new Date().getFullYear()
+(function() {
+    try {
+        const anioEl = document.getElementById('anio')
+        if (anioEl) anioEl.textContent = new Date().getFullYear()
 
-    const pfpEl = document.getElementById('pfp')
-    const photo = (localStorage.getItem('UserPhoto') || '').toString().trim()
-    if (pfpEl){
-        if (photo) pfpEl.src = photo
-        else pfpEl.removeAttribute('src')
-    }
+        const pfpEl = document.getElementById('pfp')
+        const photo = (localStorage.getItem('UserPhoto') || '').toString().trim()
+        if (pfpEl){
+            if (photo) pfpEl.src = photo
+            else pfpEl.removeAttribute('src')
+        }
 
-    const datos = document.getElementById('Datos_cuenta')
-    if (datos){
-        const userName = (localStorage.getItem('UserName') || '').toString().trim()
-        datos.textContent = 'Nombre de usuario: ' + (userName || '—')
+        const datos = document.getElementById('Datos_cuenta')
+        if (datos){
+            const userName = (localStorage.getItem('UserName') || '').toString().trim()
+            datos.textContent = 'Nombre de usuario: ' + (userName || '—')
+        }
+    } catch (err) {
+        console.error('Error inicializando config:', err)
+    } finally {
+        const loader = document.getElementById('global-loader')
+        if (loader) loader.classList.add('hidden')
     }
-}
+})();
 
 window.cerrarSesion=function() {
     localStorage.clear()
@@ -448,13 +429,6 @@ if (idiomaBtn){
     })
 }
 
-const modoOscuroBtn = document.getElementById('modo-oscuro-btn')
-if (modoOscuroBtn){
-    modoOscuroBtn.addEventListener('click', async () => {
-        const next = toggleTheme()
-        showToast(next === 'dark' ? 'Modo oscuro activado' : 'Modo claro activado', 'success')
-    })
-}
 
 // Inicializar y manejar estado de animaciones
 const animacionesBtn = document.getElementById('animaciones-btn');

@@ -8,8 +8,7 @@
     <script>
         (function () {
             try {
-                var t = (localStorage.getItem('CMS_THEME') || '').toString().trim().toLowerCase();
-                document.documentElement.dataset.theme = (t === 'light' || t === 'claro') ? 'light' : 'dark';
+
                 var a = localStorage.getItem('CMS_ANIM');
                 if (a === 'false') document.documentElement.dataset.anim = 'false';
                 var tr = localStorage.getItem('CMS_TRANS');
@@ -20,16 +19,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="/Estilos/estilos_config.css">
-    <title>Configuración | CMS Premium</title>
+    <link rel="stylesheet" href="/Estilos/fondo_liquido.css">
+    <title>Configuración | DebiTú</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 </head>
 
 <body>
-    <div class="ambient-background" aria-hidden="true">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-        <div class="glass-overlay"></div>
+    <!-- Pantalla de carga global -->
+    <div id="global-loader" class="global-loader">
+        <div class="loader-spinner"></div>
+        <h2 class="loader-text">Cargando</h2>
+    </div>
+
+    <div class="liquid-container" aria-hidden="true">
+        <div class="blob-liquid blob-liquid-1"></div>
+        <div class="blob-liquid blob-liquid-2"></div>
+        <div class="blob-liquid blob-liquid-3"></div>
     </div>
 
     <header class="navbar">
@@ -66,27 +71,16 @@
             <h2 class="section-title">Preferencias</h2>
             <div class="prefs-grid">
 
-                <div class="pref-item pref-item--visual">
-                    <div style="text-align: start;">
-                        <h3>Apariencia</h3>
-                        <p>Elige entre modo claro u oscuro.</p>
-                    </div>
-                    <div class="theme-toggle" aria-label="Tema">
-                        <span class="theme-toggle__label theme-toggle__label--light">Claro</span>
-                        <button id="modo-oscuro-btn" class="ios-switch" type="button" role="switch" aria-checked="false"
-                            aria-label="Cambiar tema"></button>
-                        <span class="theme-toggle__label theme-toggle__label--dark">Oscuro</span>
-                    </div>
-                </div>
+
 
                 <div class="pref-item pref-item--visual">
                     <div style="text-align: start;">
-                        <h3>Animaciones</h3>
+                        <h3>Fondo animado</h3>
                         <p>Fondo dinámico y efectos.</p>
                     </div>
-                    <div class="theme-toggle" aria-label="Animaciones" style="border: none;background: none;">
-                        <button id="animaciones-btn" class="ios-switch" type="button" role="switch"
-                            aria-checked="true" aria-label="Alternar animaciones"></button>
+                    <div class="theme-toggle" aria-label="Fondo animado" style="border: none;background: none;">
+                        <button id="animaciones-btn" class="ios-switch" type="button" role="switch" aria-checked="true"
+                            aria-label="Alternar fondo animado"></button>
                     </div>
                 </div>
 
@@ -130,14 +124,13 @@
             </svg>
         </a>
 
-        <a class="icon-btn" href="/Plantillas/Estadisticas.html" aria-label="Estadísticas"
-            title="Estadísticas">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                    stroke-linejoin="round" aria-hidden="true">
-                    <line x1="6" y1="20" x2="6" y2="14" />
-                    <line x1="12" y1="20" x2="12" y2="4" />
-                    <line x1="18" y1="20" x2="18" y2="10" />
-                </svg>
+        <a class="icon-btn" href="/Plantillas/Estadisticas.html" aria-label="Estadísticas" title="Estadísticas">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
+                <line x1="6" y1="20" x2="6" y2="14" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="18" y1="20" x2="18" y2="10" />
+            </svg>
         </a>
 
         <a class="icon-btn active" href="/Plantillas/Configuracion.html" aria-label="Configuración"
@@ -162,6 +155,7 @@
 
 
     <script src="/Scripts/script_config.js" type="module"></script>
+    <script src="/Scripts/spa_router.js"></script>
 </body>
 
 </html>

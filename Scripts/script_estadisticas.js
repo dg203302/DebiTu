@@ -448,6 +448,58 @@ function createGradient(canvas, startColor, endColor) {
 	return gradient;
 }
 
+/* ── Active Debt Evolution ── */
+
+function buildActiveDebtSeries(deudas, pagos, isFiltered, selectedMonth) {
+	const events = [];
+	for (const d of deudas) {
+		const date = normalizeFecha(d);
+		const tel = getRecordTelefono(d);
+		if (date && tel) events.push({ date, amount: normalizeMonto(d), type: 'deuda', tel });
+	}
+	for (const p of pagos) {
+		const date = normalizeFecha(p);
+		const tel = getRecordTelefono(p);
+		if (date && tel) events.push({ date, amount: normalizeMonto(p), type: 'pago', tel });
+	}
+	events.sort((a, b) => a.date - b.date);
+
+	const clientBalances = new Map();
+	const monthBuckets = new Map();
+	const dayBuckets = new Map();
+
+	for (const ev of events) {
+		let bal = clientBalances.get(ev.tel) || 0;
+		if (ev.type === 'deuda') bal += ev.amount;
+		if (ev.type === 'pago') bal -= ev.amount;
+		if (bal < 0) bal = 0; // clamp per client
+		clientBalances.set(ev.tel, bal);
+
+		let runningTotal = 0;
+		for (const val of clientBalances.values()) {
+			runningTotal += val;
+		}
+
+		const mKey = getMonthKey(ev.date);
+		const mLabel = formatMonthLabel(ev.date);
+		monthBuckets.set(mKey, { label: mLabel, total: runningTotal, date: ev.date });
+
+		const dKey = `${ev.date.getFullYear()}-${String(ev.date.getMonth() + 1).padStart(2, '0')}-${String(ev.date.getDate()).padStart(2, '0')}`;
+		const dLabel = formatDayLabel(ev.date);
+		dayBuckets.set(dKey, { label: dLabel, total: runningTotal, date: ev.date, monthKey: mKey });
+	}
+
+	if (!isFiltered) {
+		return Array.from(monthBuckets.entries())
+			.sort((a, b) => a[0].localeCompare(b[0]))
+			.map(([, entry]) => entry);
+	} else {
+		return Array.from(dayBuckets.values())
+			.filter(entry => entry.monthKey === selectedMonth)
+			.sort((a, b) => a.date - b.date);
+	}
+}
+
 /* ── Render with current filter ── */
 
 function renderWithFilter() {
@@ -498,11 +550,11 @@ function renderWithFilter() {
 	// Line charts: monthly view → show all months; filtered → show daily breakdown
 	let deudasSeries, pagosSeries;
 
+	deudasSeries = buildActiveDebtSeries(rawDeudas, rawPagos, isFiltered, selectedMonth);
+
 	if (isFiltered) {
-		deudasSeries = groupByDay(filteredDeudas);
 		pagosSeries = groupByDay(filteredPagos);
 	} else {
-		deudasSeries = groupByMonth(rawDeudas);
 		pagosSeries = groupByMonth(rawPagos);
 	}
 
@@ -549,7 +601,7 @@ function renderWithFilter() {
 
 	// Update chart card h3 titles based on filter
 	const chartTitles = document.querySelectorAll('.chart-card__head h3');
-	if (chartTitles.length >= 1) chartTitles[0].textContent = isFiltered ? 'Deudas registradas día a día' : 'Evolución de deudas a lo largo del tiempo';
+	if (chartTitles.length >= 1) chartTitles[0].textContent = isFiltered ? 'Evolución de deuda activa (día a día)' : 'Evolución de deuda activa';
 	if (chartTitles.length >= 2) chartTitles[1].textContent = isFiltered ? 'Pagos registrados día a día' : 'Evolución de pagos a lo largo del tiempo';
 	if (chartTitles.length >= 3) chartTitles[2].textContent = isFiltered ? 'Deuda registrada por usuario' : 'Deuda total por usuario';
 }
@@ -592,7 +644,21 @@ async function init() {
 	} catch (error) {
 		console.error(error);
 		setStatus('No se pudieron cargar los datos', 'error');
-	}
+	} finally {
+        const loader = document.getElementById('global-loader');
+        if (loader) loader.classList.add('hidden');
+    }
 }
 
-document.addEventListener('DOMContentLoaded', init);
+init();
+
+window.addEventListener('scroll', () => {
+    const headerEl = document.querySelector('.header-text');
+    if (headerEl) {
+        if (window.scrollY > 10) {
+            headerEl.classList.add('scrolled');
+        } else {
+            headerEl.classList.remove('scrolled');
+        }
+    }
+});
