@@ -598,6 +598,7 @@ async function openAddClientSheet(){
                 }
             } catch (err) {
                 console.error('Error al abrir contactos', err);
+                showValidation('No se pudo acceder a los contactos: ' + (err.message || 'Sin permisos o error de seguridad.'));
             }
         });
     }
