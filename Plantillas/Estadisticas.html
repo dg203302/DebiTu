@@ -21,6 +21,11 @@
     <link rel="stylesheet" href="/Estilos/fondo_liquido.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
+    <style>
+        html, body { overscroll-behavior: none; color-scheme: dark; }
+        * { -webkit-touch-callout: none; touch-action: manipulation; }
+        input, textarea, select { touch-action: auto; }
+    </style>
     <title>Estadísticas | DebiTú</title>
 </head>
 
@@ -53,13 +58,20 @@
                     <h2 class="text-gradient stats-report__title">Resumen global de clientes</h2>
                 </div>
                 <div class="stats-report__actions">
-                    <button class="btn btn-primary" id="btnExportarPDF" type="button" style="display:flex; align-items:center; gap:8px;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="12" y1="18" x2="12" y2="12"></line>
-                            <line x1="9" y1="15" x2="15" y2="15"></line>
-                        </svg>
+                    <button class="btn" id="btnExportarPDF" type="button"
+                        style="display:flex; align-items:center; gap:10px; width: fit-content; background: linear-gradient(135deg, #e53e3e, #c53030); color: white; border: none; border-radius: 12px; padding: 10px 18px; font-weight: 600; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(229, 62, 62, 0.4); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; border-radius: 100px;"
+                        onmouseover="this.style.transform='scale(1.04)';this.style.boxShadow='0 6px 20px rgba(229,62,62,0.55)'"
+                        onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 15px rgba(229,62,62,0.4)'">
+                        <span
+                            style="display:flex; align-items:center; justify-content:center; background: rgba(255,255,255,0.18); border-radius: 8px; width: 32px; height: 32px; flex-shrink:0;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" style="width:50px;height:50px;">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="12" y1="18" x2="12" y2="12"></line>
+                                <line x1="9" y1="15" x2="15" y2="15"></line>
+                            </svg>
+                        </span>
                         Exportar PDF
                     </button>
                     <div class="stats-status" id="stats_status">Cargando datos...</div>
