@@ -1659,8 +1659,10 @@ body.cms-sheet-open .cms-sheet-drawer {
 :root[data-theme="dark"][data-trans="false"] .details-panel,
 :root[data-theme="dark"][data-trans="false"] .control-panel,
 :root[data-theme="dark"][data-trans="false"] .add-client-sheet,
+:root[data-theme="dark"][data-trans="false"] .opd-drawer,
 :root[data-theme="dark"][data-trans="false"] .op-detail-drawer,
 :root[data-theme="dark"][data-trans="false"] .prompt-sheet,
+:root[data-theme="dark"][data-trans="false"] .cms-sheet-drawer,
 :root[data-theme="dark"][data-trans="false"] .confirm-sheet {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;

@@ -1351,6 +1351,7 @@ body.cfg-sheet-open .cfg-sheet {
 :root[data-theme="dark"][data-trans="false"] .op-detail-drawer,
 :root[data-theme="dark"][data-trans="false"] .prompt-sheet,
 :root[data-theme="dark"][data-trans="false"] .confirm-sheet,
+:root[data-theme="dark"][data-trans="false"] .cms-sheet-drawer,
 :root[data-theme="dark"][data-trans="false"] .navbar,
 :root[data-theme="dark"][data-trans="false"] .valor-card {
 	backdrop-filter: none !important;
