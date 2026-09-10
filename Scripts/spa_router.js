@@ -313,14 +313,13 @@ export async function spaNavigate(url, isPopState = false) {
         // Scroll al tope
         window.scrollTo({ top: 0, behavior: 'instant' });
 
-        // APLICAR PERFIL DE USUARIO INMEDIATAMENTE sobre el nuevo HTML inyectado
-        syncUserProfile();
-
         // Ejecutar inicialización de la vista
         if (handlerConfig && handlerConfig.module) {
             try {
-                // Importar módulo de la vista (la caché de ESM previene doble descarga)
-                const mod = await import(`${handlerConfig.module}?v=${Date.now()}`);
+                // Importar módulo de la vista usando URL fija para respetar la caché ESM.
+                // IMPORTANTE: NO usar ?v=Date.now() — eso crea instancias duplicadas del módulo
+                // en cada navegación, causando condiciones de carrera con listeners stale.
+                const mod = await import(handlerConfig.module);
                 if (typeof mod[handlerConfig.init] === 'function') {
                     await mod[handlerConfig.init]();
                 } else {
@@ -334,7 +333,8 @@ export async function spaNavigate(url, isPopState = false) {
             hideAppLoader();
         }
 
-        // Re-sincronizar perfil por si la vista reconstruyó nodos o actualizó la sesión
+        // Re-sincronizar perfil DESPUÉS de que init*() completó,
+        // para asegurar que cualquier nodo reconstruido tenga los datos correctos.
         syncUserProfile();
 
     } catch (err) {
