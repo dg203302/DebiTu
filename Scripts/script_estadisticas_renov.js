@@ -378,10 +378,10 @@ async function renderizarGraficos(deudas, pagos) {
             const dataPagos = labels.map(l => pagosMap.get(l) || 0);
             const dataDeudas = labels.map(l => deudasMap.get(l) || 0);
 
-            // Fallback si no hay transacciones para que el canvas siempre se vea premium
-            const finalLabels = labels.length > 0 ? labels : ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'];
-            const finalPagos = labels.length > 0 ? dataPagos : [1200, 2400, 1800, 3100];
-            const finalDeudas = labels.length > 0 ? dataDeudas : [1900, 1500, 2200, 1100];
+            // Sin datos: estado vacío neutro (no insertar valores ficticios)
+            const finalLabels = labels.length > 0 ? labels : ['Sin datos'];
+            const finalPagos = labels.length > 0 ? dataPagos : [0];
+            const finalDeudas = labels.length > 0 ? dataDeudas : [0];
 
             state.chartTrend = new Chart(canvasTrend, {
                 type: 'line',
@@ -468,9 +468,9 @@ async function renderizarGraficos(deudas, pagos) {
             const distLabels = topClientes.map(c => c.Nombre || c.Telefono || 'Cliente');
             const distData = topClientes.map(c => Number(c.Deuda_Activa) || 0);
 
-            // Fallback elegante
-            const finalDistLabels = distLabels.length > 0 ? distLabels : ['Carlos M.', 'María F.', 'Sofía R.', 'Juan P.'];
-            const finalDistData = distLabels.length > 0 ? distData : [2400, 1850, 1200, 874];
+            // Sin deudores: estado vacío neutro
+            const finalDistLabels = distLabels.length > 0 ? distLabels : ['Sin deudores'];
+            const finalDistData = distLabels.length > 0 ? distData : [0];
 
             state.chartDistribution = new Chart(canvasDist, {
                 type: 'bar',

@@ -80,11 +80,6 @@ async function cargarDatosDashboard() {
         state.deudas = resDeudas.data || [];
         state.pagos = resPagos.data || [];
 
-        // Si la base de datos no tiene datos o está vacía, cargar dataset de muestra para visualización fluida
-        if (state.clientes.length === 0 && state.pagos.length === 0 && state.deudas.length === 0) {
-            cargarDatasetDemo();
-        }
-
         // 4. Calcular Deuda Total Activa (Suma de Deuda_Activa de todos los clientes)
         state.totalDeudaActiva = state.clientes.reduce((acc, c) => acc + (Number(c.Deuda_Activa) || 0), 0);
         renderTotalBalance(state.totalDeudaActiva);
@@ -102,49 +97,19 @@ async function cargarDatosDashboard() {
         renderizarMovimientosRecientes();
 
     } catch (err) {
-        console.warn('Error al cargar datos desde Supabase, activando fallback:', err);
+        console.warn('Error al cargar datos desde Supabase:', err);
         cargarPerfilUsuario();
-        cargarDatasetDemo();
-        renderTotalBalance(state.totalDeudaActiva);
+        state.clientes = [];
+        state.deudas = [];
+        state.pagos = [];
+        state.totalDeudaActiva = 0;
+        renderTotalBalance(0);
         const activeClientsFallbackEl = document.getElementById('metric_active_clients_num');
-        if (activeClientsFallbackEl) activeClientsFallbackEl.textContent = state.clientes.length;
+        if (activeClientsFallbackEl) activeClientsFallbackEl.textContent = 0;
         actualizarHeroBadgeCobradoMes();
         actualizarResumenEstadistico(state.currentTimeframe);
         renderizarMovimientosRecientes();
     }
-}
-
-function cargarDatasetDemo() {
-    state.isDemoFallback = true;
-    const now = new Date();
-    
-    // Generar fechas recientes coherentes para demo
-    const haceHoras = (h) => new Date(now.getTime() - h * 3600000).toISOString();
-    const haceDias = (d) => new Date(now.getTime() - d * 86400000).toISOString();
-
-    state.clientes = [
-        { id_clie: 1, Nombre: 'María Fernández', Deuda_Activa: 2400.00 },
-        { id_clie: 2, Nombre: 'Carlos Mendoza', Deuda_Activa: 1850.50 },
-        { id_clie: 3, Nombre: 'Juan Rodríguez', Deuda_Activa: 1200.00 },
-        { id_clie: 4, Nombre: 'Sofía Romero', Deuda_Activa: 873.99 }
-    ];
-    state.totalDeudaActiva = 6324.49;
-
-    state.pagos = [
-        { id_pago: 1, Monto: 1500.00, Categoria: 'Abono en efectivo', Creado: haceHoras(2) },
-        { id_pago: 2, Monto: 850.00, Categoria: 'Transferencia bancaria', Creado: haceHoras(6) },
-        { id_pago: 3, Monto: 1200.00, Categoria: 'Cobro por tarjeta', Creado: haceDias(2) },
-        { id_pago: 4, Monto: 650.50, Categoria: 'Abono parcial', Creado: haceDias(4) },
-        { id_pago: 5, Monto: 2100.00, Categoria: 'Cancelación total', Creado: haceDias(10) },
-        { id_pago: 6, Monto: 950.00, Categoria: 'Abono mensual', Creado: haceDias(18) }
-    ];
-
-    state.deudas = [
-        { id_deuda: 1, Monto: 2400.00, Categoria: 'Venta mercadería', Creado: haceHoras(4) },
-        { id_deuda: 2, Monto: 1850.50, Categoria: 'Crédito en cuotas', Creado: haceDias(1) },
-        { id_deuda: 3, Monto: 1200.00, Categoria: 'Servicios', Creado: haceDias(3) },
-        { id_deuda: 4, Monto: 3100.00, Categoria: 'Pedido mayorista', Creado: haceDias(12) }
-    ];
 }
 
 async function cargarPerfilUsuario() {
@@ -424,11 +389,15 @@ function actualizarMiniBarras(containerId, values) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    const maxVal = Math.max(...values, 1);
+    const realMax = Math.max(...values, 0);
     container.innerHTML = values.map(val => {
-        const heightPct = val > 0 ? Math.max(25, Math.round((val / maxVal) * 100)) : 18;
-        const isActive = val === maxVal && val > 0;
-        return `<div class="mini-bar ${isActive ? 'active' : ''}" style="height: ${heightPct}%;" title="${formatCurrency(val)}"></div>`;
+        if (realMax > 0 && val > 0) {
+            const heightPct = Math.max(20, Math.round((val / realMax) * 100));
+            const isActive = val === realMax;
+            return `<div class="mini-bar ${isActive ? 'active' : ''}" style="height: ${heightPct}%;" title="${formatCurrency(val)}"></div>`;
+        } else {
+            return `<div class="mini-bar" style="height: 6%; opacity: 0.25;" title="${formatCurrency(val)}"></div>`;
+        }
     }).join('');
 }
 
@@ -490,7 +459,8 @@ function dibujarCurvaNeonSvg(values, labels) {
     const numPoints = Math.max(values.length, 1);
     const stepX = numPoints > 1 ? (availableW / (numPoints - 1)) : availableW;
 
-    const maxVal = Math.max(...values, 1);
+    const realMax = Math.max(...values, 0);
+    const hasData = realMax > 0;
 
     // Líneas de guía tenues horizontales de fondo
     if (gridGroup) {
@@ -506,46 +476,66 @@ function dibujarCurvaNeonSvg(values, labels) {
     // Coordenadas calculadas proporcionales
     const points = values.map((val, i) => {
         const x = Math.round(padX + i * stepX);
-        let ratio;
-        if (maxVal > 1) {
-            ratio = val / maxVal;
-        } else {
-            const wave = [0.22, 0.50, 0.32, 0.70, 0.42, 0.80, 0.52];
-            ratio = wave[i % wave.length];
+        let ratio = 0;
+        if (hasData) {
+            ratio = val / realMax;
+            ratio = Math.max(0.06, Math.min(0.94, ratio));
         }
-        ratio = Math.max(0.06, Math.min(0.94, ratio));
-        const y = Math.round(padBottom - (ratio * (padBottom - padTop)));
+        const y = hasData 
+            ? Math.round(padBottom - (ratio * (padBottom - padTop))) 
+            : padBottom;
         return { x, y, val, label: (labels && labels[i]) ? labels[i] : '' };
     });
 
-    // Generar línea suavizada Bézier (curva cúbica fluida)
-    let d = `M ${points[0].x},${points[0].y}`;
-    for (let i = 0; i < points.length - 1; i++) {
-        const p0 = points[i];
-        const p1 = points[i + 1];
-        const midX = (p0.x + p1.x) / 2;
-        d += ` C ${midX},${p0.y} ${midX},${p1.y} ${p1.x},${p1.y}`;
-    }
+    if (!hasData) {
+        // Línea base plana y sutil al pie sin relleno de área
+        const dFlat = `M ${points[0].x},${padBottom} L ${points[points.length - 1].x},${padBottom}`;
+        glowPath.setAttribute('d', dFlat);
+        glowPath.style.stroke = 'rgba(255,255,255,0.18)';
+        glowPath.style.strokeDasharray = '4,4';
+        areaPath.setAttribute('d', '');
 
-    const areaD = `${d} L ${points[points.length - 1].x},${height} L ${points[0].x},${height} Z`;
+        if (nodesGroup) {
+            nodesGroup.innerHTML = points.map(p => `
+                <circle cx="${p.x}" cy="${padBottom}" r="3" 
+                    fill="rgba(255,255,255,0.22)" 
+                    stroke="#0a0c0f" stroke-width="1.5" 
+                    title="${p.label ? p.label + ': ' : ''}$0.00"
+                    style="cursor: default;" />
+            `).join('');
+        }
+    } else {
+        // Generar línea suavizada Bézier (curva cúbica fluida) con datos reales
+        let d = `M ${points[0].x},${points[0].y}`;
+        for (let i = 0; i < points.length - 1; i++) {
+            const p0 = points[i];
+            const p1 = points[i + 1];
+            const midX = (p0.x + p1.x) / 2;
+            d += ` C ${midX},${p0.y} ${midX},${p1.y} ${p1.x},${p1.y}`;
+        }
 
-    glowPath.setAttribute('d', d);
-    areaPath.setAttribute('d', areaD);
+        const areaD = `${d} L ${points[points.length - 1].x},${height} L ${points[0].x},${height} Z`;
 
-    // Crear nodos perfectamente circulares con drop-shadow neón
-    if (nodesGroup) {
-        nodesGroup.innerHTML = points.map((p, idx) => {
-            const isHighest = p.val === maxVal && maxVal > 1;
-            const r = isHighest ? 5.5 : (idx === points.length - 1 ? 5 : 4);
-            const fill = isHighest ? '#ffffff' : '#ccff00';
-            return `
-                <circle cx="${p.x}" cy="${p.y}" r="${r}" 
-                    fill="${fill}" 
-                    stroke="#0a0c0f" stroke-width="2.5" 
-                    title="${p.label ? p.label + ': ' : ''}${formatCurrency(p.val)}"
-                    style="cursor: pointer; transition: transform 0.2s;" />
-            `;
-        }).join('');
+        glowPath.setAttribute('d', d);
+        glowPath.style.stroke = '#ccff00';
+        glowPath.style.strokeDasharray = 'none';
+        areaPath.setAttribute('d', areaD);
+
+        // Crear nodos perfectamente circulares con drop-shadow neón
+        if (nodesGroup) {
+            nodesGroup.innerHTML = points.map((p, idx) => {
+                const isHighest = p.val === realMax && realMax > 0;
+                const r = isHighest ? 5.5 : (idx === points.length - 1 ? 5 : 4);
+                const fill = isHighest ? '#ffffff' : '#ccff00';
+                return `
+                    <circle cx="${p.x}" cy="${p.y}" r="${r}" 
+                        fill="${fill}" 
+                        stroke="#0a0c0f" stroke-width="2.5" 
+                        title="${p.label ? p.label + ': ' : ''}${formatCurrency(p.val)}"
+                        style="cursor: pointer; transition: transform 0.2s;" />
+                `;
+            }).join('');
+        }
     }
 
     // Etiquetas de períodos limpias al pie de cada nodo
