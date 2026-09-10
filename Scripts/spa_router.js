@@ -5,8 +5,11 @@
 // ==========================================================================
 
 import { showAppLoader, hideAppLoader } from './loader_renovado.js';
+import { isDesktopViewport, resolveResponsiveUrl, resolveResponsivePath } from './device_detector.js';
 
-window.__SPA_ROUTER_ACTIVE__ = true;
+if (typeof window !== 'undefined') {
+    window.__SPA_ROUTER_ACTIVE__ = true;
+}
 
 // Mapeo de rutas a módulos de vista (Móvil y Desktop)
 const ROUTE_HANDLERS = {
@@ -75,19 +78,33 @@ const ROUTE_HANDLERS = {
     }
 };
 
-function getRouteKey(pathname) {
-    const segments = pathname.split('/').filter(Boolean);
+export function normalizeRouteKey(pathname) {
+    if (!pathname) return '';
+    const clean = pathname.split('?')[0].split('#')[0];
+    const segments = clean.split('/').filter(Boolean);
     const filename = segments[segments.length - 1] || 'index.html';
-    return filename;
+    return filename.toLowerCase().replace(/\.html$/, '');
 }
 
-function findRouteHandler(pathname) {
-    const routeKey = getRouteKey(pathname).toLowerCase();
+export function findRouteHandler(pathname) {
+    const targetKey = normalizeRouteKey(pathname);
+
+    // 1. Coincidencia exacta normalizada (sin .html)
     for (const [key, handler] of Object.entries(ROUTE_HANDLERS)) {
-        if (key.toLowerCase() === routeKey) {
+        if (normalizeRouteKey(key) === targetKey) {
             return handler;
         }
     }
+
+    // 2. Coincidencia por base (ignora sufijo _desktop)
+    const baseTarget = targetKey.replace(/_desktop$/, '');
+    for (const [key, handler] of Object.entries(ROUTE_HANDLERS)) {
+        const baseKey = normalizeRouteKey(key).replace(/_desktop$/, '');
+        if (baseKey === baseTarget) {
+            return handler;
+        }
+    }
+
     return null;
 }
 
@@ -232,7 +249,7 @@ export async function syncUserProfile() {
 
 export async function spaNavigate(url, isPopState = false) {
     try {
-        const targetUrl = new URL(url, window.location.origin);
+        let targetUrl = new URL(url, window.location.origin);
 
         // Si es hacia un host distinto, usar navegación normal
         if (targetUrl.origin !== window.location.origin) {
@@ -240,15 +257,23 @@ export async function spaNavigate(url, isPopState = false) {
             return;
         }
 
-        const routeKey = getRouteKey(targetUrl.pathname);
+        // Resolver URL responsiva según viewport antes de solicitar la plantilla
+        targetUrl = resolveResponsiveUrl(targetUrl);
+
+        const routeKey = normalizeRouteKey(targetUrl.pathname);
 
         // Si la navegación es al índice raíz o index.html, permitir carga completa para verificación de sesión
-        if (routeKey === 'index.html' || targetUrl.pathname === '/' || targetUrl.pathname === '/index.html') {
+        if (routeKey === 'index' || targetUrl.pathname === '/' || targetUrl.pathname === '/index.html') {
             window.location.href = targetUrl.href;
             return;
         }
 
         const handlerConfig = findRouteHandler(targetUrl.pathname);
+        if (!handlerConfig) {
+            console.warn(`[SPA Router] No se encontró manejador para la ruta ${targetUrl.pathname}, usando navegación completa.`);
+            window.location.href = targetUrl.href;
+            return;
+        }
 
         const loadingMsg = handlerConfig?.loadingMsg || 'Sincronizando datos...';
         showAppLoader(loadingMsg);
@@ -310,8 +335,17 @@ export async function spaNavigate(url, isPopState = false) {
         // Sincronizar dock inferior o sidebar activo
         updateActiveDock(targetUrl.pathname);
 
-        // Scroll al tope
-        window.scrollTo({ top: 0, behavior: 'instant' });
+        // Scroll al tope o al ancla (hash)
+        if (targetUrl.hash) {
+            const targetEl = document.querySelector(targetUrl.hash);
+            if (targetEl) {
+                targetEl.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                window.scrollTo({ top: 0, behavior: 'instant' });
+            }
+        } else {
+            window.scrollTo({ top: 0, behavior: 'instant' });
+        }
 
         // Ejecutar inicialización de la vista
         if (handlerConfig && handlerConfig.module) {
@@ -323,6 +357,7 @@ export async function spaNavigate(url, isPopState = false) {
                 if (typeof mod[handlerConfig.init] === 'function') {
                     await mod[handlerConfig.init]();
                 } else {
+                    console.warn(`[SPA Router] Función ${handlerConfig.init} no encontrada en ${handlerConfig.module}`);
                     hideAppLoader();
                 }
             } catch (err) {
@@ -345,8 +380,7 @@ export async function spaNavigate(url, isPopState = false) {
 }
 
 function updateActiveDock(pathname) {
-    const currentFile = getRouteKey(pathname);
-    const cleanCurrent = currentFile.toLowerCase().replace('_desktop.html', '').replace('.html', '').replace('_renov', '');
+    const cleanCurrent = normalizeRouteKey(pathname).replace(/_desktop$/, '').replace(/_renov$/, '');
     const navLinks = document.querySelectorAll('.bottom-nav-bar .nav-link, .dock-item, .desktop-nav-link');
     navLinks.forEach(item => {
         const href = (item.getAttribute('href') || '').toLowerCase();
@@ -394,17 +428,18 @@ function initHistoryListener() {
 }
 
 // Inicialización del router
-initLinkInterceptor();
-initHistoryListener();
-
-// Sincronización inmediata al cargar el script
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => syncUserProfile());
-} else {
-    syncUserProfile();
-}
-
 if (typeof window !== 'undefined') {
+    initLinkInterceptor();
+    initHistoryListener();
+
+    if (typeof document !== 'undefined') {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => syncUserProfile());
+        } else {
+            syncUserProfile();
+        }
+    }
+
     window.spaNavigate = spaNavigate;
     window.syncUserProfile = syncUserProfile;
 }

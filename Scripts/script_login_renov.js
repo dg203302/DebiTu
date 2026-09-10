@@ -41,9 +41,14 @@ function initAppMeta() {
 }
 
 async function verificarSesionExistente() {
+    const isDesktop = (typeof window !== 'undefined' && window.innerWidth >= 1024);
+    const targetDashboard = isDesktop 
+        ? '/Plantillas_Renovadas_Desktop/Dashboard_renov_desktop.html' 
+        : '/Plantillas_Renovadas/Dashboard_renov.html';
+
     const userId = localStorage.getItem('UserID');
     if (userId && userId !== 'N/A') {
-        window.location.href = '/Plantillas_Renovadas/Dashboard_renov.html';
+        window.location.href = targetDashboard;
         return;
     }
 
@@ -58,7 +63,7 @@ async function verificarSesionExistente() {
                 const photo = meta.avatar_url || meta.picture || '';
                 if (photo) localStorage.setItem('UserPhoto', photo);
 
-                window.location.href = '/Plantillas_Renovadas/Dashboard_renov.html';
+                window.location.href = targetDashboard;
             }
         } catch (e) {
             console.warn('Error verificando sesión previa:', e);

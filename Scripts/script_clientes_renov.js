@@ -336,7 +336,11 @@ async function abrirDetalleCliente(cliente) {
 
     // Link a Operacion_renov con teléfono preseleccionado
     if (opLinkEl) {
-        opLinkEl.href = `/Plantillas_Renovadas/Operacion_renov.html?tipo=${debt > 0 ? 'pago' : 'deuda'}`;
+        const isDesktop = window.location.pathname.includes('_desktop') || (typeof window !== 'undefined' && window.innerWidth >= 1024);
+        const basePath = isDesktop 
+            ? '/Plantillas_Renovadas_Desktop/Operacion_renov_desktop.html' 
+            : '/Plantillas_Renovadas/Operacion_renov.html';
+        opLinkEl.href = `${basePath}?tipo=${debt > 0 ? 'pago' : 'deuda'}`;
     }
 
     // Abrir modal
