@@ -47,6 +47,14 @@
         const setStatus = (msg) => { if (statusEl) statusEl.textContent = msg; };
 
         (async () => {
+            const isDesktop = window.innerWidth >= 1024;
+            const targetDashboard = isDesktop 
+                ? '/Plantillas_Renovadas_Desktop/Dashboard_renov_desktop.html' 
+                : '/Plantillas_Renovadas/Dashboard_renov.html';
+            const targetLogin = isDesktop 
+                ? '/Plantillas_Renovadas_Desktop/Login_renov_desktop.html' 
+                : '/Plantillas_Renovadas/Login_renov.html';
+
             try {
                 setStatus('Conectando con el sistema…');
                 const clientesup = await loadSupaBseWithAuth();
@@ -54,9 +62,9 @@
                 setStatus('Verificando credenciales…');
                 const idUsuario = localStorage.getItem('UserID');
                 
-                // Si ya existe un ID de usuario guardado y válido, redirigir al Dashboard Renovado
+                // Si ya existe un ID de usuario guardado y válido, redirigir al Dashboard correspondiente
                 if (idUsuario && idUsuario !== 'N/A') {
-                    window.location.href = '/Plantillas_Renovadas/Dashboard_renov.html';
+                    window.location.href = targetDashboard;
                     return;
                 }
 
@@ -64,7 +72,7 @@
                 const { data: { session }, error } = await clientesup.auth.getSession();
                 if (error) {
                     console.warn('Error al verificar sesión:', error);
-                    window.location.href = '/Plantillas_Renovadas/Login_renov.html';
+                    window.location.href = targetLogin;
                     return;
                 }
 
@@ -86,16 +94,16 @@
                     if (userEmail) localStorage.setItem('UserEmail', userEmail);
 
                     setStatus('Iniciando panel principal…');
-                    window.location.href = '/Plantillas_Renovadas/Dashboard_renov.html';
+                    window.location.href = targetDashboard;
                     return;
                 }
 
-                // Si no hay sesión activa, ir al login renovado
-                window.location.href = '/Plantillas_Renovadas/Login_renov.html';
+                // Si no hay sesión activa, ir al login correspondiente
+                window.location.href = targetLogin;
 
             } catch (e) {
                 console.error('Error durante la verificación inicial:', e);
-                window.location.href = '/Plantillas_Renovadas/Login_renov.html';
+                window.location.href = targetLogin;
             }
         })();
     </script>

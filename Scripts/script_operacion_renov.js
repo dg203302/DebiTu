@@ -1,4 +1,4 @@
-import { loadSupabase } from './supabase.js';
+import { loadSupabase, loadSupaBseWithAuth } from './supabase.js';
 import { showSuccessToast, showErrorToast } from './sweetalert2.js';
 import { showAppLoader, hideAppLoader } from './loader_renovado.js';
 
@@ -83,22 +83,60 @@ async function initHeaderProfile() {
     const initialsSpan = document.getElementById('header_avatar_initials');
     const nameSpan = document.getElementById('user_display_name');
 
-    const localPhoto = localStorage.getItem('UserPhoto');
-    const localName = localStorage.getItem('UserName') || 'Mi Negocio';
+    let localPhoto = (localStorage.getItem('UserPhoto') || '').toString().trim();
+    let localName = (localStorage.getItem('UserName') || '').toString().trim();
 
-    if (nameSpan) nameSpan.textContent = localName;
+    if (!localPhoto || !localName) {
+        try {
+            const clientAuth = await loadSupaBseWithAuth();
+            const { data: { session } } = await clientAuth.auth.getSession();
+            if (session?.user) {
+                const meta = session.user.user_metadata || {};
+                const identity0 = Array.isArray(session.user.identities)
+                    ? session.user.identities[0]?.identity_data
+                    : null;
 
-    const initial = (localName.trim()[0] || 'D').toUpperCase();
+                if (!localName) {
+                    localName = (meta.full_name || meta.name || meta.user_name || meta.username || session.user.email || '').toString().trim();
+                    if (localName) localStorage.setItem('UserName', localName);
+                }
+
+                if (!localPhoto) {
+                    localPhoto = (meta.avatar_url || meta.picture || identity0?.avatar_url || identity0?.picture || '').toString().trim();
+                    if (localPhoto) localStorage.setItem('UserPhoto', localPhoto);
+                }
+            }
+        } catch (e) {
+            console.warn('No se pudo obtener la sesión auth para el perfil:', e);
+        }
+    }
+
+    if (nameSpan) nameSpan.textContent = localName || 'Mi Negocio';
+
+    const initial = (localName || 'D').trim().charAt(0).toUpperCase();
     if (initialsSpan) initialsSpan.textContent = initial;
 
     if (localPhoto && localPhoto.trim() && pfpImg) {
         let photoUrl = localPhoto.trim();
-        if (photoUrl.includes('googleusercontent.com') && photoUrl.includes('=s96-c')) {
-            photoUrl = photoUrl.replace('=s96-c', '=s128-c');
+        if (photoUrl.includes('googleusercontent.com')) {
+            photoUrl = photoUrl.replace(/=s\d+-c$/, '=s128-c').replace(/=s\d+$/, '=s128');
         }
+        pfpImg.onload = () => {
+            pfpImg.style.display = 'block';
+            if (fallback) fallback.style.display = 'none';
+        };
+        pfpImg.onerror = () => {
+            pfpImg.style.display = 'none';
+            if (fallback) fallback.style.display = 'flex';
+        };
         pfpImg.src = photoUrl;
+        pfpImg.style.display = 'block';
+        if (fallback) fallback.style.display = 'none';
     } else {
-        if (pfpImg) pfpImg.style.display = 'none';
+        if (pfpImg) {
+            pfpImg.removeAttribute('src');
+            pfpImg.style.display = 'none';
+        }
         if (fallback) fallback.style.display = 'flex';
     }
 }

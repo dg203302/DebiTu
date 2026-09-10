@@ -118,18 +118,38 @@ async function loadUserProfile() {
     if (headerInitials) headerInitials.textContent = displayInitial;
     if (heroInitials) heroInitials.textContent = displayInitial;
 
-    // Asignar fotos si existen
-    if (photo) {
+    // Asignar y mostrar fotos si existen
+    if (photo && photo.trim()) {
         // Enlaces de Google: generar versiones de alta resolución
         const photoUrlHeader = photo.replace(/=s\d+-c$/, '=s128-c').replace(/=s\d+$/, '=s128');
         const photoUrlHero = photo.replace(/=s\d+-c$/, '=s256-c').replace(/=s\d+$/, '=s256');
 
         if (headerPfp) {
+            headerPfp.onload = () => {
+                headerPfp.style.display = 'block';
+                if (headerFallback) headerFallback.style.display = 'none';
+            };
+            headerPfp.onerror = () => {
+                headerPfp.style.display = 'none';
+                if (headerFallback) headerFallback.style.display = 'flex';
+            };
             headerPfp.src = photoUrlHeader;
+            headerPfp.style.display = 'block';
+            if (headerFallback) headerFallback.style.display = 'none';
         }
 
         if (heroPfp) {
+            heroPfp.onload = () => {
+                heroPfp.style.display = 'block';
+                if (heroFallback) heroFallback.style.display = 'none';
+            };
+            heroPfp.onerror = () => {
+                heroPfp.style.display = 'none';
+                if (heroFallback) heroFallback.style.display = 'flex';
+            };
             heroPfp.src = photoUrlHero;
+            heroPfp.style.display = 'block';
+            if (heroFallback) heroFallback.style.display = 'none';
         }
     } else {
         if (headerPfp) {

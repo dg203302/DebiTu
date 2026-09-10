@@ -23,12 +23,12 @@
         <header class="app-header-floating">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <div class="header-avatar-container">
-                    <img src="" id="pfp" alt="Imagen de usuario" class="header-avatar-img"
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" id="pfp" alt="Imagen de usuario" class="header-avatar-img"
                         referrerpolicy="no-referrer"
                         crossorigin="anonymous"
-                        onload="this.style.display='block'; const fb=document.getElementById('header_avatar_fallback'); if(fb) fb.style.display='none';"
-                        onerror="this.style.display='none'; const fb=document.getElementById('header_avatar_fallback'); if(fb) fb.style.display='flex';"
-                        style="display: none;" />
+                        style="display: none;"
+                        onload="if(this.src && !this.src.startsWith('data:image/svg')) { this.style.display='block'; const fb=this.parentElement.querySelector('.header-avatar-fallback'); if(fb) fb.style.display='none'; }"
+                        onerror="this.style.display='none'; const fb=this.parentElement.querySelector('.header-avatar-fallback'); if(fb) fb.style.display='flex';">
                     <div id="header_avatar_fallback" class="header-avatar-fallback" style="display: flex;">
                         <span id="header_avatar_initials">D</span>
                     </div>
@@ -126,22 +126,23 @@
 
                 <!-- Gráfico SVG Neón Fluido -->
                 <div class="chart-container">
-                    <svg id="chart_svg" class="chart-svg" viewBox="0 0 320 120" preserveAspectRatio="none">
+                    <svg id="chart_svg" class="chart-svg" viewBox="0 0 340 130" style="width: 100%; height: 100%; overflow: visible;">
                         <defs>
                             <linearGradient id="volt-gradient-fill" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="#ccff00" stop-opacity="0.35"/>
+                                <stop offset="0%" stop-color="#ccff00" stop-opacity="0.28"/>
                                 <stop offset="100%" stop-color="#ccff00" stop-opacity="0.0"/>
                             </linearGradient>
                         </defs>
+                        <!-- Guías de cuadrícula tenues -->
+                        <g id="chart_grid_group"></g>
                         <!-- Área de relleno con gradiente -->
-                        <path id="chart_area_path" class="chart-area-fill" d="M0,90 Q40,40 80,75 T160,35 T240,65 T320,20 L320,120 L0,120 Z"></path>
+                        <path id="chart_area_path" class="chart-area-fill" d=""></path>
                         <!-- Línea Volt neón con glow -->
-                        <path id="chart_glow_path" class="chart-glow-line" d="M0,90 Q40,40 80,75 T160,35 T240,65 T320,20"></path>
+                        <path id="chart_glow_path" class="chart-glow-line" d=""></path>
                         <!-- Nodos destacados -->
-                        <g id="chart_nodes_group">
-                            <circle cx="160" cy="35" r="4.5" fill="#ccff00" stroke="#0a0c0f" stroke-width="2.5" />
-                            <circle cx="320" cy="20" r="4.5" fill="#ccff00" stroke="#0a0c0f" stroke-width="2.5" />
-                        </g>
+                        <g id="chart_nodes_group"></g>
+                        <!-- Etiquetas de períodos de tiempo -->
+                        <g id="chart_labels_group"></g>
                     </svg>
                 </div>
 
@@ -242,6 +243,8 @@
     <script type="module" src="/Scripts/script_dashboard_renov.js"></script>
     <!-- Router SPA Unificado -->
     <script type="module" src="/Scripts/spa_router.js"></script>
+    <!-- Detector de Dispositivo y Redimensionamiento -->
+    <script type="module" src="/Scripts/device_detector.js"></script>
 </body>
 
 </html>

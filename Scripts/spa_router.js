@@ -8,8 +8,9 @@ import { showAppLoader, hideAppLoader } from './loader_renovado.js';
 
 window.__SPA_ROUTER_ACTIVE__ = true;
 
-// Mapeo de rutas a módulos de vista
+// Mapeo de rutas a módulos de vista (Móvil y Desktop)
 const ROUTE_HANDLERS = {
+    // Móvil
     'Dashboard_renov.html': {
         module: '/Scripts/script_dashboard_renov.js',
         init: 'initDashboard',
@@ -36,6 +37,38 @@ const ROUTE_HANDLERS = {
         loadingMsg: 'Cargando ajustes y cuenta...'
     },
     'Login_renov.html': {
+        module: '/Scripts/script_login_renov.js',
+        init: 'initLogin',
+        loadingMsg: 'Verificando credenciales...'
+    },
+
+    // Desktop
+    'Dashboard_renov_desktop.html': {
+        module: '/Scripts/script_dashboard_renov.js',
+        init: 'initDashboard',
+        loadingMsg: 'Sincronizando finanzas en escritorio...'
+    },
+    'Clientes_renov_desktop.html': {
+        module: '/Scripts/script_clientes_renov.js',
+        init: 'initClientes',
+        loadingMsg: 'Cargando directorio de clientes...'
+    },
+    'Operacion_renov_desktop.html': {
+        module: '/Scripts/script_operacion_renov.js',
+        init: 'initOperacion',
+        loadingMsg: 'Cargando operaciones...'
+    },
+    'Estadisticas_renov_desktop.html': {
+        module: '/Scripts/script_estadisticas_renov.js',
+        init: 'initEstadisticas',
+        loadingMsg: 'Calculando analíticas y estadísticas...'
+    },
+    'Config_renov_desktop.html': {
+        module: '/Scripts/script_config_renov.js',
+        init: 'initConfig',
+        loadingMsg: 'Cargando ajustes...'
+    },
+    'Login_renov_desktop.html': {
         module: '/Scripts/script_login_renov.js',
         init: 'initLogin',
         loadingMsg: 'Verificando credenciales...'
@@ -96,9 +129,17 @@ export async function spaNavigate(url, isPopState = false) {
             history.pushState({ spa: true, url: targetUrl.href }, '', targetUrl.href);
         }
 
-        // Actualizar Contenedor Principal (.app-viewport)
-        const currentViewport = document.querySelector('.app-viewport');
-        const newViewport = newDoc.querySelector('.app-viewport');
+        // Si cambia el tipo de layout (Móvil vs Desktop), hacer navegación completa para montar estructura correcta
+        const currentIsDesktop = Boolean(document.querySelector('.desktop-app-layout'));
+        const newIsDesktop = Boolean(newDoc.querySelector('.desktop-app-layout'));
+        if (currentIsDesktop !== newIsDesktop) {
+            window.location.href = targetUrl.href;
+            return;
+        }
+
+        // Actualizar Contenedor Principal (.desktop-main-wrap o .app-viewport)
+        const currentViewport = document.querySelector('.desktop-main-wrap') || document.querySelector('.app-viewport');
+        const newViewport = newDoc.querySelector('.desktop-main-wrap') || newDoc.querySelector('.app-viewport');
 
         if (currentViewport && newViewport) {
             currentViewport.innerHTML = newViewport.innerHTML;
@@ -110,6 +151,12 @@ export async function spaNavigate(url, isPopState = false) {
             // Fallback si no hay .app-viewport
             document.body.innerHTML = newDoc.body.innerHTML;
         }
+
+        // Sincronizar modales que existan fuera del viewport en newDoc
+        document.querySelectorAll('body > .neo-modal-overlay, body > .fintech-modal-overlay').forEach(m => m.remove());
+        newDoc.querySelectorAll('body > .neo-modal-overlay, body > .fintech-modal-overlay').forEach(m => {
+            document.body.appendChild(document.importNode(m, true));
+        });
 
         // Sincronizar dock inferior activo
         updateActiveDock(targetUrl.pathname);
@@ -144,10 +191,11 @@ export async function spaNavigate(url, isPopState = false) {
 
 function updateActiveDock(pathname) {
     const currentFile = getRouteKey(pathname);
-    const navLinks = document.querySelectorAll('.bottom-nav-bar .nav-link, .dock-item');
+    const cleanCurrent = currentFile.toLowerCase().replace('_desktop.html', '').replace('.html', '').replace('_renov', '');
+    const navLinks = document.querySelectorAll('.bottom-nav-bar .nav-link, .dock-item, .desktop-nav-link');
     navLinks.forEach(item => {
-        const href = item.getAttribute('href') || '';
-        if (href.includes(currentFile)) {
+        const href = (item.getAttribute('href') || '').toLowerCase();
+        if (cleanCurrent && href.includes(cleanCurrent)) {
             item.classList.add('active');
         } else {
             item.classList.remove('active');

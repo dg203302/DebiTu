@@ -23,12 +23,12 @@
         <header class="app-header-floating">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <div class="header-avatar-container">
-                    <img src="" id="pfp" alt="Imagen de usuario" class="header-avatar-img"
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" id="pfp" alt="Imagen de usuario" class="header-avatar-img"
                         referrerpolicy="no-referrer"
                         crossorigin="anonymous"
-                        onload="this.style.display='block'; const fb=document.getElementById('header_avatar_fallback'); if(fb) fb.style.display='none';"
-                        onerror="this.style.display='none'; const fb=document.getElementById('header_avatar_fallback'); if(fb) fb.style.display='flex';"
-                        style="display: none;" />
+                        style="display: none;"
+                        onload="if(this.src && !this.src.startsWith('data:image/svg')) { this.style.display='block'; const fb=this.parentElement.querySelector('.header-avatar-fallback'); if(fb) fb.style.display='none'; }"
+                        onerror="this.style.display='none'; const fb=this.parentElement.querySelector('.header-avatar-fallback'); if(fb) fb.style.display='flex';">
                     <div id="header_avatar_fallback" class="header-avatar-fallback" style="display: flex;">
                         <span id="header_avatar_initials">D</span>
                     </div>
@@ -71,7 +71,7 @@
 
             <!-- Card de Deuda Total en Cartera -->
             <section class="op-card-container" style="padding: 16px; background: linear-gradient(180deg, #181d26 0%, #12151c 100%);">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="card-cartera-row" style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
                     <div>
                         <span class="input-label" style="font-size: 0.72rem;">Deuda Total en Cartera</span>
                         <div id="metric_total_debt_amount" style="font-size: 1.65rem; font-weight: 800; color: #ff6b6d; font-family: var(--font-mono); margin-top: 2px;">$0,00</div>
@@ -357,6 +357,8 @@
     <script type="module" src="/Scripts/script_clientes_renov.js"></script>
     <!-- Router SPA Unificado -->
     <script type="module" src="/Scripts/spa_router.js"></script>
+    <!-- Detector de Dispositivo y Redimensionamiento -->
+    <script type="module" src="/Scripts/device_detector.js"></script>
 </body>
 
 </html>

@@ -77,8 +77,8 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Contenedor Mockup / Mobile Canvas */
-.app-viewport {
+/* Contenedor Mockup / Mobile Canvas (Solo para plantillas móviles) */
+body:not(:has(.desktop-app-layout)) .app-viewport {
   width: 100%;
   max-width: 440px;
   min-height: 100vh;
@@ -91,8 +91,8 @@ body {
   border-right: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-@media (min-width: 768px) {
-  .app-viewport {
+@media (min-width: 768px) and (max-width: 1023px) {
+  body:not(:has(.desktop-app-layout)) .app-viewport {
     margin: 20px auto;
     border-radius: 40px;
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--border-subtle);
@@ -147,18 +147,19 @@ body {
 
 #pfp,
 .header-avatar-img {
-  width: 42px;
-  height: 42px;
+  width: 100%;
+  height: 100%;
   border-radius: var(--radius-full);
   object-fit: cover;
   border: 1.8px solid rgba(204, 255, 0, 0.5);
   background: var(--bg-card);
   display: block;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .header-avatar-fallback {
-  width: 42px;
-  height: 42px;
+  width: 100%;
+  height: 100%;
   border-radius: var(--radius-full);
   background: var(--bg-card-pill);
   border: 1.5px solid rgba(204, 255, 0, 0.3);
@@ -168,6 +169,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.desktop-profile-box:hover .header-avatar-img,
+.desktop-profile-box:hover .header-avatar-fallback {
+  border-color: var(--brand-volt);
+  box-shadow: 0 0 12px rgba(204, 255, 0, 0.45);
 }
 
 .header-status-indicator {
@@ -465,18 +473,25 @@ body {
 .tx-info {
   flex: 1;
   margin-left: 14px;
+  min-width: 0;
 }
 
 .tx-name {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tx-sub {
   font-size: 0.78rem;
   color: var(--text-secondary);
   margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tx-amount {
@@ -1408,6 +1423,8 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .client-debt-badge.has-debt {
@@ -1433,7 +1450,7 @@ body {
   background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  z-index: 99;
+  z-index: 99999;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -2909,6 +2926,1024 @@ body {
   }
   to {
     opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   4.5. OPTIMIZACIÓN RESPONSIVA PARA PANTALLAS MÓVILES POCO ANCHAS (<= 400px & <= 350px)
+   ========================================================================== */
+@media (max-width: 400px) {
+  /* Contenedores y viewport móvil */
+  body:not(:has(.desktop-app-layout)) .app-viewport {
+    padding-bottom: 96px;
+  }
+
+  /* Ajuste de márgenes laterales para ganar espacio horizontal en celulares compactos */
+  body:not(:has(.desktop-app-layout)) .app-viewport main {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  /* Header Flotante Móvil */
+  .app-header-floating {
+    width: calc(100% - 20px) !important;
+    max-width: calc(100% - 20px) !important;
+    padding: 6px 10px 6px 7px !important;
+    top: 10px !important;
+  }
+
+  .header-avatar-container {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .header-action-btn {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .header-title {
+    font-size: 0.92rem !important;
+  }
+
+  /* Barra de Navegación Flotante Inferior */
+  .bottom-nav-bar {
+    width: calc(100% - 20px) !important;
+    max-width: calc(100% - 20px) !important;
+    bottom: 12px !important;
+    padding: 6px 8px !important;
+  }
+
+  .nav-link {
+    padding: 6px !important;
+    font-size: 1.15rem !important;
+  }
+
+  .nav-link svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .nav-action-center {
+    width: 46px !important;
+    height: 46px !important;
+    font-size: 1.35rem !important;
+  }
+
+  .nav-action-center svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  /* Dashboard: Botones rápidos circulares */
+  .quick-actions-row {
+    gap: 6px !important;
+  }
+
+  .quick-action-icon {
+    width: 50px !important;
+    height: 50px !important;
+  }
+
+  .quick-action-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .quick-action-label {
+    font-size: 0.7rem !important;
+  }
+
+  /* Dashboard: Tarjeta de saldo hero */
+  .hero-balance-value {
+    font-size: clamp(2rem, 8.5vw, 2.75rem) !important;
+  }
+
+  .hero-balance-badge {
+    padding: 5px 10px !important;
+    font-size: 0.72rem !important;
+    max-width: 100% !important;
+  }
+
+  /* Dashboard: Header del gráfico con selector temporal */
+  .card-surface > div:first-child {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .timeframe-switcher {
+    padding: 3px !important;
+    gap: 2px !important;
+  }
+
+  .timeframe-pill {
+    padding: 6px 8px !important;
+    font-size: 0.72rem !important;
+  }
+
+  /* Métricas en cuadrícula */
+  .metrics-grid {
+    gap: 8px !important;
+  }
+
+  .metric-card {
+    padding: 12px 10px !important;
+    gap: 8px !important;
+  }
+
+  .metric-label {
+    font-size: 0.72rem !important;
+  }
+
+  .metric-value {
+    font-size: clamp(1.1rem, 5vw, 1.35rem) !important;
+  }
+
+  /* Transacciones / Items de lista */
+  .tx-item {
+    padding: 11px 12px !important;
+    gap: 8px !important;
+  }
+
+  .tx-icon-wrap {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .tx-amount {
+    font-size: 0.88rem !important;
+  }
+
+  /* Estadísticas: Switcher superior de 2 botones */
+  .main-view-switcher {
+    padding: 3px !important;
+    gap: 4px !important;
+  }
+
+  .main-view-btn {
+    font-size: 0.75rem !important;
+    padding: 8px 4px !important;
+    gap: 5px !important;
+  }
+
+  .main-view-btn svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  /* Operaciones & Estadísticas: Switcher de tipo (Deuda/Pago) */
+  .op-type-toggle-grid {
+    padding: 3px !important;
+    gap: 6px !important;
+  }
+
+  .op-type-btn {
+    font-size: 0.76rem !important;
+    padding: 8px 6px !important;
+    gap: 5px !important;
+  }
+
+  .op-type-btn svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  /* Operaciones: Display de importe gigante y calculadora */
+  .amount-display-card {
+    padding: 16px 10px 14px !important;
+  }
+
+  .amount-currency-symbol {
+    font-size: 1.65rem !important;
+  }
+
+  .amount-big-input {
+    font-size: clamp(1.8rem, 8.5vw, 2.5rem) !important;
+    max-width: 220px !important;
+  }
+
+  .quick-amount-increments {
+    gap: 4px !important;
+    margin-top: 10px !important;
+  }
+
+  .quick-amt-pill {
+    padding: 6px 2px !important;
+    font-size: 0.72rem !important;
+  }
+
+  .fintech-calc-grid {
+    gap: 6px !important;
+    padding: 6px 0 !important;
+  }
+
+  .calc-btn-key {
+    height: 48px !important;
+    font-size: 1.22rem !important;
+  }
+
+  .btn-volt-action {
+    padding: 14px 16px !important;
+    font-size: 0.98rem !important;
+  }
+
+  /* Clientes: Métricas de cartera */
+  .clients-summary-grid {
+    gap: 6px !important;
+  }
+
+  .client-stat-pill {
+    padding: 10px 4px !important;
+  }
+
+  .client-stat-pill .num {
+    font-size: 1.18rem !important;
+  }
+
+  .client-stat-pill .lbl {
+    font-size: 0.62rem !important;
+  }
+
+  /* Clientes: Deuda total en cartera */
+  #metric_total_debt_amount {
+    font-size: clamp(1.25rem, 5.5vw, 1.65rem) !important;
+  }
+
+  .op-card-container > div[style*="justify-content: space-between"],
+  .card-cartera-row {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .client-search-action-row {
+    gap: 8px !important;
+  }
+
+  .btn-add-client-volt {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .client-search-box .fintech-input {
+    padding: 11px 12px 11px 38px !important;
+    font-size: 0.85rem !important;
+  }
+
+  /* Clientes: Acciones rápidas en modal */
+  .client-quick-actions-grid {
+    gap: 5px !important;
+  }
+
+  .client-action-tile {
+    padding: 8px 2px !important;
+    gap: 4px !important;
+  }
+
+  .client-action-tile span {
+    font-size: 0.62rem !important;
+  }
+
+  .client-balance-cards-row {
+    gap: 8px !important;
+  }
+
+  .client-balance-card {
+    padding: 10px !important;
+  }
+
+  .client-balance-card .val {
+    font-size: clamp(1.05rem, 4.5vw, 1.25rem) !important;
+  }
+
+  /* Modal Bottom Sheet */
+  .neo-modal-sheet {
+    padding: 18px 14px 28px !important;
+    border-radius: 24px 24px 0 0 !important;
+  }
+
+  /* Configuración */
+  .config-hero-profile {
+    padding: 18px 14px !important;
+  }
+
+  .config-avatar-huge {
+    width: 76px !important;
+    height: 76px !important;
+  }
+
+  .config-user-title {
+    font-size: 1.2rem !important;
+  }
+
+  .config-brand-card {
+    padding: 18px 14px !important;
+  }
+
+  .btn-action-danger {
+    padding: 12px 14px !important;
+    font-size: 0.82rem !important;
+  }
+}
+
+@media (max-width: 350px) {
+  /* Pantallas súper compactas (iPhone SE 1st gen, Galaxy Fold frontal ~320px) */
+  body:not(:has(.desktop-app-layout)) .app-viewport main {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .app-header-floating {
+    width: calc(100% - 14px) !important;
+    max-width: calc(100% - 14px) !important;
+    padding: 5px 8px 5px 6px !important;
+    top: 8px !important;
+  }
+
+  .header-avatar-container {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .header-action-btn {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .header-title {
+    font-size: 0.85rem !important;
+  }
+
+  .bottom-nav-bar {
+    width: calc(100% - 14px) !important;
+    max-width: calc(100% - 14px) !important;
+    bottom: 8px !important;
+    padding: 5px 6px !important;
+  }
+
+  .nav-link {
+    padding: 4px !important;
+    font-size: 1.05rem !important;
+  }
+
+  .nav-link svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .nav-action-center {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 1.2rem !important;
+  }
+
+  .nav-action-center svg {
+    width: 19px !important;
+    height: 19px !important;
+  }
+
+  .quick-action-icon {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .quick-action-label {
+    font-size: 0.65rem !important;
+  }
+
+  .main-view-btn {
+    font-size: 0.68rem !important;
+    padding: 7px 3px !important;
+    gap: 3px !important;
+  }
+
+  .main-view-btn svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  .op-type-btn {
+    font-size: 0.7rem !important;
+    padding: 7px 4px !important;
+    gap: 4px !important;
+  }
+
+  .metric-value {
+    font-size: 1.1rem !important;
+  }
+
+  .hero-balance-value {
+    font-size: 1.95rem !important;
+  }
+
+  .calc-btn-key {
+    height: 44px !important;
+    font-size: 1.15rem !important;
+  }
+
+  .btn-volt-action {
+    padding: 13px 14px !important;
+    font-size: 0.92rem !important;
+  }
+}
+
+/* ==========================================================================
+   5. SISTEMA DE DISEÑO DESKTOP (Plantillas_Renovadas_Desktop)
+   ========================================================================== */
+@media (min-width: 768px) {
+  /* En Desktop, el body ocupa el 100% de la ventana sin centrar ni cortar */
+  body {
+    display: block !important;
+    width: 100% !important;
+    min-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background-color: #090b10 !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Contenedor Shell de Pantalla Completa Desktop */
+  .desktop-app-layout {
+    display: flex !important;
+    width: 100% !important;
+    min-height: 100vh !important;
+    background: #090b10 !important;
+    color: var(--text-primary);
+    position: relative;
+    font-family: var(--font-main);
+  }
+
+  /* Barra Lateral (Sidebar) Totalmente Fija al Viewport */
+  .desktop-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 260px !important;
+    min-width: 260px !important;
+    max-width: 260px !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    background: #0d1017 !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    padding: 24px 18px !important;
+    z-index: 1000 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  .desktop-sidebar::-webkit-scrollbar {
+    width: 3px;
+  }
+  .desktop-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+  }
+
+  /* Anulación total del contenedor tipo celular (.app-viewport) dentro de Desktop */
+  .desktop-main-wrap,
+  .desktop-main-wrap.app-viewport,
+  .desktop-app-layout .app-viewport {
+    margin-left: 260px !important;
+    width: calc(100% - 260px) !important;
+    max-width: calc(100% - 260px) !important;
+    min-height: 100vh !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 32px 48px 60px !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    background-color: #090b10 !important;
+    flex: 1 1 auto !important;
+  }
+
+  /* Branding Header con Badge PRO */
+  .desktop-sidebar-brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-decoration: none;
+    margin-bottom: 28px;
+    padding: 4px 4px 0;
+  }
+
+  .desktop-sidebar-brand-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .desktop-sidebar-logo {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+  }
+
+  .desktop-sidebar-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .desktop-sidebar-title {
+    font-family: var(--font-main);
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .desktop-sidebar-title span {
+    color: var(--brand-volt);
+  }
+
+  .desktop-sidebar-tagline {
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
+    font-weight: 500;
+  }
+
+  .desktop-pro-badge {
+    background: rgba(204, 255, 0, 0.12);
+    border: 1px solid rgba(204, 255, 0, 0.3);
+    color: var(--brand-volt);
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: var(--radius-full);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* Menú de Enlaces del Sidebar */
+  .desktop-nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+  }
+
+  .desktop-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 16px;
+    border-radius: var(--radius-lg);
+    color: #8a93a6;
+    font-family: var(--font-main);
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid transparent;
+  }
+
+  .desktop-nav-link:hover {
+    background: rgba(255, 255, 255, 0.04);
+    color: #ffffff;
+  }
+
+  .desktop-nav-link.active {
+    background: #171c26;
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .desktop-nav-link.active svg {
+    color: var(--brand-volt);
+  }
+
+  .desktop-nav-link svg {
+    flex-shrink: 0;
+    color: #656e82;
+    transition: color 0.2s ease;
+  }
+
+  /* Perfil de Usuario en el Sidebar (Tarjeta Inferior) */
+  .desktop-sidebar-profile {
+    padding-top: 14px;
+  }
+
+  .desktop-profile-box {
+    background: #141822;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s ease;
+  }
+
+  .desktop-profile-box:hover {
+    background: #181d2a;
+  }
+
+  .desktop-profile-name {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .desktop-profile-role {
+    font-size: 0.68rem;
+    color: var(--text-secondary);
+  }
+
+  /* Área Principal de Contenido */
+  .desktop-main-wrap,
+  .desktop-app-layout .desktop-main-wrap {
+    flex: 1 1 auto;
+    width: calc(100% - 260px) !important;
+    max-width: calc(100% - 260px) !important;
+    min-width: 0 !important;
+    margin-left: 260px !important;
+    margin-right: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    box-sizing: border-box !important;
+    display: flex;
+    flex-direction: column;
+    background: #090b10;
+    padding: 32px 48px 60px;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Encabezado Superior Directo en el Canvas (Estilo Captura) */
+  .desktop-page-header {
+    margin-bottom: 28px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .desktop-page-title {
+    font-size: 2.1rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: #ffffff;
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+
+  .desktop-page-subtitle {
+    font-size: 0.82rem;
+    color: #838e9e;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .status-dot-neon {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--brand-volt);
+    box-shadow: 0 0 8px var(--brand-volt);
+    display: inline-block;
+  }
+
+  /* Grid Asimétrico de 2 Columnas (Referencia) */
+  .desktop-reference-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 20px;
+    align-items: start;
+  }
+
+  /* Tarjetas Base Estilo Captura */
+  .desktop-card-box {
+    background: #12151d;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 18px;
+    padding: 22px;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  }
+
+  .desktop-card-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .desktop-card-header-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6d7888;
+  }
+
+  /* Filas de la Columna Izquierda y Encabezados */
+  .desktop-row-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .desktop-row-3col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+  }
+
+  .desktop-row-4col {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  @media (max-width: 1250px) {
+    .desktop-row-4col {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* Mini Tarjetas Estadísticas Inferiores (Tiempo, Calorías, Racha) */
+  .desktop-mini-stat-card {
+    background: #12151d;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 96px;
+  }
+
+  .desktop-mini-stat-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6d7888;
+  }
+
+  .desktop-mini-stat-val {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: #ffffff;
+    font-family: var(--font-mono);
+    line-height: 1.1;
+    margin: 4px 0 2px;
+  }
+
+  .desktop-mini-stat-sub {
+    font-size: 0.72rem;
+    color: #838e9e;
+  }
+
+  /* Matriz de Actividad / Puntos de Calendario (Columna Derecha) */
+  .desktop-activity-months-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #8a93a6;
+    padding: 0 4px;
+  }
+
+  .desktop-dots-matrix {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .desktop-month-dots-col {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  .desktop-activity-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #1e2430;
+  }
+
+  .desktop-activity-dot.active {
+    background: var(--brand-volt);
+    box-shadow: 0 0 6px var(--brand-volt-glow);
+  }
+
+  .desktop-activity-dot.hollow {
+    border: 1.5px solid #364052;
+    background: transparent;
+  }
+
+  /* Tarjeta de Acción / Patrocinado / Banner */
+  .desktop-banner-card {
+    background: radial-gradient(circle at 10% 20%, rgba(204, 255, 0, 0.08) 0%, transparent 70%),
+                #12151d;
+    border: 1px solid rgba(204, 255, 0, 0.2);
+    border-radius: 18px;
+    padding: 22px;
+  }
+
+  /* Split Layout para Login Desktop */
+  .desktop-login-split {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    min-height: 100vh;
+    width: 100%;
+  }
+
+  .desktop-login-hero {
+    background: radial-gradient(circle at 20% 30%, rgba(204, 255, 0, 0.08) 0%, transparent 60%),
+                linear-gradient(180deg, #0e1117 0%, #080a0d 100%);
+    border-right: 1px solid var(--border-subtle);
+    padding: 60px 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .desktop-login-form-pane {
+    background: var(--bg-base);
+    padding: 60px 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Operaciones / Libro Mayor Desktop */
+  #view_registros_container,
+  #view_metricas_container {
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+  }
+
+  .desktop-op-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .desktop-op-filter-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #0d1017;
+    padding: 4px;
+    border-radius: var(--radius-full);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .desktop-op-filter-group .month-filter-pill,
+  .desktop-op-filter-group .op-type-btn {
+    border: 1px solid transparent;
+    background: transparent;
+    color: #838e9e;
+    font-family: var(--font-main);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 7px 16px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    margin: 0;
+  }
+
+  .desktop-op-filter-group .month-filter-pill:hover,
+  .desktop-op-filter-group .op-type-btn:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .desktop-op-filter-group .month-filter-pill.active {
+    background: var(--brand-volt-glow-subtle);
+    border-color: rgba(204, 255, 0, 0.4);
+    color: var(--brand-volt);
+    box-shadow: 0 0 12px var(--brand-volt-glow-subtle);
+  }
+
+  .desktop-op-filter-group .op-type-btn.active-deuda {
+    background: rgba(255, 77, 79, 0.16);
+    color: #ff6b6d;
+    border-color: rgba(255, 77, 79, 0.35);
+    box-shadow: 0 2px 10px rgba(255, 77, 79, 0.15);
+  }
+
+  .desktop-op-filter-group .op-type-btn.active-pago {
+    background: var(--brand-volt-glow-subtle);
+    color: var(--brand-volt);
+    border-color: rgba(204, 255, 0, 0.35);
+    box-shadow: 0 0 12px var(--brand-volt-glow-subtle);
+  }
+
+  #all_operations_container .tx-item {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+    padding: 14px 18px;
+    transition: all 0.2s ease;
+  }
+
+  #all_operations_container .tx-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.12);
+    transform: translateY(-1px);
+  }
+
+  #all_operations_container::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  #all_operations_container::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  #all_operations_container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+  }
+
+  #all_operations_container::-webkit-scrollbar-thumb:hover {
+    background: rgba(204, 255, 0, 0.3);
+  }
+
+  /* Configuración Desktop */
+  .config-desktop-grid-row {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 20px;
+    align-items: stretch;
+  }
+
+  @media (max-width: 1100px) {
+    .config-desktop-grid-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Modales en Desktop: Centrados, elegantes y con escala suave */
+  .neo-modal-overlay {
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 24px !important;
+    z-index: 99999 !important;
+  }
+
+  .neo-modal-sheet {
+    border-radius: 24px !important;
+    transform: scale(0.96) translateY(12px) !important;
+    max-height: 88vh !important;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .neo-modal-overlay.active .neo-modal-sheet {
+    transform: scale(1) translateY(0) !important;
+  }
+
+  /* Responsividad Desktop: Adaptabilidad de la cuadrícula de 2 columnas */
+  @media (max-width: 1200px) {
+    .desktop-main-wrap,
+    .desktop-main-wrap.app-viewport,
+    .desktop-app-layout .app-viewport,
+    .desktop-app-layout .desktop-main-wrap {
+      margin-left: 260px !important;
+      width: calc(100% - 260px) !important;
+      max-width: calc(100% - 260px) !important;
+      padding: 24px 20px 60px !important;
+    }
+
+    .desktop-reference-grid {
+      grid-template-columns: 1fr !important;
+    }
   }
 }
 

@@ -40,6 +40,7 @@ export async function initDashboard() {
     showAppLoader('Sincronizando finanzas...');
     try {
         initTimeframeSwitchers();
+        initChartResizeListener();
         await cargarDatosDashboard();
     } catch (err) {
         console.error('Error inicializando dashboard:', err);
@@ -88,6 +89,9 @@ async function cargarDatosDashboard() {
         state.totalDeudaActiva = state.clientes.reduce((acc, c) => acc + (Number(c.Deuda_Activa) || 0), 0);
         renderTotalBalance(state.totalDeudaActiva);
 
+        const activeClientsEl = document.getElementById('metric_active_clients_num');
+        if (activeClientsEl) activeClientsEl.textContent = state.clientes.length;
+
         // 5. Calcular e indicar "Cobrado este mes" en el badge del Hero (mes calendario actual)
         actualizarHeroBadgeCobradoMes();
 
@@ -102,6 +106,8 @@ async function cargarDatosDashboard() {
         cargarPerfilUsuario();
         cargarDatasetDemo();
         renderTotalBalance(state.totalDeudaActiva);
+        const activeClientsFallbackEl = document.getElementById('metric_active_clients_num');
+        if (activeClientsFallbackEl) activeClientsFallbackEl.textContent = state.clientes.length;
         actualizarHeroBadgeCobradoMes();
         actualizarResumenEstadistico(state.currentTimeframe);
         renderizarMovimientosRecientes();
@@ -172,28 +178,39 @@ async function cargarPerfilUsuario() {
         }
     }
 
-    // Actualizar nombre en el header
-    const nameEl = document.getElementById('user_display_name');
-    if (nameEl) nameEl.textContent = userName || 'Mi Negocio';
+    // Actualizar nombre en el header y sidebar
+    const nameEls = document.querySelectorAll('#user_display_name, .desktop-profile-name');
+    nameEls.forEach(el => { el.textContent = userName || 'Mi Negocio'; });
 
     // Actualizar iniciales del fallback
-    const initialsEl = document.getElementById('header_avatar_initials');
-    if (initialsEl) {
-        initialsEl.textContent = (userName || 'D').trim().charAt(0).toUpperCase();
-    }
+    const initialsEls = document.querySelectorAll('#header_avatar_initials');
+    initialsEls.forEach(el => {
+        el.textContent = (userName || 'D').trim().charAt(0).toUpperCase();
+    });
 
-    // Asignar la foto — el onload/onerror del HTML maneja la visibilidad
+    // Asignar y mostrar la foto de perfil
     const pfpEl = document.getElementById('pfp');
     const fallbackEl = document.getElementById('header_avatar_fallback');
 
     if (pfpEl) {
-        if (photo) {
-            // Forzar tamaño mayor en URLs de Google (=s96-c → =s128-c)
-            const photoUrl = photo.replace(/=s\d+-c$/, '=s128-c').replace(/=s\d+$/, '=s128');
+        if (photo && photo.trim()) {
+            let photoUrl = photo.trim();
+            // Forzar mayor resolución en avatars de Google (=s96-c → =s128-c)
+            if (photoUrl.includes('googleusercontent.com')) {
+                photoUrl = photoUrl.replace(/=s\d+-c$/, '=s128-c').replace(/=s\d+$/, '=s128');
+            }
+            pfpEl.onload = () => {
+                pfpEl.style.display = 'block';
+                if (fallbackEl) fallbackEl.style.display = 'none';
+            };
+            pfpEl.onerror = () => {
+                pfpEl.style.display = 'none';
+                if (fallbackEl) fallbackEl.style.display = 'flex';
+            };
             pfpEl.src = photoUrl;
-            // La visibilidad la controlará onload: si carga → muestra img, si falla → muestra fallback
+            pfpEl.style.display = 'block';
+            if (fallbackEl) fallbackEl.style.display = 'none';
         } else {
-            // Sin foto: mostrar fallback directamente
             pfpEl.removeAttribute('src');
             pfpEl.style.display = 'none';
             if (fallbackEl) fallbackEl.style.display = 'flex';
@@ -415,29 +432,90 @@ function actualizarMiniBarras(containerId, values) {
     }).join('');
 }
 
+let _ultimoChartData = null;
+
+function initChartResizeListener() {
+    if (window._chartResizeAttached) return;
+    window._chartResizeAttached = true;
+    window.addEventListener('resize', () => {
+        clearTimeout(window._chartResizeDebounce);
+        window._chartResizeDebounce = setTimeout(() => {
+            if (_ultimoChartData && typeof dibujarCurvaNeonSvg === 'function') {
+                dibujarCurvaNeonSvg(_ultimoChartData.values, _ultimoChartData.labels);
+            }
+        }, 120);
+    });
+}
+
 function dibujarCurvaNeonSvg(values, labels) {
     const glowPath = document.getElementById('chart_glow_path');
     const areaPath = document.getElementById('chart_area_path');
     const nodesGroup = document.getElementById('chart_nodes_group');
-    if (!glowPath || !areaPath) return;
+    const gridGroup = document.getElementById('chart_grid_group');
+    const labelsGroup = document.getElementById('chart_labels_group');
+    const svgEl = document.getElementById('chart_svg');
 
-    const width = 320;
-    const height = 120;
-    const padX = 15;
-    const padTop = 25;
-    const padBottom = 100;
+    if (!glowPath || !areaPath || !svgEl) return;
+
+    // Cachear datos para redibujado instantáneo en redimensión
+    _ultimoChartData = { values, labels };
+
+    // Medir dimensiones físicas reales del SVG / contenedor en píxeles
+    const rect = svgEl.getBoundingClientRect();
+    const parent = svgEl.parentElement;
+    const parentRect = parent ? parent.getBoundingClientRect() : null;
+
+    let width = Math.round(rect.width || (parentRect ? parentRect.width : 0));
+    let height = Math.round(rect.height || (parentRect ? parentRect.height : 0));
+
+    if (!width || width < 120) {
+        width = window.innerWidth >= 1024 ? 800 : 340;
+    }
+    if (!height || height < 60) {
+        height = window.innerWidth >= 1024 ? 170 : 130;
+    }
+
+    // ViewBox 1:1 con las dimensiones reales en pantalla (cero estiramiento o aplastamiento)
+    svgEl.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    svgEl.removeAttribute('preserveAspectRatio');
+
+    const hasLabels = Array.isArray(labels) && labels.length > 0;
+    const padX = Math.min(36, Math.max(18, Math.round(width * 0.035)));
+    const padTop = Math.max(22, Math.round(height * 0.16));
+    const padBottom = hasLabels 
+        ? Math.max(height - 30, Math.round(height * 0.78))
+        : Math.max(height - 18, Math.round(height * 0.85));
+
     const availableW = width - (padX * 2);
-    const stepX = availableW / (values.length - 1);
+    const numPoints = Math.max(values.length, 1);
+    const stepX = numPoints > 1 ? (availableW / (numPoints - 1)) : availableW;
 
     const maxVal = Math.max(...values, 1);
 
-    // Coordenadas calculadas
+    // Líneas de guía tenues horizontales de fondo
+    if (gridGroup) {
+        const gridY1 = Math.round(padTop + (padBottom - padTop) * 0.33);
+        const gridY2 = Math.round(padTop + (padBottom - padTop) * 0.66);
+        gridGroup.innerHTML = `
+            <line x1="${padX}" y1="${gridY1}" x2="${width - padX}" y2="${gridY1}" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="4,4" />
+            <line x1="${padX}" y1="${gridY2}" x2="${width - padX}" y2="${gridY2}" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="4,4" />
+            <line x1="${padX}" y1="${padBottom}" x2="${width - padX}" y2="${padBottom}" stroke="rgba(255,255,255,0.07)" stroke-width="1" />
+        `;
+    }
+
+    // Coordenadas calculadas proporcionales
     const points = values.map((val, i) => {
         const x = Math.round(padX + i * stepX);
-        // Si no hay valores, se crea una ondulación suave sutil
-        const ratio = val > 0 ? (val / maxVal) : 0.08;
+        let ratio;
+        if (maxVal > 1) {
+            ratio = val / maxVal;
+        } else {
+            const wave = [0.22, 0.50, 0.32, 0.70, 0.42, 0.80, 0.52];
+            ratio = wave[i % wave.length];
+        }
+        ratio = Math.max(0.06, Math.min(0.94, ratio));
         const y = Math.round(padBottom - (ratio * (padBottom - padTop)));
-        return { x, y, val, label: labels[i] || '' };
+        return { x, y, val, label: (labels && labels[i]) ? labels[i] : '' };
     });
 
     // Generar línea suavizada Bézier (curva cúbica fluida)
@@ -454,17 +532,37 @@ function dibujarCurvaNeonSvg(values, labels) {
     glowPath.setAttribute('d', d);
     areaPath.setAttribute('d', areaD);
 
-    // Crear nodos interactivos en puntos destacados
+    // Crear nodos perfectamente circulares con drop-shadow neón
     if (nodesGroup) {
         nodesGroup.innerHTML = points.map((p, idx) => {
-            const isHighest = p.val === maxVal && p.val > 0;
-            const r = isHighest ? 5 : (idx === points.length - 1 ? 4.5 : 3.5);
+            const isHighest = p.val === maxVal && maxVal > 1;
+            const r = isHighest ? 5.5 : (idx === points.length - 1 ? 5 : 4);
+            const fill = isHighest ? '#ffffff' : '#ccff00';
             return `
                 <circle cx="${p.x}" cy="${p.y}" r="${r}" 
-                    fill="${isHighest ? '#ffffff' : '#ccff00'}" 
+                    fill="${fill}" 
                     stroke="#0a0c0f" stroke-width="2.5" 
-                    title="${p.label}: ${formatCurrency(p.val)}"
+                    title="${p.label ? p.label + ': ' : ''}${formatCurrency(p.val)}"
                     style="cursor: pointer; transition: transform 0.2s;" />
+            `;
+        }).join('');
+    }
+
+    // Etiquetas de períodos limpias al pie de cada nodo
+    if (labelsGroup && hasLabels) {
+        const textY = Math.min(height - 4, padBottom + 18);
+        labelsGroup.innerHTML = points.map(p => {
+            if (!p.label) return '';
+            return `
+                <text x="${p.x}" y="${textY}" 
+                    text-anchor="middle" 
+                    fill="#6c7a9c" 
+                    font-size="11" 
+                    font-weight="600" 
+                    font-family="inherit"
+                    style="user-select: none;">
+                    ${p.label}
+                </text>
             `;
         }).join('');
     }
@@ -501,7 +599,7 @@ function renderizarMovimientosRecientes() {
         const amountClass = isPago ? 'positive' : 'negative';
 
         return `
-            <div class="tx-item" onclick="if(window.spaNavigate){window.spaNavigate('/Plantillas_Renovadas/Operacion_renov.html');}else{window.location.href='/Plantillas_Renovadas/Operacion_renov.html';}">
+            <div class="tx-item" onclick="window.irAOperacion()">
                 <div class="tx-icon-wrap" style="${isPago ? 'color: var(--brand-volt); border-color: rgba(204,255,0,0.3);' : ''}">
                     ${inicial}
                 </div>
@@ -519,10 +617,14 @@ function renderizarMovimientosRecientes() {
 
 // Accesos globales
 const navHelper = (url) => {
+    let finalUrl = url;
+    if (window.location.pathname.includes('_desktop')) {
+        finalUrl = finalUrl.replace('/Plantillas_Renovadas/', '/Plantillas_Renovadas_Desktop/').replace('.html', '_desktop.html');
+    }
     if (typeof window.spaNavigate === 'function') {
-        window.spaNavigate(url);
+        window.spaNavigate(finalUrl);
     } else {
-        window.location.href = url;
+        window.location.href = finalUrl;
     }
 };
 

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#090b10">
+    <meta name="color-scheme" content="dark">
+    <title>Dashboard | DebiTú Business</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Estilos Renovados Neo-Fintech Volt -->
+    <link rel="stylesheet" href="/Estilos/branding_renovado.css">
+</head>
+
+<body>
+    <div class="desktop-app-layout">
+        <!-- Barra Lateral (Sidebar) Fija Estilo Referencia -->
+        <aside class="desktop-sidebar">
+            <div>
+                <!-- Branding Header con Badge PRO -->
+                <div class="desktop-sidebar-brand">
+                    <a href="/Plantillas_Renovadas_Desktop/Dashboard_renov_desktop.html" class="desktop-sidebar-brand-left" style="text-decoration: none;">
+                        <div class="desktop-sidebar-logo">
+                            <img src="/icons/Icon.png" alt="DebiTú Logo">
+                        </div>
+                        <div>
+                            <div class="desktop-sidebar-title">Debi<span>Tú</span></div>
+                            <div class="desktop-sidebar-tagline">Fintech AI Suite</div>
+                        </div>
+                    </a>
+                    <span class="desktop-pro-badge">PRO</span>
+                </div>
+
+                <!-- Menú de Enlaces del Sidebar (Pills Redondeadas) -->
+                <nav class="desktop-nav-menu" aria-label="Menú principal">
+                    <a href="/Plantillas_Renovadas_Desktop/Dashboard_renov_desktop.html" class="desktop-nav-link active">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                            <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                            <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                            <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                        </svg>
+                        <span>Dashboard</span>
+                    </a>
+
+                    <a href="/Plantillas_Renovadas_Desktop/Clientes_renov_desktop.html" class="desktop-nav-link">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <span>Clientes</span>
+                    </a>
+
+                    <a href="/Plantillas_Renovadas_Desktop/Operacion_renov_desktop.html" class="desktop-nav-link">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                        <span>Nueva Operación</span>
+                    </a>
+
+                    <a href="/Plantillas_Renovadas_Desktop/Estadisticas_renov_desktop.html" class="desktop-nav-link">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                        <span>Estadísticas</span>
+                    </a>
+
+                    <a href="/Plantillas_Renovadas_Desktop/Config_renov_desktop.html" class="desktop-nav-link">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09A1.65 1.65 0 0 0 19.4 15z"></path>
+                        </svg>
+                        <span>Ajustes</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Perfil de Usuario en el Sidebar (Pill Inferior de Dashboard_renov) -->
+            <div class="desktop-sidebar-profile">
+                <a href="/Plantillas_Renovadas_Desktop/Config_renov_desktop.html" class="desktop-profile-box" style="text-decoration: none;">
+                    <div class="header-avatar-container" style="width: 36px; height: 36px;">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" id="pfp" alt="Usuario" class="header-avatar-img"
+                            referrerpolicy="no-referrer" crossorigin="anonymous" style="display: none;"
+                            onload="if(this.src && !this.src.startsWith('data:image/svg')) { this.style.display='block'; const fb=this.parentElement.querySelector('.header-avatar-fallback'); if(fb) fb.style.display='none'; }"
+                            onerror="this.style.display='none'; const fb=this.parentElement.querySelector('.header-avatar-fallback'); if(fb) fb.style.display='flex';">
+                        <div id="header_avatar_fallback" class="header-avatar-fallback" style="display: flex; font-size: 0.88rem;">
+                            <span id="header_avatar_initials">D</span>
+                        </div>
+                        <div class="header-status-indicator" title="Conectado"></div>
+                    </div>
+                    <div style="min-width: 0; flex: 1;">
+                        <div id="user_display_name" class="desktop-profile-name">DebiTú Business</div>
+                        <div class="desktop-profile-role">Configuración & Perfil</div>
+                    </div>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Área Principal de Contenido (Full Width en Desktop) -->
+        <div class="desktop-main-wrap">
+            <!-- Encabezado Limpio Estilo Referencia (Inicio + Subtítulo con punto de estado) -->
+            <header class="desktop-page-header">
+                <div>
+                    <h1 class="desktop-page-title">Inicio</h1>
+                    <div class="desktop-page-subtitle">
+                        <span class="status-dot-neon"></span>
+                        <span>Panel de rendimiento y métricas</span>
+                    </div>
+                </div>
+
+                <a href="/Plantillas_Renovadas_Desktop/Operacion_renov_desktop.html" class="fintech-modal-btn primary" style="padding: 10px 22px; font-size: 0.84rem; text-decoration: none; border-radius: var(--radius-full);">
+                    + Nueva Operación
+                </a>
+            </header>
+
+            <!-- Cuadrícula Asimétrica de 2 Columnas Estilo Referencia -->
+            <main class="desktop-reference-grid">
+                
+                <!-- ============================================================
+                     COLUMNA IZQUIERDA (Principal / Ancha)
+                     ============================================================ -->
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    
+                    <!-- Fila 1: 2 Tarjetas Superiores (Total Deuda Activa + Cobros Recibidos) -->
+                    <div class="desktop-row-2col">
+                        <!-- Tarjeta 1: Hero Deuda Total Activa (de Dashboard_renov.html) -->
+                        <div class="desktop-card-box" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 150px;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <span class="hero-balance-label" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); font-weight: 700;">Total Deuda Activa</span>
+                                <span style="color: #4f5869; font-size: 1.1rem; line-height: 1;">•••</span>
+                            </div>
+
+                            <div>
+                                <div class="hero-balance-value" style="font-size: 2.3rem; font-weight: 800; font-family: var(--font-mono); color: #ffffff; line-height: 1.1; margin: 4px 0 8px;">
+                                    <span id="balance_integer">$0</span><span id="balance_cents" class="cents">.00</span>
+                                </div>
+                                <div class="hero-balance-badge" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--brand-volt); background: rgba(204, 255, 0, 0.08); padding: 4px 10px; border-radius: var(--radius-full); border: 1px solid rgba(204, 255, 0, 0.2);">
+                                    <span style="font-size: 0.75rem;">●</span>
+                                    <span id="hero_badge_text">Calculando datos...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta 2: Cobros Recibidos (de Dashboard_renov.html) -->
+                        <div class="desktop-card-box" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 150px;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <span id="metric_cobros_label" class="metric-label" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); font-weight: 700;">Cobros Recibidos</span>
+                                <span id="metric_cobros_tag" class="metric-tag positive" style="font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: var(--radius-full);">▲ +0%</span>
+                            </div>
+
+                            <div>
+                                <div id="metric_cobros_total" class="metric-value" style="font-size: 2.3rem; font-weight: 800; font-family: var(--font-mono); color: var(--brand-volt); line-height: 1.1; margin: 4px 0 8px;">
+                                    $0.00
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-size: 0.76rem; color: #838e9e;">Recaudación del período</span>
+                                    <div id="metric_cobros_bars" class="mini-bars" style="display: flex; gap: 4px; align-items: flex-end; height: 18px;">
+                                        <div class="mini-bar" style="height: 40%;"></div>
+                                        <div class="mini-bar" style="height: 60%;"></div>
+                                        <div class="mini-bar active" style="height: 90%;"></div>
+                                        <div class="mini-bar" style="height: 50%;"></div>
+                                        <div class="mini-bar active" style="height: 100%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fila 2: Tarjeta Ancha Central (Resumen Estadístico & Gráfico Neón de Dashboard_renov.html) -->
+                    <div class="desktop-card-box" style="padding: 24px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <h3 style="font-size: 1.15rem; font-weight: 800; color: #ffffff;">Resumen Estadístico</h3>
+                                <p id="timeframe_subtitle" style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">Comportamiento financiero del mes actual</p>
+                            </div>
+                            <div class="timeframe-switcher">
+                                <button class="timeframe-pill active" data-timeframe="mensual">Mensual</button>
+                                <button class="timeframe-pill" data-timeframe="semanal">Semanal</button>
+                                <button class="timeframe-pill" data-timeframe="diario">Diario</button>
+                            </div>
+                        </div>
+
+                        <!-- Gráfico SVG Neón Dinámico (100% interactivo con script_dashboard_renov.js) -->
+                        <div class="chart-container" style="height: 170px; width: 100%; position: relative; margin-top: 8px;">
+                            <svg id="chart_svg" class="chart-svg" viewBox="0 0 800 170" style="width: 100%; height: 100%; overflow: visible;">
+                                <defs>
+                                    <linearGradient id="volt-gradient-fill" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#ccff00" stop-opacity="0.28"/>
+                                        <stop offset="100%" stop-color="#ccff00" stop-opacity="0.0"/>
+                                    </linearGradient>
+                                </defs>
+                                <!-- Guías de cuadrícula tenues -->
+                                <g id="chart_grid_group"></g>
+                                <!-- Área de relleno con gradiente -->
+                                <path id="chart_area_path" class="chart-area-fill" d=""></path>
+                                <!-- Línea Volt neón con glow -->
+                                <path id="chart_glow_path" class="chart-glow-line" d=""></path>
+                                <!-- Nodos destacados -->
+                                <g id="chart_nodes_group"></g>
+                                <!-- Etiquetas de períodos de tiempo -->
+                                <g id="chart_labels_group"></g>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Fila 3: Tarjetas Métricas Secundarias de Dashboard_renov.html -->
+                    <div class="desktop-row-3col">
+                        <!-- Mini Tarjeta 1: Deudas Emitidas -->
+                        <div class="desktop-mini-stat-card">
+                            <span id="metric_secundaria_label" class="desktop-mini-stat-label">Deudas Emitidas</span>
+                            <div id="metric_secundaria_val" class="desktop-mini-stat-val" style="color: #ff6b6d;">$0.00</div>
+                            <span id="metric_secundaria_tag" class="desktop-mini-stat-sub">● En seguimiento</span>
+                        </div>
+
+                        <!-- Mini Tarjeta 2: Distribución en Mini Barras -->
+                        <div class="desktop-mini-stat-card">
+                            <span class="desktop-mini-stat-label">Distribución</span>
+                            <div id="metric_secundaria_bars" class="mini-bars" style="display: flex; gap: 4px; align-items: flex-end; height: 26px; margin: 4px 0 2px;">
+                                <div class="mini-bar active" style="height: 70%;"></div>
+                                <div class="mini-bar active" style="height: 85%;"></div>
+                                <div class="mini-bar" style="height: 45%;"></div>
+                                <div class="mini-bar active" style="height: 80%;"></div>
+                            </div>
+                            <span class="desktop-mini-stat-sub">actividad por intervalos</span>
+                        </div>
+
+                        <!-- Mini Tarjeta 3: Clientes Registrados -->
+                        <div class="desktop-mini-stat-card">
+                            <span class="desktop-mini-stat-label">Clientes en Cartera</span>
+                            <div id="metric_active_clients_num" class="desktop-mini-stat-val">0</div>
+                            <span class="desktop-mini-stat-sub">cuentas registradas</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ============================================================
+                     COLUMNA DERECHA (Secundaria / Lateral)
+                     ============================================================ -->
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    
+                    <!-- Tarjeta 1: Acciones Rápidas (Las 4 de Dashboard_renov.html) -->
+                    <div class="desktop-card-box">
+                        <div class="desktop-card-header-row">
+                            <span class="desktop-card-header-title">Acciones Rápidas</span>
+                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--brand-volt);">ACCESOS</span>
+                        </div>
+
+                        <div class="quick-actions-row" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 0; padding: 0;">
+                            <a class="quick-action-item" href="/Plantillas_Renovadas_Desktop/Operacion_renov_desktop.html" style="padding: 12px 8px; text-decoration: none;">
+                                <div class="quick-action-icon" title="Nueva Operación" style="background: rgba(204, 255, 0, 0.1); border-color: rgba(204, 255, 0, 0.3); color: var(--brand-volt);">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                                    </svg>
+                                </div>
+                                <span class="quick-action-label" style="color: var(--brand-volt); font-size: 0.76rem; font-weight: 700;">Operaciones</span>
+                            </a>
+
+                            <a class="quick-action-item" href="/Plantillas_Renovadas_Desktop/Clientes_renov_desktop.html" style="padding: 12px 8px; text-decoration: none;">
+                                <div class="quick-action-icon" title="Directorio de Clientes">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <polyline points="16 11 18 13 22 9"></polyline>
+                                    </svg>
+                                </div>
+                                <span class="quick-action-label" style="font-size: 0.76rem;">Clientes</span>
+                            </a>
+
+                            <a class="quick-action-item" href="/Plantillas_Renovadas_Desktop/Estadisticas_renov_desktop.html" style="padding: 12px 8px; text-decoration: none;">
+                                <div class="quick-action-icon" title="Estadísticas y Reportes">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                        <path d="M3 3v18h18"></path>
+                                        <path d="M18 17l-5-5-4 4-5-5"></path>
+                                    </svg>
+                                </div>
+                                <span class="quick-action-label" style="font-size: 0.76rem;">Estadísticas</span>
+                            </a>
+
+                            <a class="quick-action-item" href="/Plantillas_Renovadas_Desktop/Config_renov_desktop.html" style="padding: 12px 8px; text-decoration: none;">
+                                <div class="quick-action-icon" title="Configuración">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                        <path d="M12 20h9"></path>
+                                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                                    </svg>
+                                </div>
+                                <span class="quick-action-label" style="font-size: 0.76rem;">Ajustes</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta 2: Movimientos Recientes (100% de Dashboard_renov.html) -->
+                    <div class="desktop-card-box" style="padding: 22px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                            <h3 style="font-size: 0.95rem; font-weight: 700; color: #ffffff;">Movimientos Recientes</h3>
+                            <a href="/Plantillas_Renovadas_Desktop/Estadisticas_renov_desktop.html#historial_operaciones" style="font-size: 0.74rem; color: var(--brand-volt); text-decoration: none; font-weight: 600;">Ver todos ↗</a>
+                        </div>
+
+                        <!-- Contenedor Oficial poblado por script_dashboard_renov.js -->
+                        <div id="lista_movimientos_recientes" class="tx-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 380px; overflow-y: auto;">
+                            <div style="text-align: center; padding: 24px 0; color: var(--text-secondary); font-size: 0.85rem;">
+                                Sincronizando movimientos...
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts Controlador de Dashboard -->
+    <script type="module" src="/Scripts/script_dashboard_renov.js"></script>
+    <!-- Router SPA Unificado -->
+    <script type="module" src="/Scripts/spa_router.js"></script>
+    <!-- Detector de Dispositivo y Redimensionamiento -->
+    <script type="module" src="/Scripts/device_detector.js"></script>
+</body>
+
+</html>

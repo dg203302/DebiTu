@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#090b10">
+    <meta name="color-scheme" content="dark">
+    <title>Clientes | DebiTú Business</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Estilos Renovados Neo-Fintech Volt -->
+    <link rel="stylesheet" href="/Estilos/branding_renovado.css">
+</head>
+
+<body>
+    <div class="desktop-app-layout">
+        <!-- Barra Lateral (Sidebar) Fija Estilo Referencia -->
+        <aside class="desktop-sidebar">
+            <div>
+                <!-- Branding Header con Badge PRO -->
+                <div class="desktop-sidebar-brand">
+                    <a href="/Plantillas_Renovadas_Desktop/Dashboard_renov_desktop.html" class="desktop-sidebar-brand-left" style="text-decoration: none;">
+                        <div class="desktop-sidebar-logo">
+                            <img src="/icons/Icon.png" alt="DebiTú Logo">
+                        </div>
+                        <div>
+                            <div class="desktop-sidebar-title">Debi<span>Tú</span></div>
+                            <div class="desktop-sidebar-tagline">Fintech AI Suite</div>
+                        </div>
+                    </a>
+                    <span class="desktop-pro-badge">PRO</span>
+                </div>
+
+                <!-- Menú de Enlaces del Sidebar (Pills Redondeadas) -->
+                <nav class="desktop-nav-menu" aria-label="Menú principal">
+                    <a href="/Plantillas_Renovadas_Desktop/Dashboard_renov_desktop.html" class="desktop-nav-link">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                            <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                            <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                            <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                        </svg>
+                        <span>Dashboard</span>
+                    </a>
+
+                    <a href="/Plantillas_Renovadas_Desktop/Clientes_renov_desktop.html" class="desktop-nav-link active">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <span>Clientes</span>
+                    </a>
+
+                    <a href="/Plantillas_Renovadas_Desktop/Operacion_renov_desktop.html" class="desktop-nav-link">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                        <span>Nueva Operación</span>
+                    </a>
+
+                    <a href="/Plantillas_Renovadas_Desktop/Estadisticas_renov_desktop.html" class="desktop-nav-link">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                        <span>Estadísticas</span>
+                    </a>
+
+                    <a href="/Plantillas_Renovadas_Desktop/Config_renov_desktop.html" class="desktop-nav-link">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09A1.65 1.65 0 0 0 19.4 15z"></path>
+                        </svg>
+                        <span>Ajustes</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Perfil de Usuario en el Sidebar (Pill Inferior) -->
+            <div class="desktop-sidebar-profile">
+                <a href="/Plantillas_Renovadas_Desktop/Config_renov_desktop.html" class="desktop-profile-box" style="text-decoration: none;">
+                    <div class="header-avatar-container" style="width: 36px; height: 36px;">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" id="pfp" alt="Usuario" class="header-avatar-img"
+                            referrerpolicy="no-referrer" crossorigin="anonymous" style="display: none;"
+                            onload="if(this.src && !this.src.startsWith('data:image/svg')) { this.style.display='block'; const fb=this.parentElement.querySelector('.header-avatar-fallback'); if(fb) fb.style.display='none'; }"
+                            onerror="this.style.display='none'; const fb=this.parentElement.querySelector('.header-avatar-fallback'); if(fb) fb.style.display='flex';">
+                        <div id="header_avatar_fallback" class="header-avatar-fallback" style="display: flex; font-size: 0.88rem;">
+                            <span id="header_avatar_initials">D</span>
+                        </div>
+                        <div class="header-status-indicator" title="Conectado"></div>
+                    </div>
+                    <div style="min-width: 0; flex: 1;">
+                        <div id="user_display_name" class="desktop-profile-name">Mi Negocio</div>
+                        <div class="desktop-profile-role">Configuración & Perfil</div>
+                    </div>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Área Principal de Contenido -->
+        <div class="desktop-main-wrap">
+            <!-- 1. Encabezado Limpio Estilo Referencia (Clientes + Subtítulo con punto) -->
+            <header class="desktop-page-header">
+                <div>
+                    <h1 class="desktop-page-title">Clientes</h1>
+                    <div class="desktop-page-subtitle">
+                        <span class="status-dot-neon"></span>
+                        <span>Directorio comercial, saldos y cobranzas</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <a href="/Plantillas_Renovadas_Desktop/Operacion_renov_desktop.html?tipo=pago" class="quick-amt-pill" style="padding: 10px 18px; text-decoration: none; font-size: 0.82rem; font-weight: 700; border-radius: var(--radius-full);">
+                        Cobrar Deuda →
+                    </a>
+                    <button type="button" id="btn_open_add_client" class="fintech-modal-btn primary" style="padding: 10px 22px; font-size: 0.84rem; border-radius: var(--radius-full);">
+                        + Nuevo Cliente
+                    </button>
+                </div>
+            </header>
+
+            <!-- 2. Fila Superior: Resumen de Cartera (Las 4 Métricas de Clientes_renov.html juntas) -->
+            <div class="desktop-row-4col" style="margin-bottom: 20px;">
+                <!-- Métrica 1: Deuda Total en Cartera -->
+                <div class="desktop-card-box" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between; min-height: 125px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <span class="desktop-mini-stat-label">Deuda Total en Cartera</span>
+                        <span style="color: #ff6b6d; font-size: 0.9rem;">●</span>
+                    </div>
+                    <div>
+                        <div id="metric_total_debt_amount" style="font-size: 1.95rem; font-weight: 800; color: #ff6b6d; font-family: var(--font-mono); line-height: 1.1;">
+                            $0,00
+                        </div>
+                        <div style="font-size: 0.74rem; color: #838e9e; margin-top: 4px;">Saldo pendiente de cobranza</div>
+                    </div>
+                </div>
+
+                <!-- Métrica 2: Total Clientes -->
+                <div class="desktop-card-box" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between; min-height: 125px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <span class="desktop-mini-stat-label">Total Clientes</span>
+                        <span style="color: #838e9e; font-size: 0.9rem;">●</span>
+                    </div>
+                    <div>
+                        <div id="metric_total_clients" style="font-size: 1.95rem; font-weight: 800; color: #ffffff; font-family: var(--font-mono); line-height: 1.1;">
+                            0
+                        </div>
+                        <div style="font-size: 0.74rem; color: #838e9e; margin-top: 4px;">Cartera comercial registrada</div>
+                    </div>
+                </div>
+
+                <!-- Métrica 3: Con Deuda -->
+                <div class="desktop-card-box" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between; min-height: 125px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <span class="desktop-mini-stat-label">Con Deuda</span>
+                        <span class="metric-tag negative" style="font-size: 0.68rem; padding: 2px 7px;">En mora</span>
+                    </div>
+                    <div>
+                        <div id="metric_with_debt" style="font-size: 1.95rem; font-weight: 800; color: #ff6b6d; font-family: var(--font-mono); line-height: 1.1;">
+                            0
+                        </div>
+                        <div style="font-size: 0.74rem; color: #838e9e; margin-top: 4px;">Clientes con saldo activo</div>
+                    </div>
+                </div>
+
+                <!-- Métrica 4: Al Día -->
+                <div class="desktop-card-box" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between; min-height: 125px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <span class="desktop-mini-stat-label">Al Día</span>
+                        <span class="metric-tag positive" style="font-size: 0.68rem; padding: 2px 7px;">Saldados</span>
+                    </div>
+                    <div>
+                        <div id="metric_settled" style="font-size: 1.95rem; font-weight: 800; color: var(--brand-volt); font-family: var(--font-mono); line-height: 1.1;">
+                            0
+                        </div>
+                        <div style="font-size: 0.74rem; color: #838e9e; margin-top: 4px;">Cuentas sin saldo pendiente</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Cuadrícula Principal de 2 Columnas Estilo Referencia -->
+            <main class="desktop-reference-grid">
+                
+                <!-- ============================================================
+                     COLUMNA IZQUIERDA (Directorio Comercial Principal)
+                     ============================================================ -->
+                <div style="display: flex; flex-direction: column; gap: 16px; min-width: 0;">
+                    <div class="desktop-card-box" style="padding: 24px;">
+                        <!-- Barra de Búsqueda y Filtros Rápidos -->
+                        <div style="display: flex; gap: 14px; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap;">
+                            <div class="client-search-box" style="flex: 1; min-width: 220px;">
+                                <span class="client-search-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                </span>
+                                <input type="text" id="client_search_input" class="fintech-input" placeholder="Buscar por nombre o teléfono..." autocomplete="off">
+                            </div>
+
+                            <div class="timeframe-switcher">
+                                <button type="button" class="timeframe-pill active" data-filter="all">Todos</button>
+                                <button type="button" class="timeframe-pill" data-filter="withDebt">Con Deuda</button>
+                                <button type="button" class="timeframe-pill" data-filter="withoutDebt">Al Día</button>
+                            </div>
+                        </div>
+
+                        <!-- Lista de Clientes Dinámica (Amplitud y comodidad de scroll) -->
+                        <div class="tx-list" id="client_list_container" style="min-height: 480px; max-height: 600px; overflow-y: auto;">
+                            <div style="text-align: center; padding: 40px; color: #838e9e; font-size: 0.85rem;">
+                                Cargando clientes...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================================
+                     COLUMNA DERECHA (Panel de Gestión y Cobranzas)
+                     ============================================================ -->
+                <div style="display: flex; flex-direction: column; gap: 20px; min-width: 0;">
+                    
+                    <!-- Tarjeta 1: Acciones Rápidas de Cartera -->
+                    <div class="desktop-card-box">
+                        <div class="desktop-card-header-row">
+                            <span class="desktop-card-header-title">Acciones Rápidas</span>
+                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--brand-volt);">ACCESOS</span>
+                        </div>
+
+                        <div class="quick-actions-row" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 0; padding: 0;">
+                            <button type="button" onclick="document.getElementById('btn_open_add_client').click()" class="quick-action-item" style="padding: 12px 8px; text-decoration: none; background: none; border: none; cursor: pointer; text-align: center;">
+                                <div class="quick-action-icon" title="Agregar Nuevo Cliente" style="background: rgba(204, 255, 0, 0.1); border-color: rgba(204, 255, 0, 0.3); color: var(--brand-volt);">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                </div>
+                                <span class="quick-action-label" style="color: var(--brand-volt); font-size: 0.76rem; font-weight: 700;">+ Cliente</span>
+                            </button>
+
+                            <a class="quick-action-item" href="/Plantillas_Renovadas_Desktop/Operacion_renov_desktop.html?tipo=pago" style="padding: 12px 8px; text-decoration: none;">
+                                <div class="quick-action-icon" title="Registrar Cobro">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                </div>
+                                <span class="quick-action-label" style="font-size: 0.76rem;">Cobrar</span>
+                            </a>
+
+                            <a class="quick-action-item" href="/Plantillas_Renovadas_Desktop/Operacion_renov_desktop.html?tipo=deuda" style="padding: 12px 8px; text-decoration: none;">
+                                <div class="quick-action-icon" title="Cargar Nueva Deuda">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                                    </svg>
+                                </div>
+                                <span class="quick-action-label" style="font-size: 0.76rem;">Nueva Deuda</span>
+                            </a>
+
+                            <a class="quick-action-item" href="/Plantillas_Renovadas_Desktop/Estadisticas_renov_desktop.html" style="padding: 12px 8px; text-decoration: none;">
+                                <div class="quick-action-icon" title="Estadísticas Comerciales">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                        <path d="M3 3v18h18"></path>
+                                        <path d="M18 17l-5-5-4 4-5-5"></path>
+                                    </svg>
+                                </div>
+                                <span class="quick-action-label" style="font-size: 0.76rem;">Métricas</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta 2: Cobranzas y Recordatorios por WhatsApp -->
+                    <div class="desktop-card-box" style="padding: 22px;">
+                        <div class="desktop-card-header-row">
+                            <span class="desktop-card-header-title">Cobranzas Directas</span>
+                            <span style="font-size: 0.72rem; font-weight: 700; color: #25D366; font-family: var(--font-mono);">WHATSAPP</span>
+                        </div>
+                        <h3 style="font-size: 1.05rem; font-weight: 800; color: #ffffff; margin-bottom: 6px;">
+                            Recordatorios de Deuda
+                        </h3>
+                        <p style="font-size: 0.78rem; color: #838e9e; line-height: 1.45; margin-bottom: 16px;">
+                            Hacé click en cualquier cliente con deuda en el listado para abrir su ficha y enviarle su saldo actualizado directo a su WhatsApp con un mensaje prediseñado.
+                        </p>
+                        <button type="button" class="btn-volt-action" style="width: 100%; padding: 11px 16px; font-size: 0.84rem; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="document.querySelector('[data-filter=withDebt]').click()">
+                            <span>Ver Clientes con Deuda</span>
+                            <span style="font-size: 1rem;">→</span>
+                        </button>
+                    </div>
+
+                    <!-- Tarjeta 3: Ficha 360° Informativa -->
+                    <div class="desktop-card-box" style="padding: 22px;">
+                        <div class="desktop-card-header-row">
+                            <span class="desktop-card-header-title">Ficha Comercial</span>
+                            <span style="font-size: 0.72rem; font-weight: 700; color: #838e9e; font-family: var(--font-mono);">VISTA 360°</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.78rem; color: #8a93a6;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="color: var(--brand-volt); font-size: 0.85rem;">✓</span>
+                                <span>Historial individual de pagos y compras</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="color: var(--brand-volt); font-size: 0.85rem;">✓</span>
+                                <span>Cálculo en vivo de saldo activo y total abonado</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="color: var(--brand-volt); font-size: 0.85rem;">✓</span>
+                                <span>Edición directa de datos y número telefónico</span>
+                            </div>
+                        </div>
+                        <div style="border-top: 1px solid rgba(255, 255, 255, 0.05); margin-top: 14px; padding-top: 12px; font-size: 0.73rem; color: #6d7888;">
+                            Seleccioná cualquier cliente del listado para abrir su ficha completa.
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+
+    <!-- ==================================================================
+         MODALES DE GESTIÓN DE CLIENTES
+         ================================================================== -->
+    <!-- Modal 1: Detalle -->
+    <div id="modal_detalle_cliente" class="neo-modal-overlay" role="dialog" aria-modal="true">
+        <div class="neo-modal-sheet" style="max-width: 540px;">
+            <div class="modal-header-row">
+                <span class="modal-header-title">Ficha del Cliente</span>
+                <button type="button" class="modal-close-btn" onclick="window.cerrarDetalleCliente()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Perfil del Cliente -->
+            <div style="display: flex; align-items: center; gap: 14px; background: var(--bg-surface); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <div id="detail_client_avatar" class="selected-client-avatar" style="width: 48px; height: 48px; font-size: 1.15rem;">C</div>
+                <div>
+                    <h3 id="detail_client_name" style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">Nombre Cliente</h3>
+                    <p id="detail_client_tel" style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 2px;">+54 9 11 0000-0000</p>
+                </div>
+            </div>
+
+            <!-- Estado Financiero del Cliente -->
+            <div class="client-balance-cards-row">
+                <div class="client-balance-card danger">
+                    <span class="input-label" style="font-size: 0.68rem;">Deuda Activa</span>
+                    <div id="detail_client_debt" class="val">$0,00</div>
+                </div>
+                <div class="client-balance-card success">
+                    <span class="input-label" style="font-size: 0.68rem;">Total Pagado</span>
+                    <div id="detail_client_total_paid" class="val">$0,00</div>
+                </div>
+            </div>
+
+            <!-- Acciones Rápidas (4 Botones) -->
+            <div class="client-quick-actions-grid">
+                <button type="button" id="detail_btn_whatsapp" class="client-action-tile wa" title="Enviar recordatorio WhatsApp">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                    </svg>
+                    <span>WhatsApp</span>
+                </button>
+
+                <a id="detail_btn_new_op" href="/Plantillas_Renovadas_Desktop/Operacion_renov_desktop.html" class="client-action-tile op-link" title="Nueva Operación">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                    <span>Operación</span>
+                </a>
+
+                <button type="button" id="detail_btn_edit" class="client-action-tile" title="Editar datos del cliente">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                    <span>Editar</span>
+                </button>
+
+                <button type="button" id="detail_btn_delete" class="client-action-tile danger" title="Eliminar cliente">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    <span>Eliminar</span>
+                </button>
+            </div>
+
+            <!-- Historial de Movimientos del Cliente -->
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="input-label">Historial de Operaciones</span>
+                    <div class="timeframe-switcher" style="padding: 2px;">
+                        <button type="button" id="tab_ops_deudas" class="timeframe-pill active" style="padding: 4px 10px; font-size: 0.72rem;">Deudas</button>
+                        <button type="button" id="tab_ops_pagos" class="timeframe-pill" style="padding: 4px 10px; font-size: 0.72rem;">Pagos</button>
+                    </div>
+                </div>
+
+                <div id="client_ops_list" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto;">
+                    <!-- Se poblará con las operaciones del cliente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Agregar -->
+    <div id="modal_nuevo_cliente" class="neo-modal-overlay" role="dialog" aria-modal="true">
+        <div class="neo-modal-sheet" style="max-width: 480px;">
+            <div class="modal-header-row">
+                <span class="modal-header-title">Nuevo Cliente</span>
+                <button type="button" class="modal-close-btn" onclick="window.cerrarModalNuevoCliente()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <form id="form_nuevo_cliente" style="display: flex; flex-direction: column; gap: 14px;">
+                <div>
+                    <label class="input-label" for="add_client_nombre">Nombre Completo</label>
+                    <input type="text" id="add_client_nombre" class="fintech-input" placeholder="Ej: Juan Pérez" style="padding-left: 14px; margin-top: 6px;" required autocomplete="name">
+                </div>
+
+                <div>
+                    <label class="input-label" for="add_client_tel">Número de Teléfono</label>
+                    <input type="tel" id="add_client_tel" class="fintech-input" placeholder="Ej: 1123456789" style="padding-left: 14px; margin-top: 6px;" required autocomplete="tel" inputmode="numeric">
+                </div>
+
+                <div>
+                    <label class="input-label" for="add_client_deuda">Deuda Inicial ($)</label>
+                    <input type="number" step="0.01" id="add_client_deuda" class="fintech-input" placeholder="0.00" value="0" style="padding-left: 14px; margin-top: 6px;" inputmode="decimal">
+                </div>
+
+                <button type="submit" id="btn_submit_add_client" class="btn-volt-action" style="margin-top: 10px;">
+                    Guardar Cliente
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 3: Editar -->
+    <div id="modal_editar_cliente" class="neo-modal-overlay" role="dialog" aria-modal="true">
+        <div class="neo-modal-sheet" style="max-width: 480px;">
+            <div class="modal-header-row">
+                <span class="modal-header-title">Editar Cliente</span>
+                <button type="button" class="modal-close-btn" onclick="window.cerrarModalEditarCliente()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <form id="form_editar_cliente" style="display: flex; flex-direction: column; gap: 14px;">
+                <div>
+                    <label class="input-label" for="edit_client_nombre">Nombre Completo</label>
+                    <input type="text" id="edit_client_nombre" class="fintech-input" style="padding-left: 14px; margin-top: 6px;" required>
+                </div>
+
+                <div>
+                    <label class="input-label" for="edit_client_tel">Número de Teléfono</label>
+                    <input type="tel" id="edit_client_tel" class="fintech-input" style="padding-left: 14px; margin-top: 6px;" required inputmode="numeric">
+                </div>
+
+                <div>
+                    <label class="input-label" for="edit_client_deuda">Deuda Activa ($)</label>
+                    <input type="number" step="0.01" id="edit_client_deuda" class="fintech-input" style="padding-left: 14px; margin-top: 6px;" required inputmode="decimal">
+                </div>
+
+                <button type="submit" id="btn_submit_edit_client" class="btn-volt-action" style="margin-top: 10px;">
+                    Actualizar Cambios
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 4: WhatsApp -->
+    <div id="modal_whatsapp" class="neo-modal-overlay" role="dialog" aria-modal="true">
+        <div class="neo-modal-sheet" style="max-width: 480px;">
+            <div class="modal-header-row">
+                <span class="modal-header-title">Enviar por WhatsApp</span>
+                <button type="button" class="modal-close-btn" onclick="window.cerrarModalWhatsApp()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <p style="font-size: 0.85rem; color: #838e9e;">Selecciona qué información deseas enviar al cliente directamente a su chat de WhatsApp.</p>
+
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <label class="input-label">Tipo de Notificación</label>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="wa-choice-pill active" data-wa-type="resumen">Saldo Actual</button>
+                    <button type="button" class="wa-choice-pill" data-wa-type="deudas">Historial Deudas</button>
+                    <button type="button" class="wa-choice-pill" data-wa-type="pagos">Historial Pagos</button>
+                </div>
+            </div>
+
+            <button type="button" id="btn_send_wa_action" class="btn-volt-action" style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: #ffffff; box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4); margin-top: 10px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                </svg>
+                Abrir WhatsApp
+            </button>
+        </div>
+    </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="/Scripts/script_clientes_renov.js"></script>
+    <script type="module" src="/Scripts/spa_router.js"></script>
+    <script type="module" src="/Scripts/device_detector.js"></script>
+</body>
+
+</html>

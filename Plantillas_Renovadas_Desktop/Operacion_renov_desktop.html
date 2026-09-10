@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#090b10">
+    <meta name="color-scheme" content="dark">
+    <title>Nueva Operación | DebiTú Business</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Estilos Renovados Neo-Fintech Volt -->
+    <link rel="stylesheet" href="/Estilos/branding_renovado.css">
+</head>
+
+<body>
+    <div class="desktop-app-layout">
+        <!-- Barra Lateral (Sidebar) Fija Estilo Referencia -->
+        <aside class="desktop-sidebar">
+            <div>
+                <!-- Branding Header con Badge PRO -->
+                <div class="desktop-sidebar-brand">
+                    <a href="/Plantillas_Renovadas_Desktop/Dashboard_renov_desktop.html" class="desktop-sidebar-brand-left" style="text-decoration: none;">
+                        <div class="desktop-sidebar-logo">
+                            <img src="/icons/Icon.png" alt="DebiTú Logo">
+                        </div>
+                        <div>
+                            <div class="desktop-sidebar-title">Debi<span>Tú</span></div>
+                            <div class="desktop-sidebar-tagline">Fintech AI Suite</div>
+                        </div>
+                    </a>
+                    <span class="desktop-pro-badge">PRO</span>
+                </div>
+
+                <!-- Menú de Enlaces del Sidebar (Pills Redondeadas) -->
+                <nav class="desktop-nav-menu" aria-label="Menú principal">
+                    <a href="/Plantillas_Renovadas_Desktop/Dashboard_renov_desktop.html" class="desktop-nav-link">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                            <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                            <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                            <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                        </svg>
+                        <span>Dashboard</span>
+                    </a>
+
+                    <a href="/Plantillas_Renovadas_Desktop/Clientes_renov_desktop.html" class="desktop-nav-link">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <span>Clientes</span>
+                    </a>
+
+                    <a href="/Plantillas_Renovadas_Desktop/Operacion_renov_desktop.html" class="desktop-nav-link active">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                        <span>Nueva Operación</span>
+                    </a>
+
+                    <a href="/Plantillas_Renovadas_Desktop/Estadisticas_renov_desktop.html" class="desktop-nav-link">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                        <span>Estadísticas</span>
+                    </a>
+
+                    <a href="/Plantillas_Renovadas_Desktop/Config_renov_desktop.html" class="desktop-nav-link">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09A1.65 1.65 0 0 0 19.4 15z"></path>
+                        </svg>
+                        <span>Ajustes</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Perfil de Usuario en el Sidebar (Pill Inferior) -->
+            <div class="desktop-sidebar-profile">
+                <a href="/Plantillas_Renovadas_Desktop/Config_renov_desktop.html" class="desktop-profile-box" style="text-decoration: none;">
+                    <div class="header-avatar-container" style="width: 36px; height: 36px;">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" id="pfp" alt="Usuario" class="header-avatar-img"
+                            referrerpolicy="no-referrer" crossorigin="anonymous" style="display: none;"
+                            onload="if(this.src && !this.src.startsWith('data:image/svg')) { this.style.display='block'; const fb=this.parentElement.querySelector('.header-avatar-fallback'); if(fb) fb.style.display='none'; }"
+                            onerror="this.style.display='none'; const fb=this.parentElement.querySelector('.header-avatar-fallback'); if(fb) fb.style.display='flex';">
+                        <div id="header_avatar_fallback" class="header-avatar-fallback" style="display: flex; font-size: 0.88rem;">
+                            <span id="header_avatar_initials">D</span>
+                        </div>
+                        <div class="header-status-indicator" title="Conectado"></div>
+                    </div>
+                    <div style="min-width: 0; flex: 1;">
+                        <div id="user_display_name" class="desktop-profile-name">Mi Negocio</div>
+                        <div class="desktop-profile-role">Configuración & Perfil</div>
+                    </div>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Área Principal de Contenido -->
+        <div class="desktop-main-wrap">
+            <!-- 1. Encabezado Limpio Estilo Referencia -->
+            <header class="desktop-page-header">
+                <div>
+                    <h1 class="desktop-page-title">Nueva Operación</h1>
+                    <div class="desktop-page-subtitle">
+                        <span class="status-dot-neon"></span>
+                        <span>Carga de deudas y cobranzas con calculadora integrada</span>
+                    </div>
+                </div>
+
+                <a href="/Plantillas_Renovadas_Desktop/Clientes_renov_desktop.html" class="fintech-modal-btn" style="padding: 10px 22px; font-size: 0.84rem; text-decoration: none; border-radius: var(--radius-full);">
+                    Ver Directorio
+                </a>
+            </header>
+
+            <!-- 2. Cuadrícula Asimétrica de 2 Columnas Estilo Referencia -->
+            <main class="desktop-reference-grid">
+                
+                <!-- ============================================================
+                     COLUMNA IZQUIERDA (Principal / Ancha)
+                     ============================================================ -->
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    
+                    <!-- Fila 1: 2 Tarjetas Superiores (Modalidad + Cliente Asociado) -->
+                    <div class="desktop-row-2col">
+                        <!-- Tarjeta Izquierda (Tipo de Operación) -->
+                        <div class="desktop-card-box" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 155px;">
+                            <div class="desktop-card-header-row">
+                                <span class="desktop-card-header-title">1. Tipo de Operación</span>
+                                <span style="color: #4f5869; font-size: 1.1rem; line-height: 1;">•••</span>
+                            </div>
+
+                            <div class="op-type-toggle-grid" role="radiogroup" aria-label="Tipo de operación" style="margin-top: 4px;">
+                                <button type="button" id="btn_type_deuda" class="op-type-btn active-deuda" aria-pressed="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <line x1="12" y1="19" x2="12" y2="5"></line>
+                                        <polyline points="5 12 12 5 19 12"></polyline>
+                                    </svg>
+                                    <span>Cargar Deuda</span>
+                                </button>
+
+                                <button type="button" id="btn_type_pago" class="op-type-btn" aria-pressed="false">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <polyline points="19 12 12 19 5 12"></polyline>
+                                    </svg>
+                                    <span>Registrar Pago</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta Derecha (Buscador y Selección de Cliente) -->
+                        <div class="desktop-card-box" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 155px;">
+                            <div class="desktop-card-header-row">
+                                <span class="desktop-card-header-title">2. Cliente Asociado</span>
+                                <a href="/Plantillas_Renovadas_Desktop/Clientes_renov_desktop.html" style="font-size: 0.72rem; color: var(--brand-volt); text-decoration: none; font-weight: 700;">+ Directorio</a>
+                            </div>
+
+                            <div class="client-search-box" id="client_search_box">
+                                <span class="client-search-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                </span>
+                                <input type="text" id="op_client_search" class="fintech-input" placeholder="Buscar cliente por nombre..." autocomplete="off">
+                                <div id="client_search_dropdown" class="client-dropdown" style="display: none;"></div>
+                            </div>
+
+                            <!-- Tarjeta de Cliente Seleccionado -->
+                            <div id="selected_client_card" class="selected-client-card" style="display: none; margin-top: 10px;">
+                                <div class="selected-client-left">
+                                    <div id="selected_client_avatar" class="selected-client-avatar">C</div>
+                                    <div class="selected-client-details">
+                                        <h4 id="selected_client_name">Cliente</h4>
+                                        <p id="selected_client_tel">+54 9 11 0000-0000</p>
+                                        <span id="selected_client_badge" class="selected-client-badge">Deuda: $0.00</span>
+                                    </div>
+                                </div>
+                                <button type="button" id="btn_remove_client" class="btn-remove-client" title="Cambiar cliente">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div id="quick_clients_container" class="quick-clients-row" style="display: none; margin-top: 10px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Fila 2: Tarjeta Ancha Central (Concepto y Categorías Rápidas) -->
+                    <div class="desktop-card-box" style="padding: 22px;">
+                        <div class="desktop-card-header-row">
+                            <span class="desktop-card-header-title">3. Detalle o Concepto</span>
+                            <span style="font-size: 0.72rem; color: #838e9e;">Opcional</span>
+                        </div>
+
+                        <div style="position: relative; display: flex; align-items: center; margin-bottom: 14px;">
+                            <span class="client-search-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                                    <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                                </svg>
+                            </span>
+                            <input type="text" id="op_category_input" class="fintech-input" placeholder="Ej: Venta de mercadería, Abono cuota, Cancelación...">
+                        </div>
+
+                        <!-- Pastillas de conceptos habituales -->
+                        <div class="category-chips-row">
+                            <button type="button" class="category-chip" data-cat="Venta mercadería">📦 Mercadería</button>
+                            <button type="button" class="category-chip" data-cat="Abono cuota">💵 Abono cuota</button>
+                            <button type="button" class="category-chip" data-cat="Servicio">⚡ Servicio</button>
+                            <button type="button" class="category-chip" data-cat="Pago total">✅ Cancelación</button>
+                            <button type="button" class="category-chip" data-cat="Crédito personal">🤝 Crédito</button>
+                        </div>
+                    </div>
+
+                    <!-- Fila 3: 3 Mini Tarjetas Inferiores (Resumen de Impacto) -->
+                    <div class="desktop-row-3col">
+                        <div class="desktop-mini-stat-card">
+                            <span class="desktop-mini-stat-label">Sincronización</span>
+                            <div class="desktop-mini-stat-val" style="color: var(--brand-volt);">Cloud</div>
+                            <span class="desktop-mini-stat-sub">base de datos segura</span>
+                        </div>
+
+                        <div class="desktop-mini-stat-card">
+                            <span class="desktop-mini-stat-label">Comprobante</span>
+                            <div class="desktop-mini-stat-val">WhatsApp</div>
+                            <span class="desktop-mini-stat-sub">envío con 1 click</span>
+                        </div>
+
+                        <div class="desktop-mini-stat-card">
+                            <span class="desktop-mini-stat-label">Historial</span>
+                            <div class="desktop-mini-stat-val">Libro Mayor</div>
+                            <span class="desktop-mini-stat-sub">auditoría inmediata</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ============================================================
+                     COLUMNA DERECHA (Secundaria / Calculadora e Importe)
+                     ============================================================ -->
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    
+                    <!-- Tarjeta 1: Display Gigante del Monto -->
+                    <div class="desktop-card-box">
+                        <div class="desktop-card-header-row">
+                            <span class="desktop-card-header-title">4. Importe a Registrar</span>
+                            <span style="font-size: 0.72rem; font-weight: 700; color: #838e9e; font-family: var(--font-mono);">ARS</span>
+                        </div>
+
+                        <div class="amount-display-card" style="margin: 0; padding: 14px 18px; border-radius: 14px;">
+                            <div class="amount-display-value-wrap">
+                                <span class="amount-currency-symbol">$</span>
+                                <input type="text" id="op_amount_input" class="amount-big-input" value="0" inputmode="decimal" spellcheck="false" autocomplete="off">
+                            </div>
+                            <div id="amount_calc_preview" class="amount-calc-preview"></div>
+
+                            <!-- Pastillas de Incremento Rápido -->
+                            <div class="quick-amount-increments">
+                                <button type="button" class="quick-amt-pill" data-add="500">+ $500</button>
+                                <button type="button" class="quick-amt-pill" data-add="1000">+ $1.000</button>
+                                <button type="button" class="quick-amt-pill" data-add="5000">+ $5.000</button>
+                                <button type="button" class="quick-amt-pill" data-add="10000">+ $10.000</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta 2: Calculadora y Teclado Fintech Integrado -->
+                    <div class="desktop-card-box">
+                        <div class="fintech-calc-grid" aria-label="Teclado numérico y calculadora">
+                            <!-- Fila 1 -->
+                            <button type="button" class="calc-btn-key" data-key="7">7</button>
+                            <button type="button" class="calc-btn-key" data-key="8">8</button>
+                            <button type="button" class="calc-btn-key" data-key="9">9</button>
+                            <button type="button" class="calc-btn-key op" data-op="/" title="Dividir">÷</button>
+
+                            <!-- Fila 2 -->
+                            <button type="button" class="calc-btn-key" data-key="4">4</button>
+                            <button type="button" class="calc-btn-key" data-key="5">5</button>
+                            <button type="button" class="calc-btn-key" data-key="6">6</button>
+                            <button type="button" class="calc-btn-key op" data-op="*" title="Multiplicar">×</button>
+
+                            <!-- Fila 3 -->
+                            <button type="button" class="calc-btn-key" data-key="1">1</button>
+                            <button type="button" class="calc-btn-key" data-key="2">2</button>
+                            <button type="button" class="calc-btn-key" data-key="3">3</button>
+                            <button type="button" class="calc-btn-key op" data-op="-" title="Restar">-</button>
+
+                            <!-- Fila 4 -->
+                            <button type="button" class="calc-btn-key action-danger" data-action="clear" title="Limpiar">C</button>
+                            <button type="button" class="calc-btn-key" data-key="0">0</button>
+                            <button type="button" class="calc-btn-key" data-key=".">.</button>
+                            <button type="button" class="calc-btn-key op" data-op="+" title="Sumar">+</button>
+
+                            <!-- Fila 5: Teclas anchas -->
+                            <button type="button" class="calc-btn-key" data-action="backspace" title="Borrar un dígito" style="grid-column: span 2; font-size: 1.25rem;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+                                    <line x1="18" y1="9" x2="12" y2="15"></line>
+                                    <line x1="12" y1="9" x2="18" y2="15"></line>
+                                </svg>
+                            </button>
+                            <button type="button" class="calc-btn-key action-eq" data-action="equals" title="Calcular total" style="grid-column: span 2;">=</button>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta 3: Botón de Acción Principal Volt -->
+                    <div class="desktop-banner-card">
+                        <button type="button" id="btn_submit_op" class="btn-volt-action btn-deuda-mode" style="width: 100%; margin: 0; padding: 14px 20px;">
+                            <svg id="submit_btn_icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="19" x2="12" y2="5"></line>
+                                <polyline points="5 12 12 5 19 12"></polyline>
+                            </svg>
+                            <span id="submit_btn_label">Cargar Deuda</span>
+                        </button>
+                    </div>
+
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="/Scripts/script_operacion_renov.js"></script>
+    <script type="module" src="/Scripts/spa_router.js"></script>
+    <script type="module" src="/Scripts/device_detector.js"></script>
+</body>
+
+</html>
