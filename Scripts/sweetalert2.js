@@ -1,109 +1,29 @@
-let __swalPromise = null;
+// ==========================================================================
+// SWEETALERT2 COMPATIBILITY LAYER -> MODALES NATIVOS NEO-FINTECH
+// Reemplaza por completo SweetAlert2 y scripts externos de CDN.
+// 100% nativo, rápido y estilizado con la identidad visual Obsidian / Volt.
+// ==========================================================================
 
-function ensureSwal() {
-    if (typeof window !== 'undefined' && window.Swal) {
-        return Promise.resolve(window.Swal);
-    }
-    if (__swalPromise) return __swalPromise;
+export {
+    Swal,
+    loadSweetAlert2,
+    showSuccess,
+    showError,
+    showSuccessToast,
+    showErrorToast,
+    showInfo,
+    showInfo as showinfo,
+    showInfoHTML,
+    openModal,
+    closeModal
+} from './modales_renovados.js';
 
-    __swalPromise = new Promise((resolve, reject) => {
-        const existing = document.querySelector('script[data-lib="sweetalert2"]');
-        if (existing) {
-            existing.addEventListener('load', () => resolve(window.Swal));
-            existing.addEventListener('error', (e) => reject(new Error('Failed to load SweetAlert2 script.')));
-            return;
-        }
-
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js';
-        script.async = true;
-        script.defer = true;
-        script.dataset.lib = 'sweetalert2';
-        script.onload = () => resolve(window.Swal);
-        script.onerror = (error) => {
-            console.error('Error loading SweetAlert2:', error);
-            reject(new Error('Failed to load SweetAlert2 script.'));
-        };
-        document.head.appendChild(script);
-    });
-
-    return __swalPromise;
-}
-
-function loadSweetAlert2() {
-    return ensureSwal();
-}
-
-async function showSuccess(title, text) {
-    const Swal = await ensureSwal();
-    return Swal.fire({
-        title,
-        text,
-        icon: 'success',
-        confirmButtonText: 'Aceptar'
-    });
-}
-
-async function showError(title, text) {
-    const Swal = await ensureSwal();
-    return Swal.fire({
-        title,
-        text,
-        icon: 'error',
-        confirmButtonText: 'Aceptar'
-    });
-}
-
-async function showSuccessToast(message) {
-    const Swal = await ensureSwal();
-    const Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        // Asegurar que quede por encima de headers/botones fijos
-        zIndex: 20000
-    });
-    return Toast.fire({ icon: 'success', title: message });
-}
-
-async function showErrorToast(message) {
-    const Swal = await ensureSwal();
-    const Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        // Asegurar que quede por encima de headers/botones fijos
-        zIndex: 20000
-    });
-    return Toast.fire({ icon: 'error', title: message });
-}
-
-async function showInfo(message) {
-    const Swal = await ensureSwal();
-    return Swal.fire({
-        title: 'Información',
-        text: message,
-        icon: 'info',
-        confirmButtonText: 'Aceptar'
-    });
-}
-
-async function showInfoHTML(message) {
-    const Swal = await ensureSwal();
-    return Swal.fire({
-        title: 'Información',
-        html: message,
-        icon: 'info',
-        confirmButtonText: 'Aceptar'
-    });
-}
+import {
+    Swal,
+    loadSweetAlert2
+} from './modales_renovados.js';
 
 if (typeof window !== 'undefined') {
+    window.Swal = Swal;
     window.loadSweetAlert2 = loadSweetAlert2;
 }
-export { ensureSwal as loadSweetAlert2, showSuccess, showError, showSuccessToast, showErrorToast };
-export { showInfo as showinfo, showInfoHTML };

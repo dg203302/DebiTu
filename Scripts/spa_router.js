@@ -1,167 +1,199 @@
-(function() {
-    if (window._spaRouterInitialized) return;
-    window._spaRouterInitialized = true;
+// ==========================================================================
+// ROUTER SPA CLIENT-SIDE (DebiTú Neo-Fintech)
+// Permite navegación fluida e instantánea entre plantillas sin recargas de página.
+// Coordina la pantalla de carga con la consulta y formateo de datos.
+// ==========================================================================
 
-    document.addEventListener('click', async (e) => {
-        const link = e.target.closest('.bottom-nav a');
-        if (!link) return;
-        
-        const url = link.getAttribute('href');
-        if (!url || url.startsWith('#') || url.startsWith('http')) return;
-        if (url === window.location.pathname) {
-            e.preventDefault();
+import { showAppLoader, hideAppLoader } from './loader_renovado.js';
+
+window.__SPA_ROUTER_ACTIVE__ = true;
+
+// Mapeo de rutas a módulos de vista
+const ROUTE_HANDLERS = {
+    'Dashboard_renov.html': {
+        module: '/Scripts/script_dashboard_renov.js',
+        init: 'initDashboard',
+        loadingMsg: 'Sincronizando finanzas...'
+    },
+    'Clientes_renov.html': {
+        module: '/Scripts/script_clientes_renov.js',
+        init: 'initClientes',
+        loadingMsg: 'Cargando directorio de clientes...'
+    },
+    'Operacion_renov.html': {
+        module: '/Scripts/script_operacion_renov.js',
+        init: 'initOperacion',
+        loadingMsg: 'Cargando operaciones y clientes...'
+    },
+    'Estadisticas_renov.html': {
+        module: '/Scripts/script_estadisticas_renov.js',
+        init: 'initEstadisticas',
+        loadingMsg: 'Calculando métricas y estadísticas...'
+    },
+    'Config_renov.html': {
+        module: '/Scripts/script_config_renov.js',
+        init: 'initConfig',
+        loadingMsg: 'Cargando ajustes y cuenta...'
+    },
+    'Login_renov.html': {
+        module: '/Scripts/script_login_renov.js',
+        init: 'initLogin',
+        loadingMsg: 'Verificando credenciales...'
+    }
+};
+
+function getRouteKey(pathname) {
+    const segments = pathname.split('/').filter(Boolean);
+    const filename = segments[segments.length - 1] || 'index.html';
+    return filename;
+}
+
+export async function spaNavigate(url, isPopState = false) {
+    try {
+        const targetUrl = new URL(url, window.location.origin);
+
+        // Si es hacia un host distinto, usar navegación normal
+        if (targetUrl.origin !== window.location.origin) {
+            window.location.href = url;
             return;
         }
 
-        e.preventDefault();
-        await navigateTo(url);
-    });
+        const routeKey = getRouteKey(targetUrl.pathname);
 
-    window.addEventListener('popstate', () => {
-        navigateTo(window.location.pathname, true);
-    });
+        // Si la navegación es al índice raíz o index.html, permitir carga completa para verificación de sesión
+        if (routeKey === 'index.html' || targetUrl.pathname === '/' || targetUrl.pathname === '/index.html') {
+            window.location.href = targetUrl.href;
+            return;
+        }
 
-    async function navigateTo(url, isPopState = false) {
-        // Show loader
-        const loader = document.getElementById('global-loader');
-        if (loader) loader.classList.remove('hidden');
+        const handlerConfig = ROUTE_HANDLERS[routeKey];
+
+        const loadingMsg = handlerConfig?.loadingMsg || 'Sincronizando datos...';
+        showAppLoader(loadingMsg);
+
+        // Descargar nuevo HTML
+        const response = await fetch(targetUrl.href, {
+            headers: { 'X-Requested-With': 'SPA-Router' }
+        });
+
+        if (!response.ok) {
+            console.warn('Fallo fetch SPA, recargando página normal:', response.status);
+            window.location.href = targetUrl.href;
+            return;
+        }
+
+        const htmlText = await response.text();
+        const parser = new DOMParser();
+        const newDoc = parser.parseFromString(htmlText, 'text/html');
+
+        // Actualizar título del documento
+        if (newDoc.title) {
+            document.title = newDoc.title;
+        }
+
+        // Actualizar URL en historial si no proviene de popstate
+        if (!isPopState) {
+            history.pushState({ spa: true, url: targetUrl.href }, '', targetUrl.href);
+        }
+
+        // Actualizar Contenedor Principal (.app-viewport)
+        const currentViewport = document.querySelector('.app-viewport');
+        const newViewport = newDoc.querySelector('.app-viewport');
+
+        if (currentViewport && newViewport) {
+            currentViewport.innerHTML = newViewport.innerHTML;
+            currentViewport.classList.remove('spa-view-enter');
+            // Forzar reflow para reiniciar animación
+            void currentViewport.offsetWidth;
+            currentViewport.classList.add('spa-view-enter');
+        } else {
+            // Fallback si no hay .app-viewport
+            document.body.innerHTML = newDoc.body.innerHTML;
+        }
+
+        // Sincronizar dock inferior activo
+        updateActiveDock(targetUrl.pathname);
+
+        // Scroll al tope
+        window.scrollTo({ top: 0, behavior: 'instant' });
+
+        // Ejecutar inicialización de la vista
+        if (handlerConfig && handlerConfig.module) {
+            try {
+                // Importar módulo de la vista (la caché de ESM previene doble descarga)
+                const mod = await import(`${handlerConfig.module}?v=${Date.now()}`);
+                if (typeof mod[handlerConfig.init] === 'function') {
+                    await mod[handlerConfig.init]();
+                } else {
+                    hideAppLoader();
+                }
+            } catch (err) {
+                console.error(`Error ejecutando ${handlerConfig.init}:`, err);
+                hideAppLoader();
+            }
+        } else {
+            hideAppLoader();
+        }
+
+    } catch (err) {
+        console.error('Error en navegación SPA:', err);
+        hideAppLoader();
+        window.location.href = url;
+    }
+}
+
+function updateActiveDock(pathname) {
+    const currentFile = getRouteKey(pathname);
+    const navLinks = document.querySelectorAll('.bottom-nav-bar .nav-link, .dock-item');
+    navLinks.forEach(item => {
+        const href = item.getAttribute('href') || '';
+        if (href.includes(currentFile)) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+}
+
+// Interceptar clics en enlaces
+function initLinkInterceptor() {
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        if (!link) return;
+
+        // Ignorar descargas, nueva pestaña o protocolos externos
+        if (link.target === '_blank' || link.hasAttribute('download')) return;
+        const href = link.getAttribute('href');
+        if (!href) return;
+
+        if (href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('tel:') || href.startsWith('mailto:') || href.startsWith('https://wa.me')) {
+            return;
+        }
 
         try {
-            const res = await fetch(url);
-            if (!res.ok) throw new Error('Network response was not ok');
-            const html = await res.text();
-            
-            const parser = new DOMParser();
-            const newDoc = parser.parseFromString(html, 'text/html');
+            const urlObj = new URL(href, window.location.origin);
+            if (urlObj.origin !== window.location.origin) return;
 
-            if (document.startViewTransition) {
-                document.startViewTransition(() => updateDOM(newDoc, url, isPopState));
-            } else {
-                updateDOM(newDoc, url, isPopState);
-            }
-        } catch (err) {
-            console.error('SPA Navigation Error:', err);
-            window.location.href = url; // Fallback to normal navigation
+            // Es enlace interno de nuestra app
+            e.preventDefault();
+            spaNavigate(urlObj.href);
+        } catch (_) {
+            // URL no válida, permitir comportamiento estándar
         }
-    }
+    });
+}
 
-    async function updateDOM(newDoc, url, isPopState) {
-        // Update Title
-        document.title = newDoc.title;
+// Soporte de botones Atrás / Adelante del navegador
+function initHistoryListener() {
+    window.addEventListener('popstate', (e) => {
+        spaNavigate(window.location.href, true);
+    });
+}
 
-        // Reset body class to avoid leaking modal/drawer states
-        document.body.className = newDoc.body.className;
+// Inicialización del router
+initLinkInterceptor();
+initHistoryListener();
 
-        // Update CSS links
-        const currentLinks = Array.from(document.head.querySelectorAll('link[rel="stylesheet"]'));
-        const newLinks = Array.from(newDoc.head.querySelectorAll('link[rel="stylesheet"]'));
-        
-        // Insert new links and wait for them to load
-        const cssPromises = [];
-        newLinks.forEach(newLink => {
-            if (!currentLinks.some(l => l.getAttribute('href') === newLink.getAttribute('href'))) {
-                const clone = newLink.cloneNode();
-                const p = new Promise(resolve => {
-                    clone.onload = resolve;
-                    clone.onerror = resolve; // resolve anyway to avoid blocking forever
-                });
-                cssPromises.push(p);
-                document.head.appendChild(clone);
-            }
-        });
-
-        await Promise.all(cssPromises);
-
-        // Remove old links
-        currentLinks.forEach(currentLink => {
-            if (!newLinks.some(l => l.getAttribute('href') === currentLink.getAttribute('href'))) {
-                currentLink.remove();
-            }
-        });
-
-        // Preserve elements
-        const preserveSelectors = ['.liquid-container', '#global-loader', 'script[src*="spa_router.js"]'];
-        
-        // Remove old body elements that shouldn't be preserved
-        Array.from(document.body.children).forEach(child => {
-            const shouldPreserve = preserveSelectors.some(sel => child.matches && child.matches(sel));
-            if (!shouldPreserve) {
-                child.remove();
-            }
-        });
-
-        // Insert new body elements
-        Array.from(newDoc.body.children).forEach(child => {
-            const isPreserved = preserveSelectors.some(sel => child.matches && child.matches(sel));
-            if (!isPreserved && child.tagName !== 'SCRIPT') {
-                document.body.appendChild(child.cloneNode(true));
-            }
-        });
-
-        if (!isPopState) {
-            history.pushState(null, '', url);
-        }
-
-        // Re-execute scripts
-        const newScripts = Array.from(newDoc.querySelectorAll('script'));
-        newScripts.forEach(script => {
-            if (script.src && script.src.includes('spa_router.js')) return;
-            if (script.textContent && script.textContent.includes('CMS_ANIM')) return;
-
-            const newScript = document.createElement('script');
-            if (script.src) {
-                const sep = script.src.includes('?') ? '&' : '?';
-                newScript.src = script.src + sep + 'spa=' + Date.now();
-            } else {
-                newScript.textContent = script.textContent;
-            }
-            if (script.type) newScript.type = script.type;
-            
-            document.body.appendChild(newScript);
-        });
-    }
-
-    // Global style for docked bottom nav
-    if (!document.getElementById('spa-router-styles')) {
-        const style = document.createElement('style');
-        style.id = 'spa-router-styles';
-        style.textContent = `
-            .bottom-nav { transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
-            .bottom-nav.bottom-nav--docked {
-                bottom: 0 !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                border-radius: 0 !important;
-                border-left: none !important;
-                border-right: none !important;
-                border-bottom: none !important;
-                padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
-                padding-top: 12px !important;
-                background: var(--glass-bg, rgba(0,0,0,0.8)) !important;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    // Global scroll listener for docking the bottom nav
-    if (!window._bottomNavScrollAttached) {
-        window._bottomNavScrollAttached = true;
-        window.addEventListener('scroll', () => {
-            const bottomNav = document.querySelector('.bottom-nav');
-            if (!bottomNav) return;
-            
-            const scrollY = window.scrollY || document.documentElement.scrollTop;
-            const innerHeight = window.innerHeight;
-            const scrollHeight = document.documentElement.scrollHeight;
-            
-            // Allow 2px margin of error to be strictly at the bottom
-            const isAtBottom = Math.ceil(scrollY + innerHeight) >= scrollHeight - 2;
-            
-            if (isAtBottom) {
-                bottomNav.classList.add('bottom-nav--docked');
-            } else {
-                bottomNav.classList.remove('bottom-nav--docked');
-            }
-        }, { passive: true });
-    }
-})();
+if (typeof window !== 'undefined') {
+    window.spaNavigate = spaNavigate;
+}

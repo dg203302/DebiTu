@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0c0e12">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="Configuración y preferencias de cuenta en DebiTú">
+
+    <title>Configuración | DebiTú</title>
+
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Sistema de Diseño Neo-Fintech Dark & Volt -->
+    <link rel="stylesheet" href="/Estilos/branding_renovado.css">
+</head>
+
+<body>
+    <div class="app-viewport">
+        <!-- Encabezado Flotante Idéntico al Resto de Plantillas -->
+        <header class="app-header-floating">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="header-avatar-container">
+                    <img src="" id="pfp" alt="Imagen de usuario" class="header-avatar-img"
+                        referrerpolicy="no-referrer"
+                        crossorigin="anonymous"
+                        onload="this.style.display='block'; const fb=document.getElementById('header_avatar_fallback'); if(fb) fb.style.display='none';"
+                        onerror="this.style.display='none'; const fb=document.getElementById('header_avatar_fallback'); if(fb) fb.style.display='flex';"
+                        style="display: none;" />
+                    <div id="header_avatar_fallback" class="header-avatar-fallback" style="display: flex;">
+                        <span id="header_avatar_initials">D</span>
+                    </div>
+                    <div class="header-status-indicator" title="Conectado"></div>
+                </div>
+                <div>
+                    <span style="font-size: 0.68rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;">Configuración</span>
+                    <h2 id="user_display_name" class="header-title" style="font-size: 1rem; line-height: 1.2;">Mi Cuenta</h2>
+                </div>
+            </div>
+
+            <!-- Botón de Salir / Cerrar Sesión en vez de engranaje -->
+            <div style="display: flex; align-items: center;">
+                <button type="button" id="btn_header_logout" class="header-action-btn" aria-label="Cerrar sesión" title="Cerrar sesión">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Contenido Central con padding inferior para no quedar tapado por la barra flotante -->
+        <main class="config-layout" style="padding: 85px 20px 120px; display: flex; flex-direction: column; gap: 20px;">
+
+            <!-- 1. Tarjeta Hero de Perfil del Usuario -->
+            <section class="config-hero-profile">
+                <div class="config-avatar-huge">
+                    <img src="" id="hero_pfp" alt="Foto de perfil" class="config-avatar-huge-img"
+                        referrerpolicy="no-referrer"
+                        crossorigin="anonymous"
+                        onload="this.style.display='block'; const fb=document.getElementById('hero_avatar_fallback'); if(fb) fb.style.display='none';"
+                        onerror="this.style.display='none'; const fb=document.getElementById('hero_avatar_fallback'); if(fb) fb.style.display='flex';"
+                        style="display: none;" />
+                    <div id="hero_avatar_fallback" class="config-avatar-fallback-huge" style="display: flex;">
+                        <span id="hero_avatar_initials">D</span>
+                    </div>
+                </div>
+
+                <div class="config-profile-meta">
+                    <h3 id="config_user_name" class="config-user-title">Mi Negocio</h3>
+                    <p id="config_user_email" style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 2px;">Cargando cuenta...</p>
+                    <div style="display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; margin-top: 4px;">
+                        <span class="config-user-badge">
+                            <span class="pulse-dot"></span>
+                            Cuenta Activa
+                        </span>
+                        <span id="config_user_id" style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); background: rgba(255, 255, 255, 0.04); padding: 4px 10px; border-radius: var(--radius-full); border: 1px solid var(--border-subtle);">
+                            ID: ...
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Información de la Aplicación (Versión 2.5.0) -->
+            <section class="config-group">
+                <span class="config-group-title">Información de la Aplicación</span>
+
+                <div class="config-brand-card">
+                    <div class="config-brand-icon-wrap">
+                        <img src="/icons/Icon.png" alt="DebiTú Logo" class="config-brand-icon" loading="lazy" decoding="async">
+                    </div>
+
+                    <div>
+                        <h4 class="config-brand-title">
+                            Debi<span>Tú</span>
+                        </h4>
+                        <p class="config-brand-tagline">
+                            Sistema Integral de Gestión de Clientes, Control de Deudas y Cobros
+                        </p>
+                    </div>
+
+                    <div class="config-brand-badges">
+                        <span class="config-brand-badge-volt">v2.5.0 Neo-Fintech</span>
+                        <span class="config-brand-badge-subtle">Cloud Sync • PWA</span>
+                    </div>
+
+                    <div class="config-brand-footer">
+                        <span>Desarrollado por <a href="https://djsolutions.lovable.app" target="_blank" rel="noopener noreferrer" style="color: var(--brand-volt); text-decoration: none; font-weight: 700;">DJ Solutions ↗</a></span>
+                        <span>&copy; <span id="anio"></span></span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Seguridad de la Cuenta (Solo botón de borrar cuenta) -->
+            <section class="config-group">
+                <span class="config-group-title">Seguridad de la Cuenta</span>
+
+                <div>
+                    <!-- Botón Eliminar Cuenta -->
+                    <button type="button" id="btn_eliminar_cuenta" class="btn-action-danger">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                        <span>Borrar Cuenta Permanentemente</span>
+                    </button>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Barra de Navegación Flotante Inferior -->
+        <nav class="bottom-nav-bar" aria-label="Navegación principal">
+            <a href="/Plantillas_Renovadas/Dashboard_renov.html" class="nav-link" title="Inicio">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </a>
+
+            <a href="/Plantillas_Renovadas/Clientes_renov.html" class="nav-link" title="Clientes">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+            </a>
+
+            <!-- Botón Operaciones -->
+            <a href="/Plantillas_Renovadas/Operacion_renov.html" class="nav-link" title="Nueva Operación">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+            </a>
+
+            <a href="/Plantillas_Renovadas/Estadisticas_renov.html" class="nav-link" title="Estadísticas">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Script Controlador Configuración Renovada -->
+    <script type="module" src="/Scripts/script_config_renov.js"></script>
+    <!-- Router SPA Unificado -->
+    <script type="module" src="/Scripts/spa_router.js"></script>
+</body>
+
+</html>

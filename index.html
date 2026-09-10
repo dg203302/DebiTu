@@ -1,95 +1,104 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" data-theme="dark">
+
 <head>
-    <link rel="manifest" href="/manifest.json">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>
-        (function () {
-            try {
-                var t = (localStorage.getItem('CMS_THEME') || '').toString().trim().toLowerCase();
-                document.documentElement.dataset.theme = (t === 'light' || t === 'claro') ? 'light' : 'dark';
-            } catch (e) {}
-        })();
-    </script>
-    <link rel="stylesheet" href="/Estilos/estilos_pantalla_carga.css">
-    <title>Bienvenido</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0c0e12">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="color-scheme" content="dark">
+    <link rel="manifest" href="/manifest.json">
+
+    <title>Iniciando | DebiTú</title>
+
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Sistema de Diseño Neo-Fintech Dark & Volt -->
+    <link rel="stylesheet" href="/Estilos/branding_renovado.css">
 </head>
+
 <body>
-    <!-- Capas de Glassmorphism (Fondo) -->
-    <div class="ambient-background" aria-hidden="true">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-        <div class="glass-overlay"></div>
+    <div class="app-viewport">
+        <main class="splash-container" role="status" aria-live="polite" aria-busy="true">
+            <div class="splash-logo-box">
+                <img src="/icons/Icon.png" alt="DebiTú Logo" loading="eager" decoding="async">
+            </div>
+
+            <div>
+                <h1 class="splash-title">
+                    Debi<span>Tú</span>
+                </h1>
+                <p id="loading-status" class="splash-status-text">Verificando sesión...</p>
+            </div>
+
+            <!-- Neo-Fintech Spinner -->
+            <div class="loader-spinner" style="width: 32px; height: 32px; border-width: 3px; border-color: rgba(204, 255, 0, 0.2); border-top-color: var(--brand-volt);"></div>
+        </main>
     </div>
 
-    <main id="loading-screen" role="status" aria-live="polite" aria-busy="true">
-        <svg class="loading-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 2v4" />
-            <path d="m16.2 7.8 2.9-2.9" />
-            <path d="M18 12h4" />
-            <path d="m16.2 16.2 2.9 2.9" />
-            <path d="M12 18v4" />
-            <path d="m4.9 19.1 2.9-2.9" />
-            <path d="M2 12h4" />
-            <path d="m4.9 4.9 2.9 2.9" />
-        </svg>
-        <h1 class="loading-title">Cargando…</h1>
-        <p id="loading-status" class="loading-subtitle">Verificando sesión</p>
-    </main>
+    <!-- Script de Verificación y Enrutamiento Renovado -->
     <script type="module">
-        import { loadSupaBseWithAuth } from '../Scripts/supabase.js';
+        import { loadSupaBseWithAuth } from '/Scripts/supabase.js';
 
         const statusEl = document.getElementById('loading-status');
         const setStatus = (msg) => { if (statusEl) statusEl.textContent = msg; };
 
         (async () => {
             try {
-                setStatus('Cargando Supabase…');
+                setStatus('Conectando con el sistema…');
                 const clientesup = await loadSupaBseWithAuth();
 
-                setStatus('Verificando sesión…');
-                const id_usuario = localStorage.getItem('UserID');
-                if (id_usuario) {
-                    window.location.href = '/Plantillas/Inicio.html';
+                setStatus('Verificando credenciales…');
+                const idUsuario = localStorage.getItem('UserID');
+                
+                // Si ya existe un ID de usuario guardado y válido, redirigir al Dashboard Renovado
+                if (idUsuario && idUsuario !== 'N/A') {
+                    window.location.href = '/Plantillas_Renovadas/Dashboard_renov.html';
                     return;
                 }
 
-                const {data: { session }, error} = await clientesup.auth.getSession();
+                // Verificar la sesión activa en Supabase Auth
+                const { data: { session }, error } = await clientesup.auth.getSession();
                 if (error) {
-                    setStatus('Error al obtener la sesión');
-                    alert('Error al obtener la sesión: ' + (error.message || error));
+                    console.warn('Error al verificar sesión:', error);
+                    window.location.href = '/Plantillas_Renovadas/Login_renov.html';
                     return;
                 }
 
-                if (session) {
+                if (session && session.user) {
                     localStorage.setItem('UserID', session.user.id);
 
-                    const meta = session.user?.user_metadata || {};
-                    const identity0 = Array.isArray(session.user?.identities)
+                    const meta = session.user.user_metadata || {};
+                    const identity0 = Array.isArray(session.user.identities)
                         ? session.user.identities[0]?.identity_data
                         : null;
 
-                    const userName = (meta.full_name || meta.name || meta.user_name || meta.username || session.user?.email || '').toString().trim();
+                    const userName = (meta.full_name || meta.name || meta.user_name || meta.username || session.user.email || '').toString().trim();
                     if (userName) localStorage.setItem('UserName', userName);
-                    else localStorage.removeItem('UserName');
 
                     const userPhoto = (meta.avatar_url || meta.picture || identity0?.avatar_url || identity0?.picture || '').toString().trim();
                     if (userPhoto) localStorage.setItem('UserPhoto', userPhoto);
-                    else localStorage.removeItem('UserPhoto');
-                    window.location.href = '/Plantillas/Inicio.html';
+
+                    const userEmail = (session.user.email || meta.email || '').toString().trim();
+                    if (userEmail) localStorage.setItem('UserEmail', userEmail);
+
+                    setStatus('Iniciando panel principal…');
+                    window.location.href = '/Plantillas_Renovadas/Dashboard_renov.html';
                     return;
                 }
 
-                window.location.href = '/Plantillas/inicio_sesion.html';
+                // Si no hay sesión activa, ir al login renovado
+                window.location.href = '/Plantillas_Renovadas/Login_renov.html';
+
             } catch (e) {
-                console.error(e);
-                setStatus('Ocurrió un error');
-                alert('Ocurrió un error al iniciar: ' + (e?.message || e));
+                console.error('Error durante la verificación inicial:', e);
+                window.location.href = '/Plantillas_Renovadas/Login_renov.html';
             }
         })();
     </script>
 </body>
+
 </html>

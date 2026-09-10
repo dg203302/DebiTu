@@ -1,3 +1,10 @@
 {
-    "liveServer.settings.port": 5502
+  "liveServer.settings.port": 5502,
+  "deno.enable": true,
+  "deno.enablePaths": [
+    "edge-functions"
+  ],
+  "deno.unstable": true,
+  "deno.importMap": ".netlify/edge-functions-import-map.json",
+  "deno.path": "C:\\Users\\Lolma\\AppData\\Roaming\\netlify\\Config\\deno-cli\\deno.exe"
 }

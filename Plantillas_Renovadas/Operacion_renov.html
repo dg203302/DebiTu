@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0c0f">
+    <meta name="color-scheme" content="dark">
+    <title>Nueva Operación | DebiTú</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Estilos Renovados Neo-Fintech Volt -->
+    <link rel="stylesheet" href="/Estilos/branding_renovado.css">
+</head>
+
+<body>
+    <div class="app-viewport">
+        <!-- Barra Superior Flotante (Header de App) -->
+        <header class="app-header-floating">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="header-avatar-container">
+                    <img src="" id="pfp" alt="Imagen de usuario" class="header-avatar-img"
+                        referrerpolicy="no-referrer"
+                        crossorigin="anonymous"
+                        onload="this.style.display='block'; const fb=document.getElementById('header_avatar_fallback'); if(fb) fb.style.display='none';"
+                        onerror="this.style.display='none'; const fb=document.getElementById('header_avatar_fallback'); if(fb) fb.style.display='flex';"
+                        style="display: none;" />
+                    <div id="header_avatar_fallback" class="header-avatar-fallback" style="display: flex;">
+                        <span id="header_avatar_initials">D</span>
+                    </div>
+                    <div class="header-status-indicator" title="Conectado"></div>
+                </div>
+                <div>
+                    <span style="font-size: 0.68rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;">Transacciones</span>
+                    <h2 class="header-title" style="font-size: 1rem; line-height: 1.2;">Nueva Operación</h2>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center;">
+                <a href="/Plantillas_Renovadas/Config_renov.html" class="header-action-btn" aria-label="Ajustes" title="Configuración">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09A1.65 1.65 0 0 0 19.4 15z"></path>
+                    </svg>
+                </a>
+            </div>
+        </header>
+
+        <!-- Contenido Central de Registro de Operación -->
+        <main style="padding: 80px 20px 20px; display: flex; flex-direction: column; gap: 18px;">
+
+            <!-- 1. Contenedor: Tipo de Operación (Deuda / Pago) -->
+            <section class="op-type-toggle-grid" role="radiogroup" aria-label="Tipo de operación">
+                <button type="button" id="btn_type_deuda" class="op-type-btn active-deuda" aria-pressed="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="19" x2="12" y2="5"></line>
+                        <polyline points="5 12 12 5 19 12"></polyline>
+                    </svg>
+                    <span>Cargar Deuda</span>
+                </button>
+
+                <button type="button" id="btn_type_pago" class="op-type-btn" aria-pressed="false">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <polyline points="19 12 12 19 5 12"></polyline>
+                    </svg>
+                    <span>Registrar Pago</span>
+                </button>
+            </section>
+
+            <!-- 2. Contenedor: Selección y Búsqueda de Cliente -->
+            <section class="op-card-container">
+                <div class="input-label-row">
+                    <span class="input-label">Cliente Asociado</span>
+                    <a href="/Plantillas_Renovadas/Clientes_renov.html" style="font-size: 0.75rem; color: var(--brand-volt); text-decoration: none; font-weight: 600;">+ Ver directorio</a>
+                </div>
+
+                <!-- Buscador de Clientes -->
+                <div class="client-search-box" id="client_search_box">
+                    <span class="client-search-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </span>
+                    <input type="text" id="op_client_search" class="fintech-input" placeholder="Buscar por nombre o teléfono..." autocomplete="off" inputmode="search">
+                    <div id="client_search_dropdown" class="client-dropdown" style="display: none;"></div>
+                </div>
+
+                <!-- Tarjeta de Cliente Seleccionado (Aparece tras seleccionar) -->
+                <div id="selected_client_card" class="selected-client-card" style="display: none;">
+                    <div class="selected-client-left">
+                        <div id="selected_client_avatar" class="selected-client-avatar">C</div>
+                        <div class="selected-client-details">
+                            <h4 id="selected_client_name">Carlos Mendoza</h4>
+                            <p id="selected_client_tel">+54 9 11 2345-6789</p>
+                            <span id="selected_client_badge" class="selected-client-badge">Deuda actual: $1,850.50</span>
+                        </div>
+                    </div>
+                    <button type="button" id="btn_remove_client" class="btn-remove-client" title="Cambiar cliente">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Carrusel Rápido de Clientes Frecuentes -->
+                <div id="quick_clients_container" class="quick-clients-row" style="display: none;"></div>
+            </section>
+
+            <!-- 3. Contenedor: Concepto o Detalle -->
+            <section class="op-card-container">
+                <div class="input-label-row">
+                    <span class="input-label">Concepto o Detalle</span>
+                </div>
+                
+                <div style="position: relative; display: flex; align-items: center;">
+                    <span class="client-search-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                        </svg>
+                    </span>
+                    <input type="text" id="op_category_input" class="fintech-input" placeholder="Ej: Venta de mercadería, Abono cuota...">
+                </div>
+
+                <!-- Pastillas rápidas de conceptos habituales -->
+                <div class="category-chips-row">
+                    <button type="button" class="category-chip" data-cat="Venta mercadería">📦 Mercadería</button>
+                    <button type="button" class="category-chip" data-cat="Abono cuota">💵 Abono cuota</button>
+                    <button type="button" class="category-chip" data-cat="Servicio">⚡ Servicio</button>
+                    <button type="button" class="category-chip" data-cat="Pago total">✅ Cancelación</button>
+                    <button type="button" class="category-chip" data-cat="Crédito personal">🤝 Crédito</button>
+                </div>
+            </section>
+
+            <!-- 4. Contenedor: Importe y Calculadora Fintech -->
+            <section class="op-card-container" style="padding-bottom: 12px;">
+                <!-- Display Gigante del Monto -->
+                <div class="amount-display-card">
+                    <span class="amount-display-label">Monto a Registrar</span>
+                    <div class="amount-display-value-wrap">
+                        <span class="amount-currency-symbol">$</span>
+                        <input type="text" id="op_amount_input" class="amount-big-input" value="0" inputmode="decimal" spellcheck="false" autocomplete="off">
+                    </div>
+                    <div id="amount_calc_preview" class="amount-calc-preview"></div>
+
+                    <!-- Pastillas de Incremento Rápido -->
+                    <div class="quick-amount-increments">
+                        <button type="button" class="quick-amt-pill" data-add="500">+ $500</button>
+                        <button type="button" class="quick-amt-pill" data-add="1000">+ $1.000</button>
+                        <button type="button" class="quick-amt-pill" data-add="5000">+ $5.000</button>
+                        <button type="button" class="quick-amt-pill" data-add="10000">+ $10.000</button>
+                    </div>
+                </div>
+
+                <!-- Teclado Numérico y Operaciones Integradas -->
+                <div class="fintech-calc-grid" aria-label="Teclado numérico y calculadora">
+                    <!-- Fila 1 -->
+                    <button type="button" class="calc-btn-key" data-key="7">7</button>
+                    <button type="button" class="calc-btn-key" data-key="8">8</button>
+                    <button type="button" class="calc-btn-key" data-key="9">9</button>
+                    <button type="button" class="calc-btn-key op" data-op="/" title="Dividir">÷</button>
+
+                    <!-- Fila 2 -->
+                    <button type="button" class="calc-btn-key" data-key="4">4</button>
+                    <button type="button" class="calc-btn-key" data-key="5">5</button>
+                    <button type="button" class="calc-btn-key" data-key="6">6</button>
+                    <button type="button" class="calc-btn-key op" data-op="*" title="Multiplicar">×</button>
+
+                    <!-- Fila 3 -->
+                    <button type="button" class="calc-btn-key" data-key="1">1</button>
+                    <button type="button" class="calc-btn-key" data-key="2">2</button>
+                    <button type="button" class="calc-btn-key" data-key="3">3</button>
+                    <button type="button" class="calc-btn-key op" data-op="-" title="Restar">-</button>
+
+                    <!-- Fila 4 -->
+                    <button type="button" class="calc-btn-key action-danger" data-action="clear" title="Limpiar">C</button>
+                    <button type="button" class="calc-btn-key" data-key="0">0</button>
+                    <button type="button" class="calc-btn-key" data-key=".">.</button>
+                    <button type="button" class="calc-btn-key op" data-op="+" title="Sumar">+</button>
+
+                    <!-- Fila 5: Teclas anchas (Borrar y Calcular) -->
+                    <button type="button" class="calc-btn-key" data-action="backspace" title="Borrar un dígito" style="grid-column: span 2; font-size: 1.25rem;">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+                            <line x1="18" y1="9" x2="12" y2="15"></line>
+                            <line x1="12" y1="9" x2="18" y2="15"></line>
+                        </svg>
+                    </button>
+                    <button type="button" class="calc-btn-key action-eq" data-action="equals" title="Calcular total" style="grid-column: span 2;">=</button>
+                </div>
+            </section>
+
+            <!-- 5. Botón de Acción Principal Volt -->
+            <button type="button" id="btn_submit_op" class="btn-volt-action btn-deuda-mode">
+                <svg id="submit_btn_icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="19" x2="12" y2="5"></line>
+                    <polyline points="5 12 12 5 19 12"></polyline>
+                </svg>
+                <span id="submit_btn_label">Cargar Deuda</span>
+            </button>
+
+        </main>
+
+        <!-- Barra de Navegación Flotante Inferior -->
+        <nav class="bottom-nav-bar" aria-label="Navegación principal">
+            <a href="/Plantillas_Renovadas/Dashboard_renov.html" class="nav-link" title="Inicio">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </a>
+
+            <a href="/Plantillas_Renovadas/Clientes_renov.html" class="nav-link" title="Clientes">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+            </a>
+
+            <!-- Botón Operaciones Activo -->
+            <a href="/Plantillas_Renovadas/Operacion_renov.html" class="nav-link active" title="Nueva Operación">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+            </a>
+
+            <a href="/Plantillas_Renovadas/Estadisticas_renov.html" class="nav-link" title="Estadísticas">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Script Controlador de Operación Renovada -->
+    <script type="module" src="/Scripts/script_operacion_renov.js"></script>
+    <!-- Router SPA Unificado -->
+    <script type="module" src="/Scripts/spa_router.js"></script>
+</body>
+
+</html>

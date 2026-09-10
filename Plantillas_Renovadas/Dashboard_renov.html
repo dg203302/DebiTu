@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0c0f">
+    <meta name="color-scheme" content="dark">
+    <title>Dashboard | DebiTú</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Estilos Renovados Neo-Fintech Volt -->
+    <link rel="stylesheet" href="/Estilos/branding_renovado.css">
+</head>
+
+<body>
+    <div class="app-viewport">
+        <!-- Barra Superior Flotante (Header de App) -->
+        <header class="app-header-floating">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="header-avatar-container">
+                    <img src="" id="pfp" alt="Imagen de usuario" class="header-avatar-img"
+                        referrerpolicy="no-referrer"
+                        crossorigin="anonymous"
+                        onload="this.style.display='block'; const fb=document.getElementById('header_avatar_fallback'); if(fb) fb.style.display='none';"
+                        onerror="this.style.display='none'; const fb=document.getElementById('header_avatar_fallback'); if(fb) fb.style.display='flex';"
+                        style="display: none;" />
+                    <div id="header_avatar_fallback" class="header-avatar-fallback" style="display: flex;">
+                        <span id="header_avatar_initials">D</span>
+                    </div>
+                    <div class="header-status-indicator" title="Conectado"></div>
+                </div>
+                <div>
+                    <span style="font-size: 0.68rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;">Panel Principal</span>
+                    <h2 id="user_display_name" class="header-title" style="font-size: 1rem; line-height: 1.2;">DebiTú Business</h2>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center;">
+                <a href="/Plantillas_Renovadas/Config_renov.html" class="header-action-btn" aria-label="Ajustes" title="Configuración">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09A1.65 1.65 0 0 0 19.4 15z"></path>
+                    </svg>
+                </a>
+            </div>
+        </header>
+
+        <!-- Contenido Central del Dashboard -->
+        <main style="padding: 80px 20px 0; display: flex; flex-direction: column; gap: 22px;">
+
+            <!-- Hero: Deuda Total Activa -->
+            <section class="hero-balance-container">
+                <span class="hero-balance-label">Total Deuda Activa</span>
+                <div class="hero-balance-value">
+                    <span id="balance_integer">$6,324</span><span id="balance_cents" class="cents">.49</span>
+                </div>
+                <div class="hero-balance-badge">
+                    <span style="font-size: 0.9rem;">●</span>
+                    <span id="hero_badge_text">+ $4,560.50 Cobrado este mes</span>
+                </div>
+            </section>
+
+            <!-- Acciones Rápidas Circulares -->
+            <section class="quick-actions-row">
+                <a class="quick-action-item" href="/Plantillas_Renovadas/Operacion_renov.html">
+                    <div class="quick-action-icon" title="Nueva Operación" style="background: rgba(204, 255, 0, 0.1); border-color: rgba(204, 255, 0, 0.3); color: var(--brand-volt);">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                    </div>
+                    <span class="quick-action-label" style="color: var(--brand-volt);">Operaciones</span>
+                </a>
+
+                <a class="quick-action-item" href="/Plantillas_Renovadas/Clientes_renov.html">
+                    <div class="quick-action-icon" title="Directorio de Clientes">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <polyline points="16 11 18 13 22 9"></polyline>
+                        </svg>
+                    </div>
+                    <span class="quick-action-label">Clientes</span>
+                </a>
+
+                <a class="quick-action-item" href="/Plantillas_Renovadas/Estadisticas_renov.html">
+                    <div class="quick-action-icon" title="Estadísticas y Reportes">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3v18h18"></path>
+                            <path d="M18 17l-5-5-4 4-5-5"></path>
+                        </svg>
+                    </div>
+                    <span class="quick-action-label">Estadísticas</span>
+                </a>
+
+                <a class="quick-action-item" href="/Plantillas_Renovadas/Config_renov.html">
+                    <div class="quick-action-icon" title="Configuración">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 20h9"></path>
+                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                        </svg>
+                    </div>
+                    <span class="quick-action-label">Ajustes</span>
+                </a>
+            </section>
+
+            <!-- Resumen Estadístico & Analíticas (Curva Neón + Métricas) -->
+            <section class="card-surface">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                    <div>
+                        <h3 style="font-size: 1rem; font-weight: 700;">Resumen Estadístico</h3>
+                        <p id="timeframe_subtitle" style="font-size: 0.75rem; color: var(--text-secondary); transition: color 0.2s;">Comportamiento financiero del mes actual</p>
+                    </div>
+                    <div class="timeframe-switcher">
+                        <button class="timeframe-pill active" data-timeframe="mensual">Mensual</button>
+                        <button class="timeframe-pill" data-timeframe="semanal">Semanal</button>
+                        <button class="timeframe-pill" data-timeframe="diario">Diario</button>
+                    </div>
+                </div>
+
+                <!-- Gráfico SVG Neón Fluido -->
+                <div class="chart-container">
+                    <svg id="chart_svg" class="chart-svg" viewBox="0 0 320 120" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="volt-gradient-fill" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#ccff00" stop-opacity="0.35"/>
+                                <stop offset="100%" stop-color="#ccff00" stop-opacity="0.0"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Área de relleno con gradiente -->
+                        <path id="chart_area_path" class="chart-area-fill" d="M0,90 Q40,40 80,75 T160,35 T240,65 T320,20 L320,120 L0,120 Z"></path>
+                        <!-- Línea Volt neón con glow -->
+                        <path id="chart_glow_path" class="chart-glow-line" d="M0,90 Q40,40 80,75 T160,35 T240,65 T320,20"></path>
+                        <!-- Nodos destacados -->
+                        <g id="chart_nodes_group">
+                            <circle cx="160" cy="35" r="4.5" fill="#ccff00" stroke="#0a0c0f" stroke-width="2.5" />
+                            <circle cx="320" cy="20" r="4.5" fill="#ccff00" stroke="#0a0c0f" stroke-width="2.5" />
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Cuadrícula de Métricas Clave -->
+                <div class="metrics-grid" style="margin-top: 14px;">
+                    <div class="metric-card">
+                        <div>
+                            <span id="metric_cobros_label" class="metric-label">Cobros Recibidos</span>
+                            <div id="metric_cobros_total" class="metric-value">$0.00</div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                            <span id="metric_cobros_tag" class="metric-tag positive">▲ +0%</span>
+                            <div id="metric_cobros_bars" class="mini-bars">
+                                <div class="mini-bar" style="height: 40%;"></div>
+                                <div class="mini-bar" style="height: 60%;"></div>
+                                <div class="mini-bar active" style="height: 90%;"></div>
+                                <div class="mini-bar" style="height: 50%;"></div>
+                                <div class="mini-bar active" style="height: 100%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div>
+                            <span id="metric_secundaria_label" class="metric-label">Deudas Emitidas</span>
+                            <div id="metric_secundaria_val" class="metric-value">$0.00</div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                            <span id="metric_secundaria_tag" class="metric-tag neutral">● En seguimiento</span>
+                            <div id="metric_secundaria_bars" class="mini-bars">
+                                <div class="mini-bar active" style="height: 70%;"></div>
+                                <div class="mini-bar active" style="height: 85%;"></div>
+                                <div class="mini-bar" style="height: 45%;"></div>
+                                <div class="mini-bar active" style="height: 80%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+
+            <!-- Movimientos Recientes ("Recent Transfers") -->
+            <section>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                    <h3 style="font-size: 1rem; font-weight: 700;">Movimientos Recientes</h3>
+                    <a href="/Plantillas_Renovadas/Estadisticas_renov.html#historial_operaciones" style="font-size: 0.8rem; color: var(--brand-volt); text-decoration: none; font-weight: 600;">Ver todos</a>
+                </div>
+
+                <div id="lista_movimientos_recientes" class="tx-list">
+                    <!-- Los items se renderizan dinámicamente con JavaScript -->
+                    <div style="text-align: center; padding: 24px; color: var(--text-secondary); font-size: 0.85rem;">
+                        Cargando movimientos...
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Barra de Navegación Flotante Inferior -->
+        <nav class="bottom-nav-bar" aria-label="Navegación principal">
+            <a href="/Plantillas_Renovadas/Dashboard_renov.html" class="nav-link active" title="Inicio">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </a>
+
+            <a href="/Plantillas_Renovadas/Clientes_renov.html" class="nav-link" title="Clientes">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+            </a>
+
+            <!-- Botón Operaciones (igual al resto) -->
+            <a href="/Plantillas_Renovadas/Operacion_renov.html" class="nav-link" title="Nueva Operación">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+            </a>
+
+            <a href="/Plantillas_Renovadas/Estadisticas_renov.html" class="nav-link" title="Estadísticas">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Script Controlador Dashboard -->
+    <script type="module" src="/Scripts/script_dashboard_renov.js"></script>
+    <!-- Router SPA Unificado -->
+    <script type="module" src="/Scripts/spa_router.js"></script>
+</body>
+
+</html>
