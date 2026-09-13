@@ -141,6 +141,35 @@
                     </div>
                 </div>
 
+                <!-- Estado Crediticio del Cliente -->
+                <div class="client-credit-card">
+                    <div class="credit-header-row">
+                        <div>
+                            <span class="input-label" style="font-size: 0.66rem;">Estado Crediticio</span>
+                            <div style="display: flex; align-items: baseline; gap: 6px; margin-top: 2px;">
+                                <span id="detail_client_score" class="credit-score-val">-- / 850</span>
+                                <span style="font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono);">(Score)</span>
+                            </div>
+                        </div>
+                        <span id="detail_client_badge" class="credit-badge" data-tone="mid">Analizando...</span>
+                    </div>
+
+                    <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.72rem; margin-bottom: 4px;">
+                            <span style="color: var(--text-secondary);">Probabilidad estimada de pago:</span>
+                            <strong id="detail_client_prob" style="color: var(--brand-volt); font-family: var(--font-mono);">--%</strong>
+                        </div>
+                        <div class="credit-prob-bar-wrap">
+                            <div id="detail_client_prob_bar" class="credit-prob-bar-fill" style="width: 0%; background: var(--brand-volt);"></div>
+                        </div>
+                    </div>
+
+                    <div class="credit-meta-row">
+                        <span id="detail_client_recencia">Último abono: calculando...</span>
+                        <span id="detail_client_cobertura" style="font-family: var(--font-mono);">Cobrado: --%</span>
+                    </div>
+                </div>
+
                 <!-- Estado Financiero del Cliente -->
                 <div class="client-balance-cards-row">
                     <div class="client-balance-card danger">
@@ -153,7 +182,7 @@
                     </div>
                 </div>
 
-                <!-- Acciones Rápidas (4 Botones) -->
+                <!-- Acciones Rápidas (5 Botones) -->
                 <div class="client-quick-actions-grid">
                     <button type="button" id="detail_btn_whatsapp" class="client-action-tile wa" title="Enviar recordatorio WhatsApp">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -170,6 +199,15 @@
                         </svg>
                         <span>Operación</span>
                     </a>
+
+                    <button type="button" id="detail_btn_stats" class="client-action-tile stats" title="Ver estadísticas y gráficos del cliente">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                        <span>Estadísticas</span>
+                    </button>
 
                     <button type="button" id="detail_btn_edit" class="client-action-tile" title="Editar datos del cliente">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -198,9 +236,107 @@
                         </div>
                     </div>
 
-                    <div id="client_ops_list" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto;">
+                    <div id="client_ops_list" style="display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto;">
                         <!-- Se poblará con las operaciones del cliente -->
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================================================================
+             MODAL: ESTADÍSTICAS INDIVIDUALES DEL CLIENTE
+             ================================================================== -->
+        <div id="modal_estadisticas_cliente" class="neo-modal-overlay" role="dialog" aria-modal="true">
+            <div class="neo-modal-sheet" style="max-width: 520px;">
+                <div class="modal-header-row">
+                    <div>
+                        <span class="modal-header-title">Estadísticas del Cliente</span>
+                        <div id="stats_client_subtitle" style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">—</div>
+                    </div>
+                    <button type="button" class="modal-close-btn" onclick="window.cerrarEstadisticasCliente()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Resumen KPIs Financieros -->
+                <div class="client-stats-kpi-grid">
+                    <div class="client-stats-kpi-card">
+                        <span class="kpi-lbl">Probabilidad de Pago</span>
+                        <div id="stats_modal_prob" class="kpi-val" style="color: var(--brand-volt);">--%</div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Estimación por historial</div>
+                    </div>
+                    <div class="client-stats-kpi-card">
+                        <span class="kpi-lbl">Score Crediticio</span>
+                        <div id="stats_modal_score" class="kpi-val">-- / 850</div>
+                        <div style="margin-top: 4px;"><span id="stats_modal_badge" class="credit-badge" data-tone="mid">--</span></div>
+                    </div>
+                    <div class="client-stats-kpi-card">
+                        <span class="kpi-lbl">Total Deuda Registrada</span>
+                        <div id="stats_modal_total_deuda" class="kpi-val" style="color: #ff6b6d;">$0,00</div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Suma de cargos históricos</div>
+                    </div>
+                    <div class="client-stats-kpi-card">
+                        <span class="kpi-lbl">Total Pagado</span>
+                        <div id="stats_modal_total_pagos" class="kpi-val" style="color: var(--brand-volt);">$0,00</div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Abonos históricos confirmados</div>
+                    </div>
+                </div>
+
+                <!-- Gráfico 1: Evolución Deuda -->
+                <div class="client-stats-kpi-card" style="padding: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span class="kpi-lbl" style="color: #ff6b6d;">Evolución de la Deuda</span>
+                        <span style="font-size: 0.68rem; color: var(--text-muted);">Mensual</span>
+                    </div>
+                    <div class="client-stats-canvas-wrap">
+                        <canvas id="chart_cliente_deudas"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico 2: Evolución Pagos -->
+                <div class="client-stats-kpi-card" style="padding: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span class="kpi-lbl" style="color: var(--brand-volt);">Evolución de los Pagos</span>
+                        <span style="font-size: 0.68rem; color: var(--text-muted);">Mensual</span>
+                    </div>
+                    <div class="client-stats-canvas-wrap">
+                        <canvas id="chart_cliente_pagos"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================================================================
+             MODAL: DETALLE DE OPERACIÓN INDIVIDUAL
+             ================================================================== -->
+        <div id="modal_detalle_op_indiv" class="neo-modal-overlay" role="dialog" aria-modal="true">
+            <div class="neo-modal-sheet" style="max-width: 440px;">
+                <div class="modal-header-row">
+                    <span id="op_detail_title" class="modal-header-title">Detalle de Operación</span>
+                    <button type="button" class="modal-close-btn" onclick="window.cerrarDetalleOperacionIndiv()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <div id="op_detail_content" style="display: flex; flex-direction: column; gap: 10px; background: var(--bg-surface); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                    <!-- Detalle dinámico -->
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 14px;">
+                    <button type="button" class="fintech-modal-btn cancel" style="flex: 1;" onclick="window.cerrarDetalleOperacionIndiv()">Cerrar</button>
+                    <button type="button" id="btn_delete_from_op_detail" class="fintech-modal-btn danger" style="flex: 1.2; background: rgba(255, 77, 79, 0.15); border: 1px solid rgba(255, 77, 79, 0.4); color: #ff6b6d;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px; vertical-align: middle;">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        Eliminar Registro
+                    </button>
                 </div>
             </div>
         </div>

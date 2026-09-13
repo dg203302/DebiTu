@@ -173,36 +173,79 @@
                         </div>
                     </div>
 
-                    <!-- Fila 2: Tarjeta Ancha Central (Resumen Estadístico & Gráfico Neón de Dashboard_renov.html) -->
+                    <!-- Fila 2: Tarjeta Ancha Central (Resumen Estadístico & Gráfico Neón Dual Interactivo) -->
                     <div class="desktop-card-box" style="padding: 24px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
                             <div>
                                 <h3 style="font-size: 1.15rem; font-weight: 800; color: #ffffff;">Resumen Estadístico</h3>
                                 <p id="timeframe_subtitle" style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">Comportamiento financiero del mes actual</p>
                             </div>
-                            <div class="timeframe-switcher">
-                                <button class="timeframe-pill active" data-timeframe="mensual">Mensual</button>
-                                <button class="timeframe-pill" data-timeframe="semanal">Semanal</button>
-                                <button class="timeframe-pill" data-timeframe="diario">Diario</button>
+                            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                <!-- Selector de Series del Gráfico (Comparativa, Cobros, Deudas) -->
+                                <div class="chart-series-selector">
+                                    <button type="button" class="chart-series-btn active" data-series="comparativa" id="btn_series_comparativa">
+                                        <span class="series-dot both"></span>
+                                        <span>Ambos</span>
+                                    </button>
+                                    <button type="button" class="chart-series-btn" data-series="cobros" id="btn_series_cobros">
+                                        <span class="series-dot volt"></span>
+                                        <span>Cobros</span>
+                                    </button>
+                                    <button type="button" class="chart-series-btn" data-series="deudas" id="btn_series_deudas">
+                                        <span class="series-dot coral"></span>
+                                        <span>Deudas</span>
+                                    </button>
+                                </div>
+                                <div class="timeframe-switcher">
+                                    <button class="timeframe-pill active" data-timeframe="mensual">Mensual</button>
+                                    <button class="timeframe-pill" data-timeframe="semanal">Semanal</button>
+                                    <button class="timeframe-pill" data-timeframe="diario">Diario</button>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Gráfico SVG Neón Dinámico (100% interactivo con script_dashboard_renov.js) -->
-                        <div class="chart-container" style="height: 170px; width: 100%; position: relative; margin-top: 8px;">
-                            <svg id="chart_svg" class="chart-svg" viewBox="0 0 800 170" style="width: 100%; height: 100%; overflow: visible;">
+                        <div class="chart-container" id="chart_container_el" style="height: 170px; width: 100%; position: relative; margin-top: 8px;">
+                            <!-- Tooltip flotante interactivo -->
+                            <div id="chart_tooltip" class="chart-floating-tooltip">
+                                <div id="chart_tooltip_title" class="tooltip-header">Período</div>
+                                <div class="tooltip-row cobros">
+                                    <span>Cobros:</span>
+                                    <strong id="chart_tooltip_cobros">$0.00</strong>
+                                </div>
+                                <div class="tooltip-row deudas">
+                                    <span>Deudas:</span>
+                                    <strong id="chart_tooltip_deudas">$0.00</strong>
+                                </div>
+                                <div class="tooltip-row balance">
+                                    <span>Balance:</span>
+                                    <strong id="chart_tooltip_net">$0.00</strong>
+                                </div>
+                            </div>
+
+                            <svg id="chart_svg" class="chart-svg" viewBox="0 0 800 170" style="width: 100%; height: 100%; overflow: visible; touch-action: none; cursor: crosshair;">
                                 <defs>
                                     <linearGradient id="volt-gradient-fill" x1="0" y1="0" x2="0" y2="1">
                                         <stop offset="0%" stop-color="#ccff00" stop-opacity="0.28"/>
                                         <stop offset="100%" stop-color="#ccff00" stop-opacity="0.0"/>
                                     </linearGradient>
+                                    <linearGradient id="coral-gradient-fill" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#ff4d4f" stop-opacity="0.28"/>
+                                        <stop offset="100%" stop-color="#ff4d4f" stop-opacity="0.0"/>
+                                    </linearGradient>
                                 </defs>
-                                <!-- Guías de cuadrícula tenues -->
+                                <!-- Guías de cuadrícula tenues y valores de escala Y -->
                                 <g id="chart_grid_group"></g>
-                                <!-- Área de relleno con gradiente -->
+                                <!-- Línea vertical interactiva (crosshair) -->
+                                <g id="chart_crosshair_group"></g>
+                                <!-- Curva y Área de Deudas (Coral) -->
+                                <path id="chart_area_deuda_path" class="chart-area-fill-deuda" d=""></path>
+                                <path id="chart_glow_deuda_path" class="chart-glow-line-deuda" d=""></path>
+                                <!-- Curva y Área de Cobros (Volt) -->
                                 <path id="chart_area_path" class="chart-area-fill" d=""></path>
-                                <!-- Línea Volt neón con glow -->
                                 <path id="chart_glow_path" class="chart-glow-line" d=""></path>
                                 <!-- Nodos destacados -->
+                                <g id="chart_nodes_deuda_group"></g>
                                 <g id="chart_nodes_group"></g>
                                 <!-- Etiquetas de períodos de tiempo -->
                                 <g id="chart_labels_group"></g>

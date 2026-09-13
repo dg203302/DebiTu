@@ -687,10 +687,175 @@ body:not(:has(.desktop-app-layout)) .app-viewport {
   stroke-linecap: round;
   stroke-linejoin: round;
   filter: drop-shadow(0 0 6px rgba(204, 255, 0, 0.6));
+  transition: opacity 0.3s ease;
 }
 
 .chart-area-fill {
   fill: url(#volt-gradient-fill);
+  transition: opacity 0.3s ease;
+}
+
+/* Curva Neón de Deudas (Coral) */
+.chart-glow-line-deuda {
+  fill: none;
+  stroke: #ff4d4f;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 6px rgba(255, 77, 79, 0.6));
+  transition: opacity 0.3s ease;
+}
+
+.chart-area-fill-deuda {
+  fill: url(#coral-gradient-fill);
+  transition: opacity 0.3s ease;
+}
+
+/* Selector de Series del Gráfico (Ambos, Cobros, Deudas) */
+.chart-series-selector {
+  display: inline-flex;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 3px;
+  gap: 3px;
+}
+
+.chart-series-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-main);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.chart-series-btn .series-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.chart-series-btn .series-dot.volt {
+  background: var(--brand-volt);
+  box-shadow: 0 0 6px var(--brand-volt);
+}
+
+.chart-series-btn .series-dot.coral {
+  background: #ff4d4f;
+  box-shadow: 0 0 6px rgba(255, 77, 79, 0.8);
+}
+
+.chart-series-btn .series-dot.both {
+  background: linear-gradient(135deg, var(--brand-volt), #ff4d4f);
+  box-shadow: 0 0 5px rgba(204, 255, 0, 0.5);
+}
+
+.chart-series-btn.active {
+  background: var(--bg-card-pill);
+  color: var(--text-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* Tooltip Flotante Interactivo Neo-Fintech */
+.chart-floating-tooltip {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: rgba(13, 16, 23, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 9px 13px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 1px rgba(255, 255, 255, 0.2);
+  z-index: 25;
+  font-family: var(--font-main);
+  min-width: 155px;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chart-floating-tooltip.visible {
+  opacity: 1;
+}
+
+.chart-floating-tooltip .tooltip-header {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 4px;
+  margin-bottom: 6px;
+}
+
+.chart-floating-tooltip .tooltip-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.chart-floating-tooltip .tooltip-row.cobros {
+  color: var(--brand-volt);
+}
+
+.chart-floating-tooltip .tooltip-row.deudas {
+  color: #ff6b6d;
+}
+
+.chart-floating-tooltip .tooltip-row.balance {
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-weight: 700;
+  font-size: 0.76rem;
+}
+
+.chart-floating-tooltip .tooltip-row.balance .positive {
+  color: var(--brand-volt);
+}
+
+.chart-floating-tooltip .tooltip-row.balance .negative {
+  color: #ff6b6d;
+}
+
+/* Tarjetas de Métricas Clickeables */
+.metric-card.interactive-card {
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.metric-card.interactive-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.metric-card.interactive-card.selected-cobros {
+  border-color: var(--brand-volt);
+  box-shadow: 0 0 16px rgba(204, 255, 0, 0.18);
+}
+
+.metric-card.interactive-card.selected-deudas {
+  border-color: #ff4d4f;
+  box-shadow: 0 0 16px rgba(255, 77, 79, 0.18);
 }
 
 /* Hub Grid de Accesos Directos */
@@ -1450,13 +1615,22 @@ body:not(:has(.desktop-app-layout)) .app-viewport {
   background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  z-index: 99999;
+  z-index: 100000;
   display: flex;
   align-items: flex-end;
   justify-content: center;
   opacity: 0;
   visibility: hidden;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Modales secundarios que abren por encima del detalle de cliente */
+#modal_detalle_op_indiv,
+#modal_estadisticas_cliente,
+#modal_whatsapp,
+#modal_editar_cliente,
+#modal_nuevo_cliente {
+  z-index: 100010 !important;
 }
 
 .neo-modal-overlay.active {
@@ -1521,8 +1695,8 @@ body:not(:has(.desktop-app-layout)) .app-viewport {
 /* Tarjetas de Acciones Rápidas del Cliente */
 .client-quick-actions-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
 }
 
 .client-action-tile {
@@ -1559,6 +1733,17 @@ body:not(:has(.desktop-app-layout)) .app-viewport {
   color: var(--brand-volt);
 }
 
+.client-action-tile.stats {
+  background: rgba(56, 189, 248, 0.1);
+  border-color: rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+}
+
+.client-action-tile.stats:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.5);
+}
+
 .client-action-tile.danger {
   color: #ff6b6d;
 }
@@ -1571,6 +1756,96 @@ body:not(:has(.desktop-app-layout)) .app-viewport {
 .client-action-tile span {
   font-size: 0.68rem;
   font-weight: 600;
+}
+
+/* Estado Crediticio del Cliente */
+.client-credit-card {
+  background: linear-gradient(135deg, rgba(20, 24, 33, 0.95) 0%, rgba(13, 17, 23, 0.95) 100%);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.client-credit-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ff4d4f 0%, #f59e0b 50%, var(--brand-volt) 100%);
+}
+
+.credit-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.credit-score-val {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.credit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 1px solid transparent;
+}
+
+.credit-badge[data-tone='high'] {
+  background: rgba(204, 255, 0, 0.12);
+  border-color: rgba(204, 255, 0, 0.35);
+  color: var(--brand-volt);
+}
+
+.credit-badge[data-tone='mid'] {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+}
+
+.credit-badge[data-tone='low'] {
+  background: rgba(255, 77, 79, 0.12);
+  border-color: rgba(255, 77, 79, 0.35);
+  color: #ff6b6d;
+}
+
+.credit-prob-bar-wrap {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.credit-prob-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.credit-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
 }
 
 /* Balance Cards en Detalle de Cliente */
@@ -1642,15 +1917,79 @@ body:not(:has(.desktop-app-layout)) .app-viewport {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px;
+  padding: 10px 12px;
   background: var(--bg-card);
   border: 1px solid var(--border-card);
   border-radius: var(--radius-md);
-  transition: background 0.15s ease;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  gap: 10px;
 }
 
 .client-op-row:hover {
   background: var(--bg-card-hover);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.op-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex: none;
+}
+
+.op-delete-btn:hover {
+  background: rgba(255, 77, 79, 0.15);
+  border-color: rgba(255, 77, 79, 0.35);
+  color: #ff6b6d;
+  transform: scale(1.08);
+}
+
+/* Modal de Estadísticas del Cliente */
+.client-stats-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.client-stats-kpi-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.client-stats-kpi-card .kpi-lbl {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.client-stats-kpi-card .kpi-val {
+  font-size: 1.15rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+.client-stats-canvas-wrap {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  min-height: 200px;
 }
 
 /* ==========================================================================
@@ -2530,14 +2869,15 @@ body:not(:has(.desktop-app-layout)) .app-viewport {
    SISTEMA DE MODALES Y TOASTS PROPIOS (NEO-FINTECH NATIVO)
    ========================================================================== */
 
-/* 1. Backdrop del Modal */
-.fintech-modal-backdrop {
+/* 1. Backdrop del Modal de Confirmación y Alertas */
+.fintech-modal-backdrop,
+.swal2-container {
   position: fixed;
   inset: 0;
-  background: rgba(10, 12, 16, 0.78);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  z-index: 21000;
+  background: rgba(10, 12, 16, 0.85) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  z-index: 200000 !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2719,11 +3059,12 @@ body:not(:has(.desktop-app-layout)) .app-viewport {
 }
 
 /* 3. Notificaciones Toast Nativas */
-.fintech-toast-container {
+.fintech-toast-container,
+.swal2-toast-container {
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 25000;
+  z-index: 210000 !important;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -2793,7 +3134,7 @@ body:not(:has(.desktop-app-layout)) .app-viewport {
 .app-loader-slider-wrap {
   position: fixed;
   inset: 0;
-  z-index: 99999;
+  z-index: 205000 !important;
   pointer-events: all;
   opacity: 1;
   visibility: visible;

@@ -61,6 +61,15 @@ export async function initOperacion() {
         initFintechCalculator();
         initClientSearch();
         await cargarClientes();
+
+        // Mostrar toast de éxito pendiente tras la recarga automática si existe
+        const pendingMsg = sessionStorage.getItem('pendingToastSuccess');
+        if (pendingMsg) {
+            sessionStorage.removeItem('pendingToastSuccess');
+            setTimeout(() => {
+                showSuccessToast(pendingMsg);
+            }, 350);
+        }
     } catch (err) {
         console.error('Error inicializando operación:', err);
     } finally {
@@ -756,20 +765,29 @@ async function registrarOperacion() {
             }
         }
 
-        // Mostrar confirmación
-        await showSuccessToast(
-            state.tipo === 'deuda' 
-                ? `¡Deuda de ${formatCurrency(monto)} cargada con éxito!` 
-                : `¡Pago de ${formatCurrency(monto)} registrado con éxito!`
-        );
+        // Notificación de éxito y preparación de recarga
+        const msg = state.tipo === 'deuda' 
+            ? `¡Deuda de ${formatCurrency(monto)} cargada con éxito!` 
+            : `¡Pago de ${formatCurrency(monto)} registrado con éxito!`;
 
-        // Reset de montos y conceptos
+        sessionStorage.setItem('pendingToastSuccess', msg);
+        await showSuccessToast(msg);
+
+        // Reset preliminar de la calculadora y categorías
         handleClear();
         if (categoryInput) categoryInput.value = '';
         document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
 
-        // Recargar la lista de clientes en memoria para que los datos estén frescos
-        await cargarClientes();
+        // Recargar la plantilla completa para evitar inconsistencias de estado y refrescar datos
+        setTimeout(() => {
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('tipo', state.tipo);
+            if (window.location.href === currentUrl.toString()) {
+                window.location.reload();
+            } else {
+                window.location.href = currentUrl.toString();
+            }
+        }, 650);
 
     } catch (err) {
         console.error('Error general al registrar operación:', err);

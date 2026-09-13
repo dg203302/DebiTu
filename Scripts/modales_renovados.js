@@ -109,7 +109,7 @@ export function showErrorToast(message) {
 // -------------------------------------------------------------
 // 2. MODALES NATIVOS (Confirmación, Mensaje, Loading)
 // -------------------------------------------------------------
-export function closeModal(result = false) {
+export function closeModal(result = false, value = undefined) {
     if (!currentModalBackdrop) return;
     const backdrop = currentModalBackdrop;
     currentModalBackdrop = null;
@@ -122,7 +122,7 @@ export function closeModal(result = false) {
     if (typeof currentModalResolve === 'function') {
         const resolve = currentModalResolve;
         currentModalResolve = null;
-        resolve({ isConfirmed: !!result });
+        resolve({ isConfirmed: !!result, value: value });
     }
 }
 
@@ -236,7 +236,19 @@ export function openModal(options = {}) {
         };
 
         if (btnConfirm) {
-            btnConfirm.addEventListener('click', () => closeModal(true));
+            btnConfirm.addEventListener('click', async () => {
+                let val = undefined;
+                if (typeof options.preConfirm === 'function') {
+                    try {
+                        val = await options.preConfirm();
+                        if (val === false) return;
+                    } catch (e) {
+                        console.error('Error en preConfirm:', e);
+                        return;
+                    }
+                }
+                closeModal(true, val);
+            });
             btnConfirm.focus();
         }
 
@@ -269,6 +281,8 @@ export const Swal = {
         return openModal(options);
     },
     close: () => closeModal(false),
+    getPopup: () => currentModalBackdrop ? currentModalBackdrop.querySelector('.fintech-modal-card') : null,
+    getContainer: () => currentModalBackdrop,
     showLoading: () => {
         if (!currentModalBackdrop) return;
         const wrap = currentModalBackdrop.querySelector('.fintech-modal-icon-wrap');

@@ -33,6 +33,7 @@ const state = {
     pagos: [],
     totalDeudaActiva: 0,
     currentTimeframe: 'mensual',
+    chartSeries: 'comparativa', // 'comparativa' | 'cobros' | 'deudas'
     isDemoFallback: false
 };
 
@@ -40,7 +41,10 @@ export async function initDashboard() {
     showAppLoader('Sincronizando finanzas...');
     try {
         initTimeframeSwitchers();
+        initSeriesSwitchers();
+        initInteractiveMetricCards();
         initChartResizeListener();
+        initChartInteraction();
         await cargarDatosDashboard();
     } catch (err) {
         console.error('Error inicializando dashboard:', err);
@@ -238,12 +242,79 @@ function initTimeframeSwitchers() {
     });
 }
 
+function initSeriesSwitchers() {
+    const btns = document.querySelectorAll('.chart-series-btn');
+    btns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const series = btn.getAttribute('data-series') || 'comparativa';
+            setChartSeries(series);
+        });
+    });
+}
+
+function setChartSeries(series) {
+    state.chartSeries = series;
+    document.querySelectorAll('.chart-series-btn').forEach(b => {
+        if (b.getAttribute('data-series') === series) {
+            b.classList.add('active');
+        } else {
+            b.classList.remove('active');
+        }
+    });
+
+    const cardCobros = document.getElementById('card_metric_cobros');
+    const cardDeudas = document.getElementById('card_metric_deudas');
+    if (cardCobros) {
+        if (series === 'cobros') cardCobros.classList.add('selected-cobros');
+        else cardCobros.classList.remove('selected-cobros');
+    }
+    if (cardDeudas) {
+        if (series === 'deudas') cardDeudas.classList.add('selected-deudas');
+        else cardDeudas.classList.remove('selected-deudas');
+    }
+
+    if (_ultimoChartData && typeof dibujarCurvaNeonSvg === 'function') {
+        dibujarCurvaNeonSvg(
+            _ultimoChartData.binsCobros,
+            _ultimoChartData.binsDeudas,
+            _ultimoChartData.binLabels,
+            _ultimoChartData.binDetails
+        );
+    }
+}
+
+function initInteractiveMetricCards() {
+    const cardCobros = document.getElementById('card_metric_cobros');
+    const cardDeudas = document.getElementById('card_metric_deudas');
+
+    if (cardCobros) {
+        cardCobros.addEventListener('click', () => {
+            if (state.chartSeries === 'cobros') {
+                setChartSeries('comparativa');
+            } else {
+                setChartSeries('cobros');
+            }
+        });
+    }
+
+    if (cardDeudas) {
+        cardDeudas.addEventListener('click', () => {
+            if (state.chartSeries === 'deudas') {
+                setChartSeries('comparativa');
+            } else {
+                setChartSeries('deudas');
+            }
+        });
+    }
+}
+
 function actualizarResumenEstadistico(timeframe) {
     const now = new Date();
     let startDate, endDate, prevStartDate, prevEndDate;
     let subtitleText = '';
     let secLabelText = '';
     let binLabels = [];
+    let binDetails = [];
     let numBins = 5;
 
     if (timeframe === 'diario') {
@@ -258,45 +329,68 @@ function actualizarResumenEstadistico(timeframe) {
         prevStartDate = new Date(startDate.getTime() - 86400000);
         prevEndDate = new Date(endDate.getTime() - 86400000);
 
-        // 6 Intervalos de 4 horas: 00-04h, 04-08h, 08-12h, 12-16h, 16-20h, 20-24h
+        // 6 Intervalos de 4 horas
         numBins = 6;
         binLabels = ['04h', '08h', '12h', '16h', '20h', '24h'];
+        binDetails = [
+            '00:00 a 04:00 hs',
+            '04:00 a 08:00 hs',
+            '08:00 a 12:00 hs',
+            '12:00 a 16:00 hs',
+            '16:00 a 20:00 hs',
+            '20:00 a 24:00 hs'
+        ];
 
     } else if (timeframe === 'semanal') {
         subtitleText = 'Comportamiento de los últimos 7 días';
         secLabelText = 'Deudas de la Semana';
 
-        // Últimos 7 días
+        numBins = 7;
+        binLabels = [];
+        binDetails = [];
+        const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+        startDate = new Date(startOfToday.getTime() - 6 * 86400000);
         endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-        startDate = new Date(endDate.getTime() - 7 * 86400000);
 
-        // Período previo: 7 días anteriores
         prevEndDate = new Date(startDate.getTime() - 1);
         prevStartDate = new Date(prevEndDate.getTime() - 7 * 86400000);
 
-        // 7 días
-        numBins = 7;
-        const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-        binLabels = [];
-        for (let i = 6; i >= 0; i--) {
-            const d = new Date(endDate.getTime() - i * 86400000);
-            binLabels.push(diasSemana[d.getDay()]);
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(startDate.getTime() + i * 86400000);
+            const diaTxt = diasSemana[d.getDay()];
+            const numTxt = String(d.getDate()).padStart(2, '0');
+            binLabels.push(`${diaTxt} ${numTxt}`);
+            binDetails.push(`${diaTxt} ${numTxt} de ${d.toLocaleDateString('es-AR', { month: 'short' })}`);
         }
 
     } else { // 'mensual' por defecto
         subtitleText = 'Comportamiento financiero del mes actual';
         secLabelText = 'Deudas del Mes';
 
+        const mesNombre = now.toLocaleDateString('es-AR', { month: 'short' });
+        const year = now.getFullYear();
+        const month = now.getMonth();
+        const diasEnMes = new Date(year, month + 1, 0).getDate();
+
         // Mes actual completo
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
-        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+        startDate = new Date(year, month, 1, 0, 0, 0, 0);
+        endDate = new Date(year, month, diasEnMes, 23, 59, 59, 999);
 
         // Mes anterior completo
-        prevStartDate = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
-        prevEndDate = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+        const diasEnMesPrev = new Date(year, month, 0).getDate();
+        prevStartDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+        prevEndDate = new Date(year, month - 1, diasEnMesPrev, 23, 59, 59, 999);
 
-        numBins = 5; // 5 semanas / segmentos del mes
+        numBins = 5;
         binLabels = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Fin'];
+        binDetails = [
+            `1 al 7 de ${mesNombre}`,
+            `8 al 14 de ${mesNombre}`,
+            `15 al 21 de ${mesNombre}`,
+            `22 al 28 de ${mesNombre}`,
+            `29 al ${diasEnMes} de ${mesNombre}`
+        ];
     }
 
     // Actualizar subtítulo descriptivo
@@ -361,28 +455,65 @@ function actualizarResumenEstadistico(timeframe) {
     }
 
     // 3. Generar distribución por bines para la curva Neón y las mini-barras
-    const binDuration = (endDate.getTime() - startDate.getTime()) / numBins;
     const binsCobros = new Array(numBins).fill(0);
     const binsDeudas = new Array(numBins).fill(0);
 
-    pagosPeriodo.forEach(p => {
-        const t = new Date(p.Creado).getTime();
-        const index = Math.min(numBins - 1, Math.max(0, Math.floor((t - startDate.getTime()) / binDuration)));
-        binsCobros[index] += (Number(p.Monto) || 0);
-    });
+    if (timeframe === 'mensual') {
+        pagosPeriodo.forEach(p => {
+            const day = new Date(p.Creado).getDate();
+            let idx = 0;
+            if (day <= 7) idx = 0;
+            else if (day <= 14) idx = 1;
+            else if (day <= 21) idx = 2;
+            else if (day <= 28) idx = 3;
+            else idx = 4;
+            binsCobros[idx] += (Number(p.Monto) || 0);
+        });
 
-    deudasPeriodo.forEach(d => {
-        const t = new Date(d.Creado).getTime();
-        const index = Math.min(numBins - 1, Math.max(0, Math.floor((t - startDate.getTime()) / binDuration)));
-        binsDeudas[index] += (Number(d.Monto) || 0);
-    });
+        deudasPeriodo.forEach(d => {
+            const day = new Date(d.Creado).getDate();
+            let idx = 0;
+            if (day <= 7) idx = 0;
+            else if (day <= 14) idx = 1;
+            else if (day <= 21) idx = 2;
+            else if (day <= 28) idx = 3;
+            else idx = 4;
+            binsDeudas[idx] += (Number(d.Monto) || 0);
+        });
+    } else if (timeframe === 'semanal') {
+        pagosPeriodo.forEach(p => {
+            const d = new Date(p.Creado);
+            const diffDays = Math.floor((d.getTime() - startDate.getTime()) / 86400000);
+            const idx = Math.min(6, Math.max(0, diffDays));
+            binsCobros[idx] += (Number(p.Monto) || 0);
+        });
+
+        deudasPeriodo.forEach(d => {
+            const f = new Date(d.Creado);
+            const diffDays = Math.floor((f.getTime() - startDate.getTime()) / 86400000);
+            const idx = Math.min(6, Math.max(0, diffDays));
+            binsDeudas[idx] += (Number(d.Monto) || 0);
+        });
+    } else { // 'diario'
+        pagosPeriodo.forEach(p => {
+            const hour = new Date(p.Creado).getHours();
+            const idx = Math.min(5, Math.floor(hour / 4));
+            binsCobros[idx] += (Number(p.Monto) || 0);
+        });
+
+        deudasPeriodo.forEach(d => {
+            const hour = new Date(d.Creado).getHours();
+            const idx = Math.min(5, Math.floor(hour / 4));
+            binsDeudas[idx] += (Number(d.Monto) || 0);
+        });
+    }
 
     // 4. Actualizar Mini Barras
     actualizarMiniBarras('metric_cobros_bars', binsCobros);
     actualizarMiniBarras('metric_secundaria_bars', binsDeudas);
 
-    // 5. Dibujar Curva Neón SVG Dinámica
-    dibujarCurvaNeonSvg(binsCobros, binLabels);
+    // 5. Dibujar Curva Neón SVG Dinámica & Dual
+    dibujarCurvaNeonSvg(binsCobros, binsDeudas, binLabels, binDetails);
 }
 
 function actualizarMiniBarras(containerId, values) {
@@ -402,6 +533,7 @@ function actualizarMiniBarras(containerId, values) {
 }
 
 let _ultimoChartData = null;
+let _chartPointsInfo = null;
 
 function initChartResizeListener() {
     if (window._chartResizeAttached) return;
@@ -410,26 +542,62 @@ function initChartResizeListener() {
         clearTimeout(window._chartResizeDebounce);
         window._chartResizeDebounce = setTimeout(() => {
             if (_ultimoChartData && typeof dibujarCurvaNeonSvg === 'function') {
-                dibujarCurvaNeonSvg(_ultimoChartData.values, _ultimoChartData.labels);
+                dibujarCurvaNeonSvg(
+                    _ultimoChartData.binsCobros,
+                    _ultimoChartData.binsDeudas,
+                    _ultimoChartData.binLabels,
+                    _ultimoChartData.binDetails
+                );
             }
         }, 120);
     });
 }
 
-function dibujarCurvaNeonSvg(values, labels) {
-    const glowPath = document.getElementById('chart_glow_path');
-    const areaPath = document.getElementById('chart_area_path');
-    const nodesGroup = document.getElementById('chart_nodes_group');
+function formatCompactCurrency(amount) {
+    const val = Number(amount) || 0;
+    if (val >= 1000000) {
+        return '$' + (val / 1000000).toLocaleString('es-AR', { maximumFractionDigits: 1 }) + 'M';
+    }
+    if (val >= 1000) {
+        return '$' + (val / 1000).toLocaleString('es-AR', { maximumFractionDigits: 1 }) + 'k';
+    }
+    return '$' + Math.round(val);
+}
+
+function buildSmoothBezierPath(pts) {
+    if (!pts || pts.length === 0) return '';
+    if (pts.length === 1) return `M ${pts[0].x},${pts[0].y}`;
+    let d = `M ${pts[0].x},${pts[0].y}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+        const p0 = pts[i];
+        const p1 = pts[i + 1];
+        const midX = (p0.x + p1.x) / 2;
+        d += ` C ${midX},${p0.y} ${midX},${p1.y} ${p1.x},${p1.y}`;
+    }
+    return d;
+}
+
+function dibujarCurvaNeonSvg(binsCobros, binsDeudas, binLabels, binDetails) {
+    const glowPathCobros = document.getElementById('chart_glow_path');
+    const areaPathCobros = document.getElementById('chart_area_path');
+    const glowPathDeudas = document.getElementById('chart_glow_deuda_path');
+    const areaPathDeudas = document.getElementById('chart_area_deuda_path');
+    const nodesGroupCobros = document.getElementById('chart_nodes_group');
+    const nodesGroupDeudas = document.getElementById('chart_nodes_deuda_group');
     const gridGroup = document.getElementById('chart_grid_group');
     const labelsGroup = document.getElementById('chart_labels_group');
+    const crosshairGroup = document.getElementById('chart_crosshair_group');
     const svgEl = document.getElementById('chart_svg');
 
-    if (!glowPath || !areaPath || !svgEl) return;
+    if (!glowPathCobros || !areaPathCobros || !svgEl) return;
 
-    // Cachear datos para redibujado instantáneo en redimensión
-    _ultimoChartData = { values, labels };
+    // Cachear datos
+    _ultimoChartData = { binsCobros, binsDeudas, binLabels, binDetails };
 
-    // Medir dimensiones físicas reales del SVG / contenedor en píxeles
+    // Limpiar crosshair activo al redibujar
+    if (crosshairGroup) crosshairGroup.innerHTML = '';
+
+    // Medir dimensiones físicas reales
     const rect = svgEl.getBoundingClientRect();
     const parent = svgEl.parentElement;
     const parentRect = parent ? parent.getBoundingClientRect() : null;
@@ -444,104 +612,162 @@ function dibujarCurvaNeonSvg(values, labels) {
         height = window.innerWidth >= 1024 ? 170 : 130;
     }
 
-    // ViewBox 1:1 con las dimensiones reales en pantalla (cero estiramiento o aplastamiento)
     svgEl.setAttribute('viewBox', `0 0 ${width} ${height}`);
     svgEl.removeAttribute('preserveAspectRatio');
 
-    const hasLabels = Array.isArray(labels) && labels.length > 0;
-    const padX = Math.min(36, Math.max(18, Math.round(width * 0.035)));
+    const hasLabels = Array.isArray(binLabels) && binLabels.length > 0;
+    const padX = Math.min(36, Math.max(18, Math.round(width * 0.04)));
     const padTop = Math.max(22, Math.round(height * 0.16));
     const padBottom = hasLabels 
-        ? Math.max(height - 30, Math.round(height * 0.78))
+        ? Math.max(height - 28, Math.round(height * 0.78))
         : Math.max(height - 18, Math.round(height * 0.85));
 
     const availableW = width - (padX * 2);
-    const numPoints = Math.max(values.length, 1);
+    const numPoints = Math.max(binsCobros.length, 1);
     const stepX = numPoints > 1 ? (availableW / (numPoints - 1)) : availableW;
 
-    const realMax = Math.max(...values, 0);
+    const maxCobro = Math.max(...binsCobros, 0);
+    const maxDeuda = Math.max(...binsDeudas, 0);
+    let realMax = Math.max(maxCobro, maxDeuda, 0);
+
+    const showCobros = state.chartSeries === 'comparativa' || state.chartSeries === 'cobros';
+    const showDeudas = state.chartSeries === 'comparativa' || state.chartSeries === 'deudas';
+
+    if (state.chartSeries === 'cobros') realMax = maxCobro;
+    if (state.chartSeries === 'deudas') realMax = maxDeuda;
+
     const hasData = realMax > 0;
 
-    // Líneas de guía tenues horizontales de fondo
+    // Líneas de guía horizontales con valores de escala monetaria
     if (gridGroup) {
-        const gridY1 = Math.round(padTop + (padBottom - padTop) * 0.33);
-        const gridY2 = Math.round(padTop + (padBottom - padTop) * 0.66);
+        const gridY1 = Math.round(padTop);
+        const gridY2 = Math.round((padTop + padBottom) / 2);
+        const topLabel = hasData ? formatCompactCurrency(realMax) : '$0';
+        const midLabel = hasData ? formatCompactCurrency(realMax / 2) : '';
+
         gridGroup.innerHTML = `
-            <line x1="${padX}" y1="${gridY1}" x2="${width - padX}" y2="${gridY1}" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="4,4" />
-            <line x1="${padX}" y1="${gridY2}" x2="${width - padX}" y2="${gridY2}" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="4,4" />
-            <line x1="${padX}" y1="${padBottom}" x2="${width - padX}" y2="${padBottom}" stroke="rgba(255,255,255,0.07)" stroke-width="1" />
+            <line x1="${padX}" y1="${gridY1}" x2="${width - padX}" y2="${gridY1}" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="3,3" />
+            <text x="${width - padX}" y="${gridY1 - 4}" text-anchor="end" fill="rgba(255,255,255,0.22)" font-size="9" font-family="monospace">${topLabel}</text>
+            <line x1="${padX}" y1="${gridY2}" x2="${width - padX}" y2="${gridY2}" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="3,3" />
+            ${midLabel ? `<text x="${width - padX}" y="${gridY2 - 4}" text-anchor="end" fill="rgba(255,255,255,0.22)" font-size="9" font-family="monospace">${midLabel}</text>` : ''}
+            <line x1="${padX}" y1="${padBottom}" x2="${width - padX}" y2="${padBottom}" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+            <text x="${width - padX}" y="${padBottom - 4}" text-anchor="end" fill="rgba(255,255,255,0.22)" font-size="9" font-family="monospace">$0</text>
         `;
     }
 
-    // Coordenadas calculadas proporcionales
-    const points = values.map((val, i) => {
+    // Coordenadas calculadas
+    const pointsCobros = binsCobros.map((val, i) => {
         const x = Math.round(padX + i * stepX);
-        let ratio = 0;
-        if (hasData) {
-            ratio = val / realMax;
-            ratio = Math.max(0.06, Math.min(0.94, ratio));
-        }
-        const y = hasData 
-            ? Math.round(padBottom - (ratio * (padBottom - padTop))) 
-            : padBottom;
-        return { x, y, val, label: (labels && labels[i]) ? labels[i] : '' };
+        let ratio = (hasData && realMax > 0) ? (val / realMax) : 0;
+        ratio = Math.max(0, Math.min(1, ratio));
+        const y = hasData ? Math.round(padBottom - (ratio * (padBottom - padTop))) : padBottom;
+        return { x, y, val, label: binLabels[i], detail: binDetails[i] };
     });
 
-    if (!hasData) {
-        // Línea base plana y sutil al pie sin relleno de área
-        const dFlat = `M ${points[0].x},${padBottom} L ${points[points.length - 1].x},${padBottom}`;
-        glowPath.setAttribute('d', dFlat);
-        glowPath.style.stroke = 'rgba(255,255,255,0.18)';
-        glowPath.style.strokeDasharray = '4,4';
-        areaPath.setAttribute('d', '');
+    const pointsDeudas = binsDeudas.map((val, i) => {
+        const x = Math.round(padX + i * stepX);
+        let ratio = (hasData && realMax > 0) ? (val / realMax) : 0;
+        ratio = Math.max(0, Math.min(1, ratio));
+        const y = hasData ? Math.round(padBottom - (ratio * (padBottom - padTop))) : padBottom;
+        return { x, y, val, label: binLabels[i], detail: binDetails[i] };
+    });
 
-        if (nodesGroup) {
-            nodesGroup.innerHTML = points.map(p => `
-                <circle cx="${p.x}" cy="${padBottom}" r="3" 
-                    fill="rgba(255,255,255,0.22)" 
-                    stroke="#0a0c0f" stroke-width="1.5" 
-                    title="${p.label ? p.label + ': ' : ''}$0.00"
-                    style="cursor: default;" />
-            `).join('');
+    // Guardar información para interacción de cursor / toque
+    _chartPointsInfo = {
+        pointsCobros,
+        pointsDeudas,
+        binsCobros,
+        binsDeudas,
+        binLabels,
+        binDetails,
+        padX,
+        padBottom,
+        stepX,
+        width,
+        height
+    };
+
+    // 1. RENDERIZAR SERIE DE DEUDAS (Coral Neón)
+    if (showDeudas && glowPathDeudas && areaPathDeudas) {
+        glowPathDeudas.style.opacity = '1';
+        areaPathDeudas.style.opacity = '1';
+
+        if (maxDeuda > 0) {
+            const dDeudas = buildSmoothBezierPath(pointsDeudas);
+            const areaDDeudas = `${dDeudas} L ${pointsDeudas[pointsDeudas.length - 1].x},${height} L ${pointsDeudas[0].x},${height} Z`;
+            glowPathDeudas.setAttribute('d', dDeudas);
+            glowPathDeudas.style.strokeDasharray = 'none';
+            areaPathDeudas.setAttribute('d', areaDDeudas);
+
+            if (nodesGroupDeudas) {
+                nodesGroupDeudas.innerHTML = pointsDeudas.map(p => {
+                    const isMax = p.val === maxDeuda && maxDeuda > 0;
+                    const r = isMax ? 5 : 3.5;
+                    const fill = isMax ? '#ffffff' : '#ff4d4f';
+                    return `
+                        <circle cx="${p.x}" cy="${p.y}" r="${r}" 
+                            fill="${fill}" 
+                            stroke="#0a0c0f" stroke-width="2" 
+                            style="cursor: pointer;" />
+                    `;
+                }).join('');
+            }
+        } else {
+            glowPathDeudas.setAttribute('d', `M ${pointsDeudas[0].x},${padBottom} L ${pointsDeudas[pointsDeudas.length - 1].x},${padBottom}`);
+            glowPathDeudas.style.strokeDasharray = '3,3';
+            glowPathDeudas.style.stroke = 'rgba(255, 77, 79, 0.3)';
+            areaPathDeudas.setAttribute('d', '');
+            if (nodesGroupDeudas) nodesGroupDeudas.innerHTML = '';
         }
-    } else {
-        // Generar línea suavizada Bézier (curva cúbica fluida) con datos reales
-        let d = `M ${points[0].x},${points[0].y}`;
-        for (let i = 0; i < points.length - 1; i++) {
-            const p0 = points[i];
-            const p1 = points[i + 1];
-            const midX = (p0.x + p1.x) / 2;
-            d += ` C ${midX},${p0.y} ${midX},${p1.y} ${p1.x},${p1.y}`;
-        }
-
-        const areaD = `${d} L ${points[points.length - 1].x},${height} L ${points[0].x},${height} Z`;
-
-        glowPath.setAttribute('d', d);
-        glowPath.style.stroke = '#ccff00';
-        glowPath.style.strokeDasharray = 'none';
-        areaPath.setAttribute('d', areaD);
-
-        // Crear nodos perfectamente circulares con drop-shadow neón
-        if (nodesGroup) {
-            nodesGroup.innerHTML = points.map((p, idx) => {
-                const isHighest = p.val === realMax && realMax > 0;
-                const r = isHighest ? 5.5 : (idx === points.length - 1 ? 5 : 4);
-                const fill = isHighest ? '#ffffff' : '#ccff00';
-                return `
-                    <circle cx="${p.x}" cy="${p.y}" r="${r}" 
-                        fill="${fill}" 
-                        stroke="#0a0c0f" stroke-width="2.5" 
-                        title="${p.label ? p.label + ': ' : ''}${formatCurrency(p.val)}"
-                        style="cursor: pointer; transition: transform 0.2s;" />
-                `;
-            }).join('');
-        }
+    } else if (glowPathDeudas && areaPathDeudas) {
+        glowPathDeudas.style.opacity = '0';
+        areaPathDeudas.style.opacity = '0';
+        if (nodesGroupDeudas) nodesGroupDeudas.innerHTML = '';
     }
 
-    // Etiquetas de períodos limpias al pie de cada nodo
+    // 2. RENDERIZAR SERIE DE COBROS (Volt Neón)
+    if (showCobros) {
+        glowPathCobros.style.opacity = '1';
+        areaPathCobros.style.opacity = '1';
+
+        if (maxCobro > 0) {
+            const dCobros = buildSmoothBezierPath(pointsCobros);
+            const areaDCobros = `${dCobros} L ${pointsCobros[pointsCobros.length - 1].x},${height} L ${pointsCobros[0].x},${height} Z`;
+            glowPathCobros.setAttribute('d', dCobros);
+            glowPathCobros.style.stroke = '#ccff00';
+            glowPathCobros.style.strokeDasharray = 'none';
+            areaPathCobros.setAttribute('d', areaDCobros);
+
+            if (nodesGroupCobros) {
+                nodesGroupCobros.innerHTML = pointsCobros.map(p => {
+                    const isMax = p.val === maxCobro && maxCobro > 0;
+                    const r = isMax ? 5.5 : 4;
+                    const fill = isMax ? '#ffffff' : '#ccff00';
+                    return `
+                        <circle cx="${p.x}" cy="${p.y}" r="${r}" 
+                            fill="${fill}" 
+                            stroke="#0a0c0f" stroke-width="2" 
+                            style="cursor: pointer;" />
+                    `;
+                }).join('');
+            }
+        } else {
+            glowPathCobros.setAttribute('d', `M ${pointsCobros[0].x},${padBottom} L ${pointsCobros[pointsCobros.length - 1].x},${padBottom}`);
+            glowPathCobros.style.strokeDasharray = '4,4';
+            glowPathCobros.style.stroke = 'rgba(255,255,255,0.18)';
+            areaPathCobros.setAttribute('d', '');
+            if (nodesGroupCobros) nodesGroupCobros.innerHTML = '';
+        }
+    } else {
+        glowPathCobros.style.opacity = '0';
+        areaPathCobros.style.opacity = '0';
+        if (nodesGroupCobros) nodesGroupCobros.innerHTML = '';
+    }
+
+    // 3. ETIQUETAS DE TIEMPO
     if (labelsGroup && hasLabels) {
         const textY = Math.min(height - 4, padBottom + 18);
-        labelsGroup.innerHTML = points.map(p => {
+        labelsGroup.innerHTML = pointsCobros.map(p => {
             if (!p.label) return '';
             return `
                 <text x="${p.x}" y="${textY}" 
@@ -556,6 +782,83 @@ function dibujarCurvaNeonSvg(values, labels) {
             `;
         }).join('');
     }
+}
+
+// -------------------------------------------------------------
+// Interacción Táctil y con Cursor (Crosshair + Tooltip Flotante)
+// -------------------------------------------------------------
+function initChartInteraction() {
+    const container = document.getElementById('chart_container_el') || document.querySelector('.chart-container');
+    const svg = document.getElementById('chart_svg');
+    const tooltip = document.getElementById('chart_tooltip');
+    if (!container || !svg) return;
+
+    const handlePointer = (e) => {
+        if (!_chartPointsInfo) return;
+        const crosshairGroup = document.getElementById('chart_crosshair_group');
+        const rect = svg.getBoundingClientRect();
+        if (rect.width <= 0) return;
+
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const relX = clientX - rect.left;
+
+        const svgW = _chartPointsInfo.width;
+        const svgScale = svgW / rect.width;
+        const xInSvg = relX * svgScale;
+
+        const { padX, stepX, pointsCobros, pointsDeudas, binDetails, binsCobros, binsDeudas } = _chartPointsInfo;
+        const num = pointsCobros.length;
+        let closestIdx = Math.round((xInSvg - padX) / stepX);
+        closestIdx = Math.max(0, Math.min(num - 1, closestIdx));
+
+        const pCobro = pointsCobros[closestIdx];
+        const pDeuda = pointsDeudas[closestIdx];
+
+        if (crosshairGroup) {
+            crosshairGroup.innerHTML = `
+                <line x1="${pCobro.x}" y1="8" x2="${pCobro.x}" y2="${_chartPointsInfo.padBottom}" 
+                    stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-dasharray="3,3" />
+                <circle cx="${pCobro.x}" cy="${pCobro.y}" r="6" fill="#ccff00" stroke="#0a0c0f" stroke-width="2.5" />
+                <circle cx="${pDeuda.x}" cy="${pDeuda.y}" r="6" fill="#ff4d4f" stroke="#0a0c0f" stroke-width="2.5" />
+            `;
+        }
+
+        if (tooltip) {
+            const titleEl = document.getElementById('chart_tooltip_title');
+            const cobrosEl = document.getElementById('chart_tooltip_cobros');
+            const deudasEl = document.getElementById('chart_tooltip_deudas');
+            const netEl = document.getElementById('chart_tooltip_net');
+
+            if (titleEl) titleEl.textContent = binDetails[closestIdx] || `Período ${closestIdx + 1}`;
+            if (cobrosEl) cobrosEl.textContent = formatCurrency(binsCobros[closestIdx]);
+            if (deudasEl) deudasEl.textContent = formatCurrency(binsDeudas[closestIdx]);
+
+            const net = binsCobros[closestIdx] - binsDeudas[closestIdx];
+            if (netEl) {
+                netEl.textContent = (net >= 0 ? '+ ' : '') + formatCurrency(net);
+                netEl.className = net >= 0 ? 'positive' : 'negative';
+            }
+
+            tooltip.classList.add('visible');
+
+            const containerRect = container.getBoundingClientRect();
+            const pixelX = (pCobro.x / svgScale);
+            const clampedX = Math.max(85, Math.min(containerRect.width - 85, pixelX));
+            tooltip.style.left = `${clampedX}px`;
+        }
+    };
+
+    const handleLeave = () => {
+        const crosshairGroup = document.getElementById('chart_crosshair_group');
+        if (crosshairGroup) crosshairGroup.innerHTML = '';
+        if (tooltip) tooltip.classList.remove('visible');
+    };
+
+    svg.addEventListener('pointermove', handlePointer);
+    svg.addEventListener('pointerdown', handlePointer);
+    svg.addEventListener('pointerleave', handleLeave);
+    svg.addEventListener('touchend', () => setTimeout(handleLeave, 2500));
 }
 
 // -------------------------------------------------------------
